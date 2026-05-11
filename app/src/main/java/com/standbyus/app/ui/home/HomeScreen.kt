@@ -3,7 +3,6 @@ package com.standbyus.app.ui.home
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,7 +20,6 @@ import com.standbyus.app.ui.theme.Orange
 @Composable
 fun HomeScreen(
     onNavigateToPost: () -> Unit,
-    onNavigateToHistory: () -> Unit,
     onNavigateToSettings: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -33,35 +31,14 @@ fun HomeScreen(
             TopAppBar(
                 title = { Text("StandBy Us", fontWeight = FontWeight.Bold) },
                 actions = {
-                    IconButton(onClick = onNavigateToHistory) {
-                        Icon(Icons.Default.History, contentDescription = "历史")
-                    }
                     IconButton(onClick = onNavigateToSettings) {
-                        Icon(Icons.Default.Settings, contentDescription = "设置")
+                        Icon(Icons.Filled.Settings, contentDescription = "设置")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent
                 )
             )
-        },
-        bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface
-            ) {
-                NavigationBarItem(
-                    selected = true,
-                    onClick = {},
-                    icon = { Text("🏠", fontSize = 20.sp) },
-                    label = { Text("首页") }
-                )
-                NavigationBarItem(
-                    selected = false,
-                    onClick = onNavigateToHistory,
-                    icon = { Text("📜", fontSize = 20.sp) },
-                    label = { Text("历史") }
-                )
-            }
         }
     ) { padding ->
         Column(
@@ -73,7 +50,6 @@ fun HomeScreen(
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Partner status card
             StatusCard(
                 status = partnerStatus,
                 userName = "她",
@@ -82,7 +58,6 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // My status bar
             Surface(
                 onClick = onNavigateToPost,
                 shape = RoundedCornerShape(16.dp),
@@ -104,7 +79,6 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Share button
             Button(
                 onClick = onNavigateToPost,
                 modifier = Modifier

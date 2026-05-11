@@ -60,4 +60,5 @@ dependencies {
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)
     implementation(libs.coroutines.android)
+    implementation(libs.coil)
 }

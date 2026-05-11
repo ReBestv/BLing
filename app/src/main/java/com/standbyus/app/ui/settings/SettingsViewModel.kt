@@ -14,6 +14,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.standbyus.app.ui.theme.EmojiTheme
+import com.standbyus.app.ui.theme.EmojiThemeManager
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,6 +36,11 @@ class SettingsViewModel @Inject constructor(
 
     private val _isPaired = MutableStateFlow(false)
     val isPaired: StateFlow<Boolean> = _isPaired.asStateFlow()
+
+    private val _currentTheme = MutableStateFlow(EmojiThemeManager.getCurrentTheme(context))
+    val currentTheme: StateFlow<EmojiTheme> = _currentTheme.asStateFlow()
+
+    val availableThemes = EmojiThemeManager.themes
 
     private val _justPaired = MutableStateFlow(false)
     val justPaired: StateFlow<Boolean> = _justPaired.asStateFlow()
@@ -156,6 +163,11 @@ class SettingsViewModel @Inject constructor(
             _joinCodeInput.value = ""
             _status.value = "已解除配对"
         }
+    }
+
+    fun selectTheme(themeId: String) {
+        EmojiThemeManager.setCurrentTheme(context, themeId)
+        _currentTheme.value = EmojiThemeManager.getCurrentTheme(context)
     }
 
     fun dismissPairCelebration() {

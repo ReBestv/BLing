@@ -4,9 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -50,40 +48,26 @@ fun PostStatusScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .padding(horizontal = 20.dp)
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                    .padding(horizontal = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Feeling picker
+                // 心情选择（上下翻页）
                 FeelingPicker(
                     selectedFeeling = viewModel.selectedFeeling,
-                    onFeelingSelected = { viewModel.selectFeeling(it) }
+                    onFeelingSelected = { viewModel.selectFeeling(it) },
+                    modifier = Modifier.weight(1f)
                 )
 
-                // Doing picker
+                // 自定义状态（可选）
                 DoingPicker(
-                    selectedDoing = viewModel.selectedDoing,
-                    onDoingSelected = { viewModel.selectDoing(it) },
+                    selectedFeeling = viewModel.selectedFeeling,
                     customDoing = viewModel.customDoing,
                     onCustomDoingChanged = { viewModel.updateCustomDoing(it) }
                 )
 
-                // Note
-                Column {
-                    Text("补充说明（可选）", fontSize = 16.sp)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = viewModel.note,
-                        onValueChange = { viewModel.updateNote(it) },
-                        placeholder = { Text("今天发生了什么？") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(120.dp),
-                        shape = RoundedCornerShape(16.dp)
-                    )
-                }
+                Spacer(modifier = Modifier.height(16.dp))
 
                 // Error message
                 if (viewModel.error.isNotEmpty()) {
@@ -121,7 +105,7 @@ fun PostStatusScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

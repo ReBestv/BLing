@@ -9,6 +9,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.IOException
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +38,36 @@ class SupabaseService @Inject constructor() {
         .build()
 
     private val jsonType = "application/json".toMediaType()
+
+    // 文件上传用（不同 Content-Type）
+    private val uploadClient = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
+        .addInterceptor { chain ->
+            val request = chain.request().newBuilder()
+                .addHeader("apikey", SupabaseConfig.ANON_KEY)
+                .addHeader("Authorization", "Bearer ${SupabaseConfig.ANON_KEY}")
+                .build()
+            chain.proceed(request)
+        }
+        .build()
+
+    /** 上传文件到 Storage，返回公开 URL */
+    suspend fun uploadFile(bucket: String, path: String, fileBytes: ByteArray, mimeType: String): String = withContext(Dispatchers.IO) {
+        val mediaType = mimeType.toMediaTypeOrNull()
+        val body = fileBytes.toRequestBody(mediaType)
+        val request = Request.Builder()
+            .url("${SupabaseConfig.SUPABASE_URL}/storage/v1/object/$bucket/$path")
+            .post(body)
+            .build()
+        val response = uploadClient.newCall(request).execute()
+        val bodyStr = response.body?.string() ?: throw IOException("上传空响应")
+        if (!response.isSuccessful) {
+            throw IOException("上传失败 (${response.code}): $bodyStr")
+        }
+        "${SupabaseConfig.SUPABASE_URL}/storage/v1/object/public/$bucket/$path"
+    }
 
     /** 获取/生成本地设备 ID */
     fun getDeviceId(context: Context): String {
@@ -74,8 +105,21 @@ class SupabaseService @Inject constructor() {
         executeAndParse(request)
     }
 
+    /** 删除 Storage 文件 */
+    suspend fun deleteFile(bucket: String, path: String) = withContext(Dispatchers.IO) {
+        val request = Request.Builder()
+            .url("${SupabaseConfig.SUPABASE_URL}/storage/v1/object/$bucket/$path")
+            .delete()
+            .build()
+        val response = uploadClient.newCall(request).execute()
+        if (!response.isSuccessful && response.code != 404) {
+            val bodyStr = response.body?.string() ?: ""
+            throw IOException("删除文件失败 (${response.code}): $bodyStr")
+        }
+    }
+
     /** 删除记录 */
-    suspend fun delete(table: String, query: String) {
+    suspend fun delete(table: String, query: String) = withContext(Dispatchers.IO) {
         val request = Request.Builder()
             .url("${SupabaseConfig.REST_URL}$table?$query")
             .delete()
