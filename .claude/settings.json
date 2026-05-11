@@ -1,0 +1,8 @@
+{
+  "enabledPlugins": {
+    "ui-ux-pro-max@local": true
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits"
+  }
+}
