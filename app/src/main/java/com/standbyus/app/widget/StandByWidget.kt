@@ -12,19 +12,20 @@ import androidx.glance.layout.*
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import androidx.compose.ui.graphics.Color
 import com.standbyus.app.data.model.UserStatus
 
 class StandByWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        provideContent {
-            val status = loadCachedStatus(context)
-            val bgColor = try {
-                ColorProvider(android.graphics.Color.parseColor(status?.feelingColor ?: "#FFD93D"))
-            } catch (e: Exception) {
-                ColorProvider(android.graphics.Color.parseColor("#FFD93D"))
-            }
+        val status = loadCachedStatus(context)
+        val bgColor = try {
+            ColorProvider(Color(android.graphics.Color.parseColor(status?.feelingColor ?: "#FFD93D")))
+        } catch (e: Exception) {
+            ColorProvider(Color(android.graphics.Color.parseColor("#FFD93D")))
+        }
 
+        provideContent {
             Column(
                 modifier = GlanceModifier
                     .fillMaxSize()
@@ -44,13 +45,13 @@ class StandByWidget : GlanceAppWidget() {
                 if (doingText.isNotEmpty()) {
                     Text(
                         text = doingText,
-                        style = TextStyle(fontSize = 14.sp, color = ColorProvider(android.graphics.Color.DKGRAY))
+                        style = TextStyle(fontSize = 14.sp, color = ColorProvider(Color.DarkGray))
                     )
                 }
                 if (!status?.note.isNullOrEmpty()) {
                     Text(
                         text = status!!.note,
-                        style = TextStyle(fontSize = 12.sp, color = ColorProvider(android.graphics.Color.GRAY))
+                        style = TextStyle(fontSize = 12.sp, color = ColorProvider(Color.Gray))
                     )
                 }
             }

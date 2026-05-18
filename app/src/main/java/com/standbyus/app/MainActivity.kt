@@ -5,20 +5,27 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -29,17 +36,27 @@ import com.standbyus.app.ui.album.AlbumScreen
 import com.standbyus.app.ui.celebration.CelebrationConfig
 import com.standbyus.app.ui.celebration.CelebrationDay
 import com.standbyus.app.ui.celebration.CelebrationOverlay
+import com.standbyus.app.ui.checkin.CheckinScreen
 import com.standbyus.app.ui.history.HistoryScreen
 import com.standbyus.app.ui.home.HomeScreen
 import com.standbyus.app.ui.poststatus.PostStatusScreen
 import com.standbyus.app.ui.settings.SettingsScreen
+import com.standbyus.app.ui.theme.Border
+import com.standbyus.app.ui.theme.Primary
 import com.standbyus.app.ui.theme.StandByUsTheme
+import com.standbyus.app.ui.theme.Surface
+import com.standbyus.app.ui.theme.TextSecondary
+import com.standbyus.app.ui.theme.NavIcons
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private data class BottomNavItem(val route: String, val icon: ImageVector, val label: String)
+private data class BottomNavItem(
+    val route: String,
+    val icon: ImageVector,
+    val label: String
+)
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -59,45 +76,29 @@ class MainActivity : ComponentActivity() {
                     val navBackStackEntry by navController.currentBackStackEntryAsState()
                     val currentRoute = navBackStackEntry?.destination?.route
 
-                    val items = listOf(
-                        BottomNavItem(Routes.HOME, Icons.Filled.Home, "首页"),
-                        BottomNavItem(Routes.ALBUM, Icons.Filled.PhotoLibrary, "我们的故事"),
-                        BottomNavItem(Routes.HISTORY, Icons.Filled.History, "历史"),
-                        BottomNavItem(Routes.SETTINGS, Icons.Filled.Settings, "设置")
+                    val navItems = listOf(
+                        BottomNavItem(Routes.HOME, NavIcons.Home, "首页"),
+                        BottomNavItem(Routes.CHECKIN, NavIcons.Checkin, "打卡"),
+                        BottomNavItem(Routes.ALBUM, NavIcons.Album, "相册"),
+                        BottomNavItem(Routes.HISTORY, NavIcons.Timeline, "时光轴")
                     )
 
                     Scaffold(
                         bottomBar = {
-                            if (currentRoute in items.map { it.route }) {
-                                NavigationBar(
-                                    containerColor = MaterialTheme.colorScheme.surface
-                                ) {
-                                    items.forEach { item ->
-                                        val selected = navBackStackEntry?.destination?.hierarchy?.any {
-                                            it.route == item.route
-                                        } == true
-                                        NavigationBarItem(
-                                            selected = selected,
-                                            onClick = {
-                                                navController.navigate(item.route) {
-                                                    popUpTo(navController.graph.findStartDestination().id) {
-                                                        saveState = true
-                                                    }
-                                                    launchSingleTop = true
-                                                    restoreState = true
-                                                }
-                                            },
-                                            icon = {
-                                                Icon(
-                                                    item.icon,
-                                                    contentDescription = item.label,
-                                                    modifier = Modifier.size(24.dp)
-                                                )
-                                            },
-                                            label = { Text(item.label) }
-                                        )
+                            if (currentRoute in navItems.map { it.route }) {
+                                BottomNavBar(
+                                    items = navItems,
+                                    currentRoute = currentRoute,
+                                    onItemSelected = { item ->
+                                        navController.navigate(item.route) {
+                                            popUpTo(navController.graph.findStartDestination().id) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
                                     }
-                                }
+                                )
                             }
                         }
                     ) { padding ->
@@ -110,6 +111,11 @@ class MainActivity : ComponentActivity() {
                                 HomeScreen(
                                     onNavigateToPost = { navController.navigate(Routes.POST_STATUS) },
                                     onNavigateToSettings = { navController.navigate(Routes.SETTINGS) }
+                                )
+                            }
+                            composable(Routes.CHECKIN) {
+                                CheckinScreen(
+                                    onBack = { navController.popBackStack() }
                                 )
                             }
                             composable(Routes.ALBUM) {
@@ -167,3 +173,51 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@Composable
+private fun BottomNavBar(
+    items: List<BottomNavItem>,
+    currentRoute: String?,
+    onItemSelected: (BottomNavItem) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Surface)
+            .drawBehind {
+                drawLine(
+                    color = Border,
+                    start = Offset(0f, 0f),
+                    end = Offset(size.width, 0f),
+                    strokeWidth = 1.dp.toPx()
+                )
+            }
+            .padding(top = 8.dp, bottom = 16.dp),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        items.forEach { item ->
+            val selected = currentRoute == item.route
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable { onItemSelected(item) },
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = item.icon,
+                    contentDescription = item.label,
+                    tint = if (selected) Primary else TextSecondary,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = item.label,
+                    color = if (selected) Primary else TextSecondary,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+    }
+}

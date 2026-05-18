@@ -16,6 +16,14 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+private fun androidx.compose.ui.graphics.Color.toHex(): String {
+    val a = (alpha * 255).toInt()
+    val r = (red * 255).toInt()
+    val g = (green * 255).toInt()
+    val b = (blue * 255).toInt()
+    return "#${a.toString(16).padStart(2, '0')}${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}"
+}
+
 @HiltViewModel
 class PostStatusViewModel @Inject constructor(
     private val statusRepository: StatusRepository,
@@ -46,10 +54,10 @@ class PostStatusViewModel @Inject constructor(
 
             val status = UserStatus(
                 userId = userId,
-                doing = customDoing.ifEmpty { "发呆" },
+                doing = customDoing,
                 customDoing = customDoing,
                 feeling = selectedFeeling.displayName,
-                feelingColor = selectedFeeling.color.toString(),
+                feelingColor = selectedFeeling.color.toHex(),
                 feelingEmoji = EmojiThemeManager.getEmoji(context, selectedFeeling.displayName),
                 note = ""
             )

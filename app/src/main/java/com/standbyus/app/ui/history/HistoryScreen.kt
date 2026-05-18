@@ -1,6 +1,8 @@
 package com.standbyus.app.ui.history
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,18 +15,34 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.standbyus.app.data.model.Feeling
 import com.standbyus.app.data.model.UserStatus
+import com.standbyus.app.ui.components.AppHeader
 import java.text.SimpleDateFormat
 import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class)
+import androidx.compose.ui.graphics.graphicsLayer
+
+// ——— Design tokens ———
+private val TimelineOutline = Color(0xFFF0EAE6)
+private val TimelineDotBorder = Color(0xFFFFFFFF)
+private val TextSecondary = Color(0xFF9E8E86)
+private val FgColor = Color(0xFF5A4A42)
+private val BgColor = Color(0xFFFFF8F5)
+private val CardBg = Color(0xFFFFFFFF)
+
+private val TimelineColumnWidth = 56.dp
+private val LineX = 39.dp
+private val DotSize = 40.dp
+private val LineWidth = 2.dp
+
 @Composable
 fun HistoryScreen(
     onBack: () -> Unit,
@@ -32,8 +50,8 @@ fun HistoryScreen(
 ) {
     val history by viewModel.statusHistory.collectAsState()
     val loading by viewModel.loading.collectAsState()
+    val myId by viewModel.myId.collectAsState()
 
-    // 按日期分组
     val groupedHistory = remember(history) {
         history.groupBy { status ->
             val cal = Calendar.getInstance().apply { timeInMillis = status.updatedAt }
@@ -41,26 +59,27 @@ fun HistoryScreen(
         }.entries.sortedByDescending { it.key }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("时光轴") },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { viewModel.refresh() }) {
-                        Icon(Icons.Filled.Refresh, contentDescription = "刷新")
-                    }
-                }
-            )
-        }
-    ) { padding ->
+    Column(modifier = Modifier.fillMaxSize().background(BgColor)) {
+        // ——— Custom App Bar ———
+        AppHeader(
+            title = "时光轴",
+            onBack = onBack,
+            rightIcon = {
+                Icon(
+                    imageVector = Icons.Filled.Refresh,
+                    contentDescription = "刷新",
+                    tint = Color(0xFF9E8E86),
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable { viewModel.refresh() }
+                )
+            }
+        )
+
         if (history.isEmpty() && !loading) {
+            // ——— Empty state ———
             Box(
-                modifier = Modifier.fillMaxSize().padding(padding),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -69,133 +88,210 @@ fun HistoryScreen(
                     Text(
                         "还没有状态记录",
                         fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        fontWeight = FontWeight.Medium,
+                        color = TextSecondary
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         "分享你的第一个瞬间吧",
                         fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        color = TextSecondary.copy(alpha = 0.7f)
                     )
                 }
             }
         } else {
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(0.dp)
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 24.dp)
             ) {
                 if (loading && history.isNotEmpty()) {
                     item {
                         LinearProgressIndicator(
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
                         )
                     }
                 }
 
                 groupedHistory.forEach { (dateKey, statuses) ->
-                    item {
-                        DateHeader(dateKey)
-                    }
+                    item { DateHeader(dateKey) }
                     items(statuses) { status ->
-                        HistoryItem(status = status)
+                        TimelineEntry(status = status, isMe = status.userId == myId)
                     }
                 }
-
-                item { Spacer(modifier = Modifier.height(16.dp)) }
             }
         }
     }
 }
 
+// ================================================================
+// Date Header
+// ================================================================
 @Composable
 private fun DateHeader(dateKey: String) {
     val parts = dateKey.split("-")
-    val cal = Calendar.getInstance()
     val todayCal = Calendar.getInstance()
 
     val label = if (parts.size == 3) {
         val dateCal = Calendar.getInstance().apply {
             set(parts[0].toInt(), parts[1].toInt(), parts[2].toInt())
         }
-        val daysDiff = ((todayCal.timeInMillis - dateCal.timeInMillis) / (1000 * 60 * 60 * 24)).toInt()
+        val daysDiff =
+            ((todayCal.timeInMillis - dateCal.timeInMillis) / (1000 * 60 * 60 * 24)).toInt()
         when {
             daysDiff == 0 -> "今天"
             daysDiff == 1 -> "昨天"
             daysDiff <= 7 -> "${daysDiff}天前"
-            else -> {
-                val fmt = SimpleDateFormat("M月d日", Locale.CHINESE)
-                fmt.format(Date(dateCal.timeInMillis))
-            }
+            else -> SimpleDateFormat("M月d日", Locale.CHINESE).format(Date(dateCal.timeInMillis))
         }
     } else dateKey
 
     Text(
-        text = label,
-        fontSize = 13.sp,
-        fontWeight = FontWeight.SemiBold,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+        text = label.uppercase(),
+        fontSize = 14.sp,
+        fontWeight = FontWeight(700),
+        color = TextSecondary,
+        letterSpacing = 1.sp,
+        modifier = Modifier.padding(start = 32.dp, top = 20.dp, bottom = 12.dp)
     )
 }
 
+// ================================================================
+// Timeline Entry — dot + line + content card
+// ================================================================
 @Composable
-private fun HistoryItem(status: UserStatus) {
-    val feeling = Feeling.fromDisplayName(status.feeling) ?: Feeling.HAPPY
-    val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
-    val timeStr = sdf.format(Date(status.updatedAt))
+private fun TimelineEntry(status: UserStatus, isMe: Boolean) {
+    val feeling = Feeling.fromDisplayName(status.feeling)
+    val feelingColor = feeling?.color ?: Color(0xFFFFD180)
+    val emoji = feeling?.emoji ?: status.feelingEmoji
+    val moodName = feeling?.displayName ?: status.feeling
+    val activityText = status.customDoing.ifEmpty { status.doing }.ifEmpty { status.feeling }
+    val formattedTime = SimpleDateFormat("HH:mm", Locale.getDefault())
+        .format(Date(status.updatedAt))
 
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = feeling.color.copy(alpha = 0.12f),
+    // Use parity of timestamp for hand-diary style rotation (+1 or -1)
+    val rotationDeg = if ((status.updatedAt % 2).toInt() == 0) 1f else -1f
+
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        tonalElevation = 0.dp
+            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .graphicsLayer { rotationZ = rotationDeg },
+        horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start
     ) {
-        Row(
-            modifier = Modifier.padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // 左侧：时间
-            Text(
-                text = timeStr,
-                fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.width(44.dp)
-            )
-
-            // 中间：Emoji 圆点
+        if (!isMe) {
+            // ——— Other person's dot (Left) ———
             Box(
                 modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(feeling.color),
+                    .padding(top = 4.dp, end = 12.dp)
+                    .size(DotSize) // 40.dp
+                    .shadow(
+                        6.dp,
+                        CircleShape,
+                        ambientColor = TimelineDotBorder.copy(alpha = 0.35f),
+                        spotColor = TimelineDotBorder.copy(alpha = 0.35f)
+                    )
+                    .border(2.dp, TimelineDotBorder, CircleShape)
+                    .padding(2.dp)
+                    .background(feelingColor, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Text(feeling.emoji, fontSize = 18.sp)
+                Text(text = emoji, fontSize = 24.sp)
             }
+        }
 
-            Spacer(modifier = Modifier.width(12.dp))
+        // ——— Content card ———
+        Card(
+            modifier = Modifier
+                .width(260.dp) // Constrain width based on content, acting like a message bubble
+                .shadow(
+                    elevation = 16.dp,
+                    shape = RoundedCornerShape(16.dp),
+                    ambientColor = Color(0x1F5A4A42),
+                    spotColor = Color(0x1F5A4A42)
+                ),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = CardBg),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 16.dp)
+            ) {
+                // Header row: emoji + mood name + time
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .background(feelingColor.copy(alpha = 0.2f), shape = RoundedCornerShape(8.dp))
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(text = emoji, fontSize = 16.sp)
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = moodName,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = feelingColor
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = if (isMe) "我" else "她",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = FgColor
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = formattedTime,
+                        fontSize = 12.sp,
+                        color = TextSecondary
+                    )
+                }
 
-            // 右侧内容
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "${feeling.displayName} · ${status.customDoing.ifEmpty { status.doing }}",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                // Activity text
+                if (activityText.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = activityText,
+                        fontSize = 14.sp,
+                        color = TextSecondary
+                    )
+                }
+
+                // Optional note
                 if (status.note.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = status.note,
                         fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 2
+                        color = TextSecondary.copy(alpha = 0.8f),
+                        fontStyle = FontStyle.Italic
                     )
                 }
+            }
+        }
+
+        if (isMe) {
+            // ——— My dot (Right) ———
+            Box(
+                modifier = Modifier
+                    .padding(top = 4.dp, start = 12.dp)
+                    .size(DotSize) // 40.dp
+                    .shadow(
+                        6.dp,
+                        CircleShape,
+                        ambientColor = TimelineDotBorder.copy(alpha = 0.35f),
+                        spotColor = TimelineDotBorder.copy(alpha = 0.35f)
+                    )
+                    .border(2.dp, TimelineDotBorder, CircleShape)
+                    .padding(2.dp)
+                    .background(feelingColor, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = emoji, fontSize = 24.sp)
             }
         }
     }

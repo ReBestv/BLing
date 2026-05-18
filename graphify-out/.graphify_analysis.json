@@ -1,0 +1,573 @@
+{
+  "communities": {
+    "0": [
+      "album_albumscreen_albumscreen",
+      "album_albumscreen_photocard",
+      "app_mainactivity_bottomnavitem",
+      "app_mainactivity_mainactivity",
+      "app_mainactivity_mainactivity_checkcelebrationday",
+      "app_mainactivity_mainactivity_oncreate",
+      "app_src_main_java_com_standbyus_app_mainactivity_kt",
+      "app_src_main_java_com_standbyus_app_ui_album_albumscreen_kt",
+      "app_src_main_java_com_standbyus_app_ui_celebration_celebrationday_kt",
+      "app_src_main_java_com_standbyus_app_ui_celebration_celebrationoverlay_kt",
+      "app_src_main_java_com_standbyus_app_ui_components_statuscard_kt",
+      "app_src_main_java_com_standbyus_app_ui_history_historyscreen_kt",
+      "app_src_main_java_com_standbyus_app_ui_home_homescreen_kt",
+      "app_src_main_java_com_standbyus_app_ui_settings_settingsscreen_kt",
+      "app_src_main_java_com_standbyus_app_ui_theme_theme_kt",
+      "celebration_celebrationday_celebrationday",
+      "celebration_celebrationoverlay_celebrationoverlay",
+      "celebration_celebrationoverlay_particle",
+      "components_statuscard_statuscard",
+      "history_historyscreen_dateheader",
+      "history_historyscreen_historyitem",
+      "history_historyscreen_historyscreen",
+      "home_homescreen_homescreen",
+      "settings_settingsscreen_settingsscreen",
+      "theme_theme_standbyustheme"
+    ],
+    "1": [
+      "custom_doing",
+      "feature_celebration",
+      "feature_history",
+      "feature_home",
+      "feature_post_status",
+      "feature_settings",
+      "icon_motion",
+      "icon_post",
+      "icon_ruler",
+      "icon_send",
+      "icon_settings",
+      "icon_signal",
+      "icon_sparkle",
+      "icon_sun",
+      "icon_timeline",
+      "icon_trash",
+      "newui_design_system",
+      "newui_icons_dir",
+      "pairing_feature",
+      "status_polling"
+    ],
+    "2": [
+      "albumscreen",
+      "albumviewmodel",
+      "avatarwithglow",
+      "celebrationconfig",
+      "celebrationday",
+      "celebrationoverlay",
+      "device_uuid_identity",
+      "doingpicker",
+      "feeling_enum",
+      "feelingpicker",
+      "historyscreen",
+      "historyviewmodel",
+      "homescreen",
+      "homeviewmodel",
+      "polling_based_sync",
+      "settingsscreen",
+      "settingsviewmodel",
+      "statuscard"
+    ],
+    "3": [
+      "AlbumPhoto_AlbumPhoto",
+      "AlbumRepository_AlbumRepository",
+      "AppDatabase_AppDatabase",
+      "AppModule_AppModule",
+      "PairingInfo_PairingInfo",
+      "PairingRepository_PairingRepository",
+      "StandByApplication_StandByApplication",
+      "StatusDao_StatusDao",
+      "StatusEntity_StatusEntity",
+      "StatusEntity_user_status_conversion",
+      "StatusRepository_StatusRepository",
+      "StatusRepository_widget_cache",
+      "StickerManager_StickerManager",
+      "SupabaseConfig_SupabaseConfig",
+      "SupabaseService_SupabaseService",
+      "SupabaseService_device_id",
+      "UserStatus_UserStatus"
+    ],
+    "4": [
+      "color_coralpalette",
+      "color_darkmode",
+      "color_functional",
+      "color_legacyaliases",
+      "color_warmneutrals",
+      "drawable_launcherbackground",
+      "drawable_launcherforeground",
+      "mipmap_hdpilauncher",
+      "mipmap_hdpilauncherround",
+      "mipmap_launcher",
+      "theme_darkcolorscheme",
+      "theme_lightcolorscheme",
+      "theme_standbyustheme",
+      "type_standbytypography"
+    ],
+    "5": [
+      "agents_archdoc",
+      "agents_deviceidentity",
+      "agents_roomcache",
+      "gradle_properties",
+      "graph_report",
+      "manifest_androidmanifest",
+      "readme_project",
+      "readme_techstack",
+      "userstatus_model",
+      "versions_libs",
+      "widget_standbywidget",
+      "widget_standbywidgetreceiver",
+      "widget_widgetcache",
+      "xml_widgetinfo"
+    ],
+    "6": [
+      "app_src_main_java_com_standbyus_app_data_repository_statusrepository_kt",
+      "app_src_main_java_com_standbyus_app_standbyapplication_kt",
+      "app_src_main_java_com_standbyus_app_widget_standbywidget_kt",
+      "app_standbyapplication_standbyapplication",
+      "app_standbyapplication_standbyapplication_oncreate",
+      "repository_statusrepository_statusrepository",
+      "repository_statusrepository_statusrepository_getcachedstatus",
+      "repository_statusrepository_statusrepository_observestatus",
+      "repository_statusrepository_statusrepository_updatestatus",
+      "repository_statusrepository_statusrepository_updatewidgetcache",
+      "widget_standbywidget_standbywidget",
+      "widget_standbywidget_standbywidget_loadcachedstatus",
+      "widget_standbywidget_standbywidget_provideglance"
+    ],
+    "7": [
+      "app_src_main_java_com_standbyus_app_data_local_statusentity_kt",
+      "app_src_main_java_com_standbyus_app_data_model_userstatus_kt",
+      "app_src_main_java_com_standbyus_app_ui_poststatus_poststatusviewmodel_kt",
+      "local_statusentity_statusentity",
+      "local_statusentity_toentity",
+      "local_statusentity_touserstatus",
+      "model_userstatus_frommap",
+      "model_userstatus_userstatus",
+      "model_userstatus_userstatus_tomap",
+      "poststatus_poststatusviewmodel_poststatusviewmodel",
+      "poststatus_poststatusviewmodel_poststatusviewmodel_publish",
+      "poststatus_poststatusviewmodel_poststatusviewmodel_selectfeeling",
+      "poststatus_poststatusviewmodel_poststatusviewmodel_updatecustomdoing"
+    ],
+    "8": [
+      "app_src_main_java_com_standbyus_app_data_remote_supabaseservice_kt",
+      "remote_supabaseservice_supabaseservice",
+      "remote_supabaseservice_supabaseservice_create",
+      "remote_supabaseservice_supabaseservice_delete",
+      "remote_supabaseservice_supabaseservice_deletefile",
+      "remote_supabaseservice_supabaseservice_executeandparse",
+      "remote_supabaseservice_supabaseservice_getcacheddeviceid",
+      "remote_supabaseservice_supabaseservice_getdeviceid",
+      "remote_supabaseservice_supabaseservice_parsejsonarray",
+      "remote_supabaseservice_supabaseservice_parsevalue",
+      "remote_supabaseservice_supabaseservice_query",
+      "remote_supabaseservice_supabaseservice_update",
+      "remote_supabaseservice_supabaseservice_uploadfile"
+    ],
+    "9": [
+      "app_src_main_java_com_standbyus_app_ui_settings_settingsviewmodel_kt",
+      "settings_settingsviewmodel_settingsviewmodel",
+      "settings_settingsviewmodel_settingsviewmodel_cacheall",
+      "settings_settingsviewmodel_settingsviewmodel_checkexistingpair",
+      "settings_settingsviewmodel_settingsviewmodel_createcode",
+      "settings_settingsviewmodel_settingsviewmodel_dismisspaircelebration",
+      "settings_settingsviewmodel_settingsviewmodel_joinpair",
+      "settings_settingsviewmodel_settingsviewmodel_pollpairingcomplete",
+      "settings_settingsviewmodel_settingsviewmodel_selecttheme",
+      "settings_settingsviewmodel_settingsviewmodel_unpair",
+      "settings_settingsviewmodel_settingsviewmodel_updatejoincode"
+    ],
+    "10": [
+      "app_src_main_java_com_standbyus_app_ui_theme_standbyustokens_kt",
+      "theme_standbyustokens_emojitheme",
+      "theme_standbyustokens_moodcolor",
+      "theme_standbyustokens_standbyusdarkcolors",
+      "theme_standbyustokens_standbyuselevation",
+      "theme_standbyustokens_standbyuslightcolors",
+      "theme_standbyustokens_standbyusmoods",
+      "theme_standbyustokens_standbyusmotion",
+      "theme_standbyustokens_standbyusshapes",
+      "theme_standbyustokens_standbyusspacing",
+      "theme_standbyustokens_standbyustypography"
+    ],
+    "11": [
+      "newui_standbyustokens_emojitheme",
+      "newui_standbyustokens_kt",
+      "newui_standbyustokens_moodcolor",
+      "newui_standbyustokens_standbyusdarkcolors",
+      "newui_standbyustokens_standbyuselevation",
+      "newui_standbyustokens_standbyuslightcolors",
+      "newui_standbyustokens_standbyusmoods",
+      "newui_standbyustokens_standbyusmotion",
+      "newui_standbyustokens_standbyusshapes",
+      "newui_standbyustokens_standbyusspacing",
+      "newui_standbyustokens_standbyustypography"
+    ],
+    "12": [
+      "app_src_main_java_com_standbyus_app_data_model_albumphoto_kt",
+      "app_src_main_java_com_standbyus_app_data_repository_albumrepository_kt",
+      "model_albumphoto_albumphoto",
+      "model_albumphoto_frommap",
+      "repository_albumrepository_albumrepository",
+      "repository_albumrepository_albumrepository_compressimage",
+      "repository_albumrepository_albumrepository_deletephoto",
+      "repository_albumrepository_albumrepository_getphotos",
+      "repository_albumrepository_albumrepository_uploadphoto"
+    ],
+    "13": [
+      "app_src_main_java_com_standbyus_app_data_repository_pairingrepository_kt",
+      "repository_pairingrepository_joinresult",
+      "repository_pairingrepository_pairingrepository",
+      "repository_pairingrepository_pairingrepository_createpairingcode",
+      "repository_pairingrepository_pairingrepository_findpairbyuserid",
+      "repository_pairingrepository_pairingrepository_generatepairingcode",
+      "repository_pairingrepository_pairingrepository_getpairinfo",
+      "repository_pairingrepository_pairingrepository_joinpair",
+      "repository_pairingrepository_pairingrepository_unpair"
+    ],
+    "14": [
+      "album_albumviewmodel_albumviewmodel",
+      "album_albumviewmodel_albumviewmodel_deletephoto",
+      "album_albumviewmodel_albumviewmodel_dismisssheet",
+      "album_albumviewmodel_albumviewmodel_loadphotos",
+      "album_albumviewmodel_albumviewmodel_selectphoto",
+      "album_albumviewmodel_albumviewmodel_setfilter",
+      "album_albumviewmodel_albumviewmodel_updatecaption",
+      "album_albumviewmodel_albumviewmodel_upload",
+      "app_src_main_java_com_standbyus_app_ui_album_albumviewmodel_kt"
+    ],
+    "15": [
+      "app_src_main_java_com_standbyus_app_ui_components_doingpicker_kt",
+      "app_src_main_java_com_standbyus_app_ui_components_feelingpicker_kt",
+      "app_src_main_java_com_standbyus_app_ui_poststatus_poststatusscreen_kt",
+      "components_doingpicker_doingpicker",
+      "components_feelingpicker_feelingpicker",
+      "components_feelingpicker_isemoji",
+      "poststatus_poststatusscreen_poststatusscreen"
+    ],
+    "16": [
+      "app_src_main_java_com_standbyus_app_ui_theme_emojitheme_kt",
+      "theme_emojitheme_emojithememanager",
+      "theme_emojitheme_emojithememanager_getcurrenttheme",
+      "theme_emojitheme_emojithememanager_getemoji",
+      "theme_emojitheme_emojithememanager_setcurrenttheme",
+      "theme_emojitheme_emojithemeset"
+    ],
+    "17": [
+      "app_src_main_java_com_standbyus_app_data_local_statusdao_kt",
+      "local_statusdao_statusdao",
+      "local_statusdao_statusdao_clearall",
+      "local_statusdao_statusdao_getstatus",
+      "local_statusdao_statusdao_upsertstatus"
+    ],
+    "18": [
+      "app_src_main_java_com_standbyus_app_widget_standbywidgetreceiver_kt",
+      "widget_standbywidgetreceiver_standbywidgetreceiver",
+      "widget_standbywidgetreceiver_standbywidgetreceiver_ondisabled",
+      "widget_standbywidgetreceiver_standbywidgetreceiver_onenabled",
+      "widget_standbywidgetreceiver_standbywidgetreceiver_onupdate"
+    ],
+    "19": [
+      "app_src_main_java_com_standbyus_app_data_model_pairinginfo_kt",
+      "model_pairinginfo_frommap",
+      "model_pairinginfo_pairinginfo",
+      "model_pairinginfo_pairinginfo_tomap"
+    ],
+    "20": [
+      "app_src_main_java_com_standbyus_app_data_remote_stickermanager_kt",
+      "remote_stickermanager_stickermanager",
+      "remote_stickermanager_stickermanager_getextension",
+      "remote_stickermanager_stickermanager_uploadsticker"
+    ],
+    "21": [
+      "app_src_main_java_com_standbyus_app_di_appmodule_kt",
+      "di_appmodule_appmodule",
+      "di_appmodule_appmodule_providedatabase",
+      "di_appmodule_appmodule_providestatusdao"
+    ],
+    "22": [
+      "app_src_main_java_com_standbyus_app_ui_history_historyviewmodel_kt",
+      "history_historyviewmodel_historyviewmodel",
+      "history_historyviewmodel_historyviewmodel_loadhistory",
+      "history_historyviewmodel_historyviewmodel_refresh"
+    ],
+    "23": [
+      "app_src_main_java_com_standbyus_app_data_local_appdatabase_kt",
+      "local_appdatabase_appdatabase",
+      "local_appdatabase_appdatabase_statusdao"
+    ],
+    "24": [
+      "app_src_main_java_com_standbyus_app_ui_home_homeviewmodel_kt",
+      "home_homeviewmodel_homeviewmodel",
+      "home_homeviewmodel_homeviewmodel_setpartnerid"
+    ],
+    "25": [
+      "app_build_gradle_kts_app_module",
+      "build_gradle_kts_StandByUs_project",
+      "settings_gradle_kts_root_settings"
+    ],
+    "26": [
+      "agents_polling",
+      "agents_supabasehttp",
+      "firebase_setup"
+    ],
+    "27": [
+      "app_src_main_java_com_standbyus_app_data_model_doing_kt",
+      "model_doing_doing"
+    ],
+    "28": [
+      "app_src_main_java_com_standbyus_app_data_model_feeling_kt",
+      "model_feeling_feeling"
+    ],
+    "29": [
+      "app_src_main_java_com_standbyus_app_data_remote_supabaseconfig_kt",
+      "remote_supabaseconfig_supabaseconfig"
+    ],
+    "30": [
+      "app_src_main_java_com_standbyus_app_di_supabasemodule_kt",
+      "di_supabasemodule_supabasemodule"
+    ],
+    "31": [
+      "app_src_main_java_com_standbyus_app_navigation_routes_kt",
+      "navigation_routes_routes"
+    ],
+    "32": [
+      "app_src_main_java_com_standbyus_app_ui_celebration_celebrationconfig_kt",
+      "celebration_celebrationconfig_celebrationconfig"
+    ],
+    "33": [
+      "app_src_main_java_com_standbyus_app_ui_components_avatarwithglow_kt",
+      "components_avatarwithglow_avatarwithglow"
+    ],
+    "34": [
+      "app_src_main_java_com_standbyus_app_ui_theme_emotioncolors_kt",
+      "theme_emotioncolors_feelingbackgroundcolor"
+    ],
+    "35": [
+      "MainActivity_MainActivity",
+      "MainActivity_celebration_overlay"
+    ],
+    "36": [
+      "Doing_Doing",
+      "Feeling_Feeling"
+    ],
+    "37": [
+      "build_gradle_kts"
+    ],
+    "38": [
+      "settings_gradle_kts"
+    ],
+    "39": [
+      "app_build_gradle_kts"
+    ],
+    "40": [
+      "app_src_main_java_com_standbyus_app_ui_theme_color_kt"
+    ],
+    "41": [
+      "app_src_main_java_com_standbyus_app_ui_theme_type_kt"
+    ],
+    "42": [
+      "supabasemodule"
+    ],
+    "43": [
+      "routes"
+    ],
+    "44": [
+      "agents_conventions"
+    ]
+  },
+  "cohesion": {
+    "0": 0.1,
+    "1": 0.13,
+    "2": 0.14,
+    "3": 0.21,
+    "4": 0.19,
+    "5": 0.15,
+    "6": 0.18,
+    "7": 0.18,
+    "8": 0.23,
+    "9": 0.24,
+    "10": 0.18,
+    "11": 0.18,
+    "12": 0.28,
+    "13": 0.31,
+    "14": 0.31,
+    "15": 0.33,
+    "16": 0.4,
+    "17": 0.4,
+    "18": 0.4,
+    "19": 0.67,
+    "20": 0.67,
+    "21": 0.5,
+    "22": 0.67,
+    "23": 0.67,
+    "24": 0.67,
+    "25": 0.67,
+    "26": 0.67,
+    "27": 1.0,
+    "28": 1.0,
+    "29": 1.0,
+    "30": 1.0,
+    "31": 1.0,
+    "32": 1.0,
+    "33": 1.0,
+    "34": 1.0,
+    "35": 1.0,
+    "36": 1.0,
+    "37": 1.0,
+    "38": 1.0,
+    "39": 1.0,
+    "40": 1.0,
+    "41": 1.0,
+    "42": 1.0,
+    "43": 1.0,
+    "44": 1.0
+  },
+  "gods": [
+    {
+      "id": "remote_supabaseservice_supabaseservice",
+      "label": "SupabaseService",
+      "degree": 12
+    },
+    {
+      "id": "settings_settingsviewmodel_settingsviewmodel",
+      "label": "SettingsViewModel",
+      "degree": 10
+    },
+    {
+      "id": "album_albumviewmodel_albumviewmodel",
+      "label": "AlbumViewModel",
+      "degree": 8
+    },
+    {
+      "id": "StatusRepository_StatusRepository",
+      "label": "StatusRepository",
+      "degree": 8
+    },
+    {
+      "id": "repository_pairingrepository_pairingrepository",
+      "label": "PairingRepository",
+      "degree": 7
+    },
+    {
+      "id": "SupabaseService_SupabaseService",
+      "label": "SupabaseService",
+      "degree": 7
+    },
+    {
+      "id": "model_userstatus_userstatus",
+      "label": "UserStatus",
+      "degree": 6
+    },
+    {
+      "id": "repository_albumrepository_albumrepository",
+      "label": "AlbumRepository",
+      "degree": 5
+    },
+    {
+      "id": "repository_statusrepository_statusrepository",
+      "label": "StatusRepository",
+      "degree": 5
+    },
+    {
+      "id": "widget_standbywidget_standbywidget",
+      "label": "StandByWidget",
+      "degree": 5
+    }
+  ],
+  "surprises": [
+    {
+      "source": "ic-sun.svg \u2014 Sun Icon (circle with 8 radiating rays)",
+      "target": "Feeling Enum (9 values: \u5f00\u5fc3/\u96be\u8fc7/\u75b2\u60eb/\u751f\u75c5/\u60a0\u95f2/\u60f3\u4f60\u4e86/\u7761\u89c9/\u594b\u6597/\u601d\u8003)",
+      "source_files": [
+        "NewUI/icons/ic-sun.svg",
+        "data/model/Feeling.kt"
+      ],
+      "confidence": "AMBIGUOUS",
+      "relation": "represents",
+      "why": "ambiguous connection - not explicitly stated in source; crosses file types (image \u2194 code); connects across different repos/directories; bridges separate communities"
+    },
+    {
+      "source": "ic-ruler.svg \u2014 Ruler/Pencil Icon (angled measuring tool)",
+      "target": "Custom Doing Text Input (max 20 chars)",
+      "source_files": [
+        "NewUI/icons/ic-ruler.svg",
+        "data/model/Doing.kt"
+      ],
+      "confidence": "AMBIGUOUS",
+      "relation": "represents",
+      "why": "ambiguous connection - not explicitly stated in source; crosses file types (image \u2194 code); connects across different repos/directories"
+    },
+    {
+      "source": "StandByUs Architecture Documentation (AGENTS.md)",
+      "target": "widget_cache SharedPreferences",
+      "source_files": [
+        "AGENTS.md",
+        "app/src/main/java/com/standbyus/app/widget/StandByWidget.kt"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "",
+      "why": "crosses file types (code \u2194 doc); connects across different repos/directories; peripheral node `widget_cache SharedPreferences` unexpectedly reaches hub `StandByUs Architecture Documentation (AGENTS.md)`"
+    },
+    {
+      "source": "ic-signal.svg \u2014 Signal Bars Icon (4 vertical bars ascending height)",
+      "target": "Device Pairing (6-char alphanumeric code exchange)",
+      "source_files": [
+        "NewUI/icons/ic-signal.svg",
+        "data/repository/PairingRepository.kt"
+      ],
+      "confidence": "INFERRED",
+      "relation": "represents",
+      "why": "inferred connection - not explicitly stated in source; crosses file types (image \u2194 code); connects across different repos/directories"
+    },
+    {
+      "source": "ic-signal.svg \u2014 Signal Bars Icon (4 vertical bars ascending height)",
+      "target": "Status Polling (6s callbackFlow via Supabase REST)",
+      "source_files": [
+        "NewUI/icons/ic-signal.svg",
+        "ui/home/HomeViewModel.kt"
+      ],
+      "confidence": "INFERRED",
+      "relation": "represents",
+      "why": "inferred connection - not explicitly stated in source; crosses file types (image \u2194 code); connects across different repos/directories"
+    }
+  ],
+  "questions": [
+    {
+      "type": "ambiguous_edge",
+      "question": "What is the exact relationship between `ic-ruler.svg \u2014 Ruler/Pencil Icon (angled measuring tool)` and `Custom Doing Text Input (max 20 chars)`?",
+      "why": "Edge tagged AMBIGUOUS (relation: represents) - confidence is low."
+    },
+    {
+      "type": "ambiguous_edge",
+      "question": "What is the exact relationship between `ic-ruler.svg \u2014 Ruler/Pencil Icon (angled measuring tool)` and `Post Status Screen (Navigation Destination)`?",
+      "why": "Edge tagged AMBIGUOUS (relation: part_of) - confidence is low."
+    },
+    {
+      "type": "ambiguous_edge",
+      "question": "What is the exact relationship between `ic-sun.svg \u2014 Sun Icon (circle with 8 radiating rays)` and `Feeling Enum (9 values: \u5f00\u5fc3/\u96be\u8fc7/\u75b2\u60eb/\u751f\u75c5/\u60a0\u95f2/\u60f3\u4f60\u4e86/\u7761\u89c9/\u594b\u6597/\u601d\u8003)`?",
+      "why": "Edge tagged AMBIGUOUS (relation: represents) - confidence is low."
+    },
+    {
+      "type": "ambiguous_edge",
+      "question": "What is the exact relationship between `ic-trash.svg \u2014 Trash/Delete Icon (can with lid and vertical slit lines)` and `History Screen (Navigation Destination)`?",
+      "why": "Edge tagged AMBIGUOUS (relation: part_of) - confidence is low."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `Feeling Enum (9 values: \u5f00\u5fc3/\u96be\u8fc7/\u75b2\u60eb/\u751f\u75c5/\u60a0\u95f2/\u60f3\u4f60\u4e86/\u7761\u89c9/\u594b\u6597/\u601d\u8003)` connect `Community 2` to `Community 1`?",
+      "why": "High betweenness centrality (0.009) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `ic-sun.svg \u2014 Sun Icon (circle with 8 radiating rays)` connect `Community 1` to `Community 2`?",
+      "why": "High betweenness centrality (0.009) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `Doing`, `Feeling`, `SupabaseConfig` to the rest of the system?",
+      "why": "55 weakly-connected nodes found - possible documentation gaps or missing edges."
+    }
+  ]
+}

@@ -5,24 +5,33 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import com.standbyus.app.ui.theme.StandByUsLightColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,10 +39,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.standbyus.app.data.model.AlbumPhoto
-import java.text.SimpleDateFormat
-import java.util.*
+import com.standbyus.app.ui.components.AppHeader
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlbumScreen(
     onBack: () -> Unit,
@@ -47,6 +54,8 @@ fun AlbumScreen(
     val caption by viewModel.caption.collectAsState()
     val error by viewModel.error.collectAsState()
     val filterDays by viewModel.filterDays.collectAsState()
+
+    var fullScreenPhoto by remember { mutableStateOf<AlbumPhoto?>(null) }
 
     // 相册选择器
     val photoPicker = rememberLauncherForActivityResult(
@@ -66,41 +75,60 @@ fun AlbumScreen(
         Scaffold(
             snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
-                TopAppBar(
-                    title = { Text("我们的故事", fontWeight = FontWeight.Bold) },
-                    navigationIcon = {
-                        IconButton(onClick = onBack) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
+                AppHeader(
+                    title = "我们的相册",
+                    onBack = onBack,
+                    rightIcon = if (!uploading) {
+                        {
+                            Icon(
+                                imageVector = Icons.Default.FileUpload,
+                                contentDescription = "上传照片",
+                                tint = Color(0xFF9E8E86),
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .clickable {
+                                        photoPicker.launch(
+                                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                        )
+                                    }
+                            )
                         }
-                    },
-                    actions = {
-                        if (!uploading) {
-                            IconButton(onClick = {
-                                photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                            }) {
-                                Text("＋", fontSize = 22.sp, fontWeight = FontWeight.Light)
-                            }
-                        }
-                    }
+                    } else null
                 )
             }
         ) { padding ->
             Column(Modifier.fillMaxSize().padding(padding)) {
-                // 时间筛选
+                // 横向可滚动的筛选标签
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                        .horizontalScroll(rememberScrollState())
+                        .padding(horizontal = 24.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    val filters = listOf(0 to "全部", 7 to "最近7天", 30 to "最近30天")
+                    val filters = listOf(0 to "全部", 7 to "近7天", 30 to "近30天", 90 to "近90天")
                     filters.forEach { (days, label) ->
-                        FilterChip(
-                            selected = filterDays == days,
-                            onClick = { viewModel.setFilter(days) },
-                            label = { Text(label, fontSize = 12.sp) },
-                            shape = RoundedCornerShape(16.dp)
-                        )
+                        val isActive = filterDays == days
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(if (isActive) Color(0xFFFFB4A2) else Color.Transparent)
+                                .then(
+                                    if (!isActive) Modifier.border(
+                                        1.dp,
+                                        Color(0xFFF0EAE6),
+                                        RoundedCornerShape(20.dp)
+                                    ) else Modifier
+                                )
+                                .clickable { viewModel.setFilter(days) }
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                        ) {
+                            Text(
+                                text = label,
+                                fontSize = 13.sp,
+                                color = if (isActive) Color.White else Color(0xFF9E8E86)
+                            )
+                        }
                     }
                 }
 
@@ -109,26 +137,38 @@ fun AlbumScreen(
                         CircularProgressIndicator()
                     }
                 } else if (photos.isEmpty()) {
+                    // 空状态
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("🖼️", fontSize = 64.sp)
+                            Text("📷", fontSize = 64.sp)
                             Spacer(Modifier.height(12.dp))
-                            Text("还没有照片", fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(
+                                "还没有照片",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = StandByUsLightColors.fgSecondary
+                            )
                             Spacer(Modifier.height(4.dp))
-                            Text("点击右上角 ＋ 上传第一张", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f))
+                            Text(
+                                "点击右上角上传第一张",
+                                fontSize = 13.sp,
+                                color = StandByUsLightColors.muted
+                            )
                         }
                     }
                 } else {
+                    // 3列照片网格
                     LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        columns = GridCells.Fixed(3),
+                        modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                         contentPadding = PaddingValues(vertical = 12.dp)
                     ) {
                         items(photos, key = { it.id }) { photo ->
                             PhotoCard(
                                 photo = photo,
+                                onClick = { fullScreenPhoto = photo },
                                 onDelete = { viewModel.deletePhoto(photo) }
                             )
                         }
@@ -139,30 +179,42 @@ fun AlbumScreen(
 
         // 上传底部弹窗
         if (showSheet && selectedUri != null) {
+            // 遮罩
             Box(
-                modifier = Modifier.fillMaxSize().clickable { viewModel.dismissSheet() }
-                    .background(androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.3f))
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable { viewModel.dismissSheet() }
+                    .background(Color.Black.copy(alpha = 0.4f))
             )
+            // 底部面板
             Surface(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                color = MaterialTheme.colorScheme.surface
+                color = StandByUsLightColors.surface
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    // 拖拽手柄
                     Box(
                         modifier = Modifier
-                            .width(36.dp).height(4.dp)
+                            .width(36.dp)
+                            .height(4.dp)
                             .clip(RoundedCornerShape(2.dp))
-                            .background(MaterialTheme.colorScheme.outline)
+                            .background(StandByUsLightColors.borderLight)
                     )
                     Spacer(Modifier.height(16.dp))
+
                     // 预览图
                     AsyncImage(
-                        model = ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
-                            .data(selectedUri).crossfade(true).build(),
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(selectedUri)
+                            .crossfade(true)
+                            .build(),
                         contentDescription = null,
                         modifier = Modifier
                             .size(160.dp)
@@ -170,6 +222,8 @@ fun AlbumScreen(
                         contentScale = ContentScale.Crop
                     )
                     Spacer(Modifier.height(16.dp))
+
+                    // 输入框
                     OutlinedTextField(
                         value = caption,
                         onValueChange = { viewModel.updateCaption(it) },
@@ -179,23 +233,40 @@ fun AlbumScreen(
                         modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(Modifier.height(12.dp))
+
+                    // 错误信息
                     if (error.isNotEmpty()) {
-                        Text(error, fontSize = 13.sp, color = MaterialTheme.colorScheme.error)
+                        Text(
+                            text = error,
+                            fontSize = 13.sp,
+                            color = MaterialTheme.colorScheme.error
+                        )
                         Spacer(Modifier.height(8.dp))
                     }
+
+                    // 发布按钮
                     Button(
                         onClick = { viewModel.upload() },
                         enabled = !uploading,
-                        shape = RoundedCornerShape(24.dp),
+                        shape = RoundedCornerShape(28.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = com.standbyus.app.ui.theme.Primary
+                            containerColor = Color(0xFFFFB4A2)
                         ),
-                        modifier = Modifier.fillMaxWidth().height(48.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
                     ) {
                         if (uploading) {
-                            CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = androidx.compose.ui.graphics.Color.White)
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp),
+                                strokeWidth = 2.dp,
+                                color = Color.White
+                            )
                         } else {
-                            Text("发布到我们的故事", fontWeight = FontWeight.SemiBold)
+                            Text(
+                                "发布到我们的相册",
+                                fontWeight = FontWeight.SemiBold
+                            )
                         }
                     }
                 }
@@ -210,44 +281,57 @@ private fun PhotoCard(
     photo: AlbumPhoto,
     onDelete: () -> Unit = {}
 ) {
-    val sdf = remember { SimpleDateFormat("M月d日", Locale.CHINESE) }
-    val dateStr = remember(photo.createdAt) { sdf.format(Date(photo.createdAt)) }
     var showConfirm by remember { mutableStateOf(false) }
 
-    Box(modifier = Modifier.clip(RoundedCornerShape(14.dp))) {
-        Surface(
-            shape = RoundedCornerShape(14.dp),
-            shadowElevation = 2.dp,
-            modifier = Modifier.combinedClickable(
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .combinedClickable(
                 onClick = { },
                 onLongClick = { showConfirm = true }
             )
-        ) {
-            Column {
-                AsyncImage(
-                    model = ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
-                        .data(photo.url).crossfade(true).build(),
-                    contentDescription = photo.caption,
-                    modifier = Modifier.fillMaxWidth().aspectRatio(1f),
-                    contentScale = ContentScale.Crop
-                )
-                if (photo.caption.isNotEmpty()) {
-                    Text(
-                        text = photo.caption,
-                        fontSize = 13.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                        color = MaterialTheme.colorScheme.onSurface
+    ) {
+        // 图片 - 正方形
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(photo.url)
+                .crossfade(true)
+                .build(),
+            contentDescription = photo.caption,
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(12.dp)),
+            contentScale = ContentScale.Crop
+        )
+
+        // 底部渐变遮罩 + 标题覆盖
+        if (photo.caption.isNotEmpty()) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .height(48.dp)
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
+                        ),
+                        shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
                     )
-                }
-                Text(
-                    text = dateStr,
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 8.dp)
-                )
-            }
+            )
+            Text(
+                text = photo.caption,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(horizontal = 6.dp, vertical = 6.dp)
+            )
         }
 
         // 长按确认删除对话框

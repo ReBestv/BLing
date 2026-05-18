@@ -32,5 +32,9 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/standby_widget_info" />
         </receiver>
+        
+        <receiver
+            android:name="androidx.glance.appwidget.action.ActionCallbackBroadcastReceiver"
+            android:exported="false" />
     </application>
 </manifest>

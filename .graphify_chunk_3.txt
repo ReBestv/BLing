@@ -1,0 +1,10 @@
+E:\AndroidProject\StandByUs\NewUI\icons\ic-motion.svg
+E:\AndroidProject\StandByUs\NewUI\icons\ic-post.svg
+E:\AndroidProject\StandByUs\NewUI\icons\ic-ruler.svg
+E:\AndroidProject\StandByUs\NewUI\icons\ic-send.svg
+E:\AndroidProject\StandByUs\NewUI\icons\ic-settings.svg
+E:\AndroidProject\StandByUs\NewUI\icons\ic-signal.svg
+E:\AndroidProject\StandByUs\NewUI\icons\ic-sparkle.svg
+E:\AndroidProject\StandByUs\NewUI\icons\ic-sun.svg
+E:\AndroidProject\StandByUs\NewUI\icons\ic-timeline.svg
+E:\AndroidProject\StandByUs\NewUI\icons\ic-trash.svg

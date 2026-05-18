@@ -1,5 +1,6 @@
 package com.standbyus.app.ui.album
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -9,6 +10,7 @@ import com.standbyus.app.data.remote.SupabaseService
 import com.standbyus.app.data.repository.AlbumRepository
 import com.standbyus.app.data.repository.PairingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,8 +21,11 @@ import javax.inject.Inject
 class AlbumViewModel @Inject constructor(
     private val albumRepository: AlbumRepository,
     private val supabaseService: SupabaseService,
-    private val pairingRepository: PairingRepository
+    private val pairingRepository: PairingRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    private val prefs = context.getSharedPreferences("pairing", Context.MODE_PRIVATE)
 
     private val _photos = MutableStateFlow<List<AlbumPhoto>>(emptyList())
     val photos: StateFlow<List<AlbumPhoto>> = _photos.asStateFlow()
@@ -61,12 +66,18 @@ class AlbumViewModel @Inject constructor(
                 Log.d(TAG, "loadPhotos myId=$myId")
                 if (myId.isEmpty()) { Log.w(TAG, "myId empty"); _loading.value = false; return@launch }
 
-                val pair = pairingRepository.findPairByUserId(myId)
-                Log.d(TAG, "pair=$pair")
-                val partnerId = when {
-                    pair?.user1Id == myId && pair.user2Id.isNotEmpty() -> pair.user2Id
-                    pair?.user2Id == myId && pair.user1Id.isNotEmpty() -> pair.user1Id
-                    else -> ""
+                // 优先使用缓存的 partner_id
+                val cachedPartnerId = prefs.getString("partner_id", null)
+                val partnerId = if (!cachedPartnerId.isNullOrEmpty()) {
+                    cachedPartnerId
+                } else {
+                    val pair = pairingRepository.findPairByUserId(myId)
+                    Log.d(TAG, "pair=$pair")
+                    when {
+                        pair?.user1Id == myId && pair.user2Id.isNotEmpty() -> pair.user2Id
+                        pair?.user2Id == myId && pair.user1Id.isNotEmpty() -> pair.user1Id
+                        else -> ""
+                    }
                 }
                 Log.d(TAG, "partnerId=$partnerId")
 

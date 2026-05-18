@@ -14,6 +14,13 @@ fun feelingBackgroundColor(feeling: Feeling, isDark: Boolean = false): Color {
         Feeling.SLEEPING -> Color(0xFFA29BFE)
         Feeling.HUSTLING -> Color(0xFF00CEC9)
         Feeling.THINKING -> Color(0xFFFFEAA7)
+        Feeling.KISS -> Color(0xFFFFB8D0)
+        Feeling.LOVE -> Color(0xFFF8BBD0)
+        Feeling.WATCHING -> Color(0xFFB39DDB)
+        Feeling.UPSET -> Color(0xFFB0BEC5)
+        Feeling.ANGRY -> Color(0xFFFF5252)
+        Feeling.ANXIOUS -> Color(0xFFCFD8DC)
+        Feeling.BORED -> Color(0xFFD7CCC8)
     }
     return if (isDark) base.copy(alpha = 0.7f) else base
 }

@@ -12,6 +12,7 @@ import com.standbyus.app.widget.StandByWidget
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -36,19 +37,10 @@ class StatusRepository @Inject constructor(
     suspend fun updateStatus(userStatus: UserStatus) {
         Log.d(TAG, "Updating status for user: ${userStatus.userId}")
         try {
-            // Upsert: 查找现有记录，有则更新，无则创建
-            val existing = supabaseService.query(
-                TABLE,
-                "userId=eq.${userStatus.userId}&order=updatedAt.desc&limit=1"
-            )
+            // 时光轴：每次发布都向数据库插入新记录，而不是覆盖旧记录
             val data = userStatus.toMap()
-            if (existing.isNotEmpty()) {
-                supabaseService.update(TABLE, "userId=eq.${userStatus.userId}", data)
-                Log.d(TAG, "Supabase update success")
-            } else {
-                supabaseService.create(TABLE, data)
-                Log.d(TAG, "Supabase create success")
-            }
+            supabaseService.create(TABLE, data)
+            Log.d(TAG, "Supabase create success (append to history)")
         } catch (e: Exception) {
             Log.e(TAG, "Supabase write failed: ${e.message}", e)
             throw e
@@ -58,6 +50,8 @@ class StatusRepository @Inject constructor(
         // Widget 缓存
         updateWidgetCache(userStatus)
     }
+
+    private val widgetScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private fun updateWidgetCache(status: UserStatus) {
         val prefs = context.getSharedPreferences("widget_cache", Context.MODE_PRIVATE)
@@ -71,7 +65,7 @@ class StatusRepository @Inject constructor(
             putLong("updatedAt", status.updatedAt)
             apply()
         }
-        CoroutineScope(Dispatchers.IO).launch {
+        widgetScope.launch {
             StandByWidget().updateAll(context)
         }
     }
@@ -111,7 +105,7 @@ class StatusRepository @Inject constructor(
         fetchFromRemote()
 
         // 然后定时轮询
-        val job = CoroutineScope(Dispatchers.IO).launch {
+        val job = widgetScope.launch {
             delay(POLL_MS) // 等一轮再查
             while (isActive) {
                 fetchFromRemote()

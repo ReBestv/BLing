@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.standbyus.app.ui.theme.StandByUsLightColors
 import kotlinx.coroutines.delay
 import kotlin.math.sin
 import kotlin.random.Random
@@ -35,13 +36,13 @@ fun CelebrationOverlay(
 ) {
     val colors = remember {
         listOf(
-            Color(0xFFFF9F43),
-            Color(0xFFFFD93D),
-            Color(0xFF74B9FF),
-            Color(0xFFFD79A8),
-            Color(0xFF55EFC4),
-            Color(0xFFA29BFE),
-            Color(0xFF00CEC9),
+            StandByUsLightColors.accent,      // coral
+            StandByUsLightColors.accentHover, // deep coral
+            StandByUsLightColors.accentSoft,  // soft coral
+            StandByUsLightColors.success,     // green
+            StandByUsLightColors.warn,        // gold
+            Color(0xFFFFB5A7),                // warm pink
+            Color(0xFFA8E6CF),                // soft mint
         )
     }
 
@@ -59,6 +60,7 @@ fun CelebrationOverlay(
         }
     }
 
+    // ...keep rest of the file (animation logic, Canvas, etc.)
     val scale = remember { Animatable(0f) }
     LaunchedEffect(Unit) {
         scale.animateTo(
@@ -86,51 +88,46 @@ fun CelebrationOverlay(
         label = "particleProgress"
     )
 
-    Box(modifier = Modifier.fillMaxSize().clickable(onClick = onDismiss)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable { onDismiss() },
+        contentAlignment = Alignment.Center
+    ) {
         Canvas(modifier = Modifier.fillMaxSize()) {
-            drawRect(Color.Black.copy(alpha = 0.45f))
-        }
+            particles.forEach { particle ->
+                val animatedY = (particle.y + progress * particle.speed / 1000f) % 1.1f
+                val wobbleX = sin(progress / 100f * particle.wobbleSpeed + particle.wobblePhase) * 20f
 
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val w = size.width
-            val h = size.height
-            val t = progress / 1000f
-            for (p in particles) {
-                p.y = ((p.y + p.speed * t / 20f) % 1.2f) - 0.2f
-                p.x += sin(p.wobblePhase + t * p.wobbleSpeed) * 0.005f
-                p.x = p.x.coerceIn(0f, 1f)
+                val drawX = particle.x * size.width + wobbleX
+                val drawY = animatedY * size.height
 
                 drawCircle(
-                    color = p.color,
-                    radius = p.size,
-                    center = Offset(p.x * w, p.y * h)
+                    color = particle.color,
+                    radius = particle.size,
+                    center = Offset(drawX, drawY)
                 )
             }
         }
 
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.graphicsLayer {
-                    scaleX = scale.value
-                    scaleY = scale.value
-                }
-            ) {
-                Text(
-                    text = celebration.emoji,
-                    fontSize = 72.sp
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = celebration.message,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.graphicsLayer {
+                scaleX = scale.value
+                scaleY = scale.value
             }
+        ) {
+            Text(
+                text = celebration.emoji,
+                fontSize = 64.sp
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = celebration.message,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
         }
     }
 }

@@ -1,0 +1,546 @@
+{
+  "nodes": [
+    {
+      "id": "supabasemodule",
+      "label": "SupabaseModule",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/di/SupabaseModule.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "routes",
+      "label": "Routes",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/navigation/Routes.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "albumscreen",
+      "label": "AlbumScreen",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/album/AlbumScreen.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "albumviewmodel",
+      "label": "AlbumViewModel",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/album/AlbumViewModel.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Uploads photos to Supabase Storage via AlbumRepository; resolves partner ID via PairingRepository to fetch shared album."
+    },
+    {
+      "id": "celebrationconfig",
+      "label": "CelebrationConfig",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/celebration/CelebrationConfig.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Predefined celebratory dates (birthday, Christmas, Valentine's) — hardcoded because app targets a specific couple."
+    },
+    {
+      "id": "celebrationday",
+      "label": "CelebrationDay",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/celebration/CelebrationDay.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "celebrationoverlay",
+      "label": "CelebrationOverlay",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/celebration/CelebrationOverlay.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Fullscreen particle animation overlay; auto-dismisses after 4 seconds. Shown once per day via SharedPreferences date flag."
+    },
+    {
+      "id": "avatarwithglow",
+      "label": "AvatarWithGlow",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/components/AvatarWithGlow.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "doingpicker",
+      "label": "DoingPicker",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/components/DoingPicker.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Free-text activity input capped at 30 characters; references selected Feeling for contextual placeholder."
+    },
+    {
+      "id": "feelingpicker",
+      "label": "FeelingPicker",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/components/FeelingPicker.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "3-column grid of Feeling entries; resolves emoji via EmojiThemeManager supporting theme-switchable emoji sets."
+    },
+    {
+      "id": "statuscard",
+      "label": "StatusCard",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/components/StatusCard.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Gradient card displaying partner status — feeling drives gradient colors via Feeling.gradientStart/gradientEnd; breathing glow animation on shadow."
+    },
+    {
+      "id": "historyscreen",
+      "label": "HistoryScreen",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/history/HistoryScreen.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "historyviewmodel",
+      "label": "HistoryViewModel",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/history/HistoryViewModel.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Fetches merged timeline of own + partner statuses from Supabase; resolves partnerId via PairingRepository; limits to 20 entries each."
+    },
+    {
+      "id": "homescreen",
+      "label": "HomeScreen",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/home/HomeScreen.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "homeviewmodel",
+      "label": "HomeViewModel",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/home/HomeViewModel.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Polls Supabase every 6s via callbackFlow for real-time-like updates; caches partner ID in SharedPreferences; observes own + partner status from Room via flatMapLatest."
+    },
+    {
+      "id": "settingsscreen",
+      "label": "SettingsScreen",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/settings/SettingsScreen.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "settingsviewmodel",
+      "label": "SettingsViewModel",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/settings/SettingsViewModel.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Manages 6-char pairing code generation/join; emoji theme selection via EmojiThemeManager; caches paired state in SharedPreferences."
+    },
+    {
+      "id": "device_uuid_identity",
+      "label": "Device-UUID Identity",
+      "file_type": "rationale",
+      "source_file": null,
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "No user accounts — device UUID from SharedPreferences serves as userId. Two devices pair by exchanging a 6-character alphanumeric code. Rationale: couples app, no auth needed."
+    },
+    {
+      "id": "polling_based_sync",
+      "label": "Polling-based Sync",
+      "file_type": "rationale",
+      "source_file": null,
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "No real-time subscriptions (WebSocket/SSE). Status updates use polling every 6 seconds via callbackFlow. Trade-off: simpler implementation vs slightly delayed updates."
+    }
+  ],
+  "edges": [
+    {
+      "source": "albumscreen",
+      "target": "albumviewmodel",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AlbumScreen obtains viewModel via hiltViewModel<AlbumViewModel>()"
+    },
+    {
+      "source": "historyscreen",
+      "target": "historyviewmodel",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HistoryScreen obtains viewModel via hiltViewModel<HistoryViewModel>()"
+    },
+    {
+      "source": "homescreen",
+      "target": "homeviewmodel",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HomeScreen obtains viewModel via hiltViewModel<HomeViewModel>()"
+    },
+    {
+      "source": "settingsscreen",
+      "target": "settingsviewmodel",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "SettingsScreen obtains viewModel via hiltViewModel<SettingsViewModel>()"
+    },
+    {
+      "source": "homescreen",
+      "target": "statuscard",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HomeScreen embeds StatusCard composable to display partner status"
+    },
+    {
+      "source": "settingsscreen",
+      "target": "celebrationoverlay",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "SettingsScreen shows CelebrationOverlay when justPaired flag is true"
+    },
+    {
+      "source": "settingsscreen",
+      "target": "celebrationday",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "SettingsScreen imports and uses CelebrationDay data class for overlay"
+    },
+    {
+      "source": "statuscard",
+      "target": "feeling_enum",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StatusCard calls Feeling.fromDisplayName() and uses feeling.emoji/gradientStart/gradientEnd at runtime"
+    },
+    {
+      "source": "feelingpicker",
+      "target": "feeling_enum",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "FeelingPicker iterates Feeling.entries and renders each in a grid"
+    },
+    {
+      "source": "feelingpicker",
+      "target": "emojithememanager",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "FeelingPicker calls EmojiThemeManager.getEmoji() to resolve theme-aware emoji"
+    },
+    {
+      "source": "settingsviewmodel",
+      "target": "emojithememanager",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "SettingsViewModel calls EmojiThemeManager.getCurrentTheme() and reads EmojiThemeManager.themes"
+    },
+    {
+      "source": "celebrationconfig",
+      "target": "celebrationday",
+      "type": "contains",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "CelebrationConfig.days is a list of CelebrationDay instances"
+    },
+    {
+      "source": "celebrationoverlay",
+      "target": "celebrationday",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "CelebrationOverlay accepts CelebrationDay as parameter"
+    },
+    {
+      "source": "albumviewmodel",
+      "target": "supabaseservice",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AlbumViewModel injects SupabaseService and calls getCachedDeviceId(), upload/delete operations"
+    },
+    {
+      "source": "homeviewmodel",
+      "target": "supabaseservice",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HomeViewModel injects SupabaseService and calls getCachedDeviceId() and polling methods"
+    },
+    {
+      "source": "historyviewmodel",
+      "target": "supabaseservice",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HistoryViewModel injects SupabaseService and calls getCachedDeviceId() and query()"
+    },
+    {
+      "source": "settingsviewmodel",
+      "target": "supabaseservice",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "SettingsViewModel injects SupabaseService and calls getCachedDeviceId() and pairing operations"
+    },
+    {
+      "source": "albumviewmodel",
+      "target": "pairingrepository",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AlbumViewModel injects PairingRepository and calls findPairByUserId() to resolve partner"
+    },
+    {
+      "source": "homeviewmodel",
+      "target": "pairingrepository",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HomeViewModel injects PairingRepository and calls findPairByUserId() to resolve partner"
+    },
+    {
+      "source": "historyviewmodel",
+      "target": "pairingrepository",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HistoryViewModel injects PairingRepository and calls findPairByUserId() to resolve partner"
+    },
+    {
+      "source": "settingsviewmodel",
+      "target": "pairingrepository",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "SettingsViewModel injects PairingRepository and calls findPairByUserId(), createPair(), joinPair()"
+    },
+    {
+      "source": "albumviewmodel",
+      "target": "albumrepository",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AlbumViewModel injects AlbumRepository for photo CRUD operations"
+    },
+    {
+      "source": "homeviewmodel",
+      "target": "statusrepository",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HomeViewModel injects StatusRepository and calls observeStatus() for Room-backed reactive status"
+    },
+    {
+      "source": "doingpicker",
+      "target": "feeling_enum",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "DoingPicker accepts selectedFeeling: Feeling parameter for contextual display"
+    },
+    {
+      "source": "avatarwithglow",
+      "target": "standbyusmotion",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AvatarWithGlow uses StandByUsMotion.DUR_BREATH for breathing animation timing"
+    },
+    {
+      "source": "statuscard",
+      "target": "standbyusmotion",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StatusCard uses StandByUsMotion.DUR_BREATH for breathing glow animation"
+    },
+    {
+      "source": "celebrationoverlay",
+      "target": "standbyuslightcolors",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "CelebrationOverlay uses StandByUsLightColors accent/success/warn for particle colors"
+    },
+    {
+      "source": "doingpicker",
+      "target": "feelingpicker",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.75,
+      "evidence": "INFERRED",
+      "rationale": "Both are status-input composable components: FeelingPicker selects mood, DoingPicker inputs activity text; together they form the PostStatus input composable pair"
+    },
+    {
+      "source": "avatarwithglow",
+      "target": "statuscard",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.75,
+      "evidence": "INFERRED",
+      "rationale": "Both use breathing animation with identical StandByUsMotion.DUR_BREATH timing, creating a consistent visual language for status/avatar glow effects"
+    },
+    {
+      "source": "albumviewmodel",
+      "target": "historyviewmodel",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.85,
+      "evidence": "INFERRED",
+      "rationale": "Both resolve partner via identical pattern: getCachedDeviceId() then findPairByUserId() then determine partnerId; both fetch data scoped to the pair"
+    },
+    {
+      "source": "homeviewmodel",
+      "target": "historyviewmodel",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.85,
+      "evidence": "INFERRED",
+      "rationale": "Both resolve partner via the same PairingRepository.findPairByUserId() pattern to determine partnerId"
+    },
+    {
+      "source": "device_uuid_identity",
+      "target": "homeviewmodel",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HomeViewModel calls supabaseService.getCachedDeviceId() to obtain device UUID as identity"
+    },
+    {
+      "source": "device_uuid_identity",
+      "target": "albumviewmodel",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AlbumViewModel calls supabaseService.getCachedDeviceId() for identity"
+    },
+    {
+      "source": "device_uuid_identity",
+      "target": "historyviewmodel",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HistoryViewModel calls supabaseService.getCachedDeviceId() for identity"
+    },
+    {
+      "source": "device_uuid_identity",
+      "target": "settingsviewmodel",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "SettingsViewModel calls supabaseService.getCachedDeviceId() for identity"
+    },
+    {
+      "source": "polling_based_sync",
+      "target": "homeviewmodel",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HomeViewModel polls Supabase every 6s via callbackFlow — the sole implementation of the polling sync strategy"
+    }
+  ],
+  "hyperedges": [
+    {
+      "label": "MVVM+StateFlow Architecture Pattern",
+      "node_ids": [
+        "albumviewmodel",
+        "homeviewmodel",
+        "historyviewmodel",
+        "settingsviewmodel"
+      ],
+      "description": "All four ViewModels follow identical pattern: @HiltViewModel with @Inject constructor receiving repositories/services; expose state via MutableStateFlow/StateFlow; run initialization in init{} block; use viewModelScope for coroutine launching."
+    },
+    {
+      "label": "Celebration Display Pipeline",
+      "node_ids": [
+        "celebrationconfig",
+        "celebrationday",
+        "celebrationoverlay",
+        "settingsscreen"
+      ],
+      "description": "CelebrationConfig defines static CelebrationDay instances. CelebrationOverlay renders fullscreen particle animation with spring scale and auto-dismiss after 4s. SettingsScreen embeds CelebrationOverlay when justPaired flag triggers after successful pairing."
+    },
+    {
+      "label": "Partner Identity Resolution Pattern",
+      "node_ids": [
+        "pairingrepository",
+        "homeviewmodel",
+        "albumviewmodel",
+        "historyviewmodel"
+      ],
+      "description": "All three ViewModels resolve the partner's userId via the same pattern: call supabaseService.getCachedDeviceId() for self-ID, call pairingRepository.findPairByUserId(selfId), determine partnerId from pair.user1Id/user2Id. SettingsViewModel also uses this in checkExistingPair()."
+    }
+  ]
+}

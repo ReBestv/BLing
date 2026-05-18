@@ -136,6 +136,7 @@ dimen notification_small_icon_size_as_large
 dimen notification_subtext_size
 dimen notification_top_pad
 dimen notification_top_pad_large_text
+drawable abc_vector_test
 drawable glance_abc_btn_check_material_anim_enabled
 drawable glance_btn_checkbox_checked_mtrl
 drawable glance_btn_checkbox_checked_to_unchecked_mtrl_animation
@@ -322,6 +323,7 @@ id childStub9_wrap_expand
 id childStub9_wrap_match
 id childStub9_wrap_wrap
 id chronometer
+id coil_request_manager
 id compose_view_saveable_id_tag
 id consume_window_insets_tag
 id deletedViewId
@@ -1567,6 +1569,7 @@ layout size_match_match
 layout size_match_wrap
 layout size_wrap_match
 layout size_wrap_wrap
+layout widget_loading
 mipmap ic_launcher
 raw glance_appwidget_keep
 string androidx_startup
@@ -1706,6 +1709,9 @@ style Widget_Compat_NotificationActionContainer
 style Widget_Compat_NotificationActionText
 style Widget_Glance_AppWidget_CallbackTrampoline
 styleable ActivityNavigator android_name action data dataPattern targetPackage
+styleable AnimatedStateListDrawableCompat android_dither android_visible android_variablePadding android_constantSize android_enterFadeDuration android_exitFadeDuration
+styleable AnimatedStateListDrawableItem android_id android_drawable
+styleable AnimatedStateListDrawableTransition android_drawable android_toId android_fromId android_reversible
 styleable Capability queryPatterns shortcutMatchRequired
 styleable ColorStateListItem android_color android_alpha android_lStar alpha lStar
 styleable FontFamily fontProviderAuthority fontProviderCerts fontProviderFetchStrategy fontProviderFetchTimeout fontProviderPackage fontProviderQuery fontProviderSystemFontFamily
@@ -1722,4 +1728,6 @@ styleable NavGraphNavigator startDestination
 styleable NavHost navGraph
 styleable NavInclude graph
 styleable Navigator android_label android_id route
+styleable StateListDrawable android_dither android_visible android_variablePadding android_constantSize android_enterFadeDuration android_exitFadeDuration
+styleable StateListDrawableItem android_drawable
 xml standby_widget_info

@@ -1,6 +1,8 @@
 package com.standbyus.app.ui.theme
 
 import android.app.Activity
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
@@ -14,41 +16,42 @@ import androidx.core.view.WindowCompat
 private val LightColorScheme = lightColorScheme(
     primary = Primary,
     onPrimary = Surface,
-    primaryContainer = SurfaceVariant,
+    primaryContainer = PrimarySoft,
     secondary = Secondary,
-    onSecondary = OnBackground,
-    tertiary = Tertiary,
+    onSecondary = TextPrimary,
+    tertiary = PrimaryLight,
     background = Background,
-    onBackground = OnBackground,
+    onBackground = TextPrimary,
     surface = Surface,
-    onSurface = OnSurface,
+    onSurface = TextPrimary,
     surfaceVariant = SurfaceVariant,
-    onSurfaceVariant = OnSurfaceVariant,
-    outline = Outline,
-    outlineVariant = OutlineVariant,
-    error = Error,
-    onError = OnError
+    onSurfaceVariant = TextSecondary,
+    outline = Border,
+    outlineVariant = BorderLight,
+    error = Danger,
+    onError = OnDanger
 )
 
 private val DarkColorScheme = darkColorScheme(
     primary = Primary,
-    onPrimary = DarkBackground,
+    onPrimary = DarkBg,
     primaryContainer = DarkSurfaceVariant,
     secondary = Secondary,
-    onSecondary = DarkOnBackground,
-    tertiary = Tertiary,
-    background = DarkBackground,
-    onBackground = DarkOnBackground,
+    onSecondary = DarkTextPrimary,
+    tertiary = PrimaryLight,
+    background = DarkBg,
+    onBackground = DarkTextPrimary,
     surface = DarkSurface,
-    onSurface = DarkOnSurface,
+    onSurface = DarkTextPrimary,
     surfaceVariant = DarkSurfaceVariant,
-    onSurfaceVariant = DarkOnSurfaceVariant,
-    outline = DarkOutline,
-    outlineVariant = DarkOutlineVariant,
-    error = Error,
-    onError = OnError
+    onSurfaceVariant = DarkTextSecondary,
+    outline = DarkBorder,
+    outlineVariant = DarkBorderLight,
+    error = Danger,
+    onError = OnDanger
 )
 
+@RequiresApi(Build.VERSION_CODES.CUPCAKE)
 @Composable
 fun StandByUsTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

@@ -1,0 +1,662 @@
+{
+  "nodes": [
+    {
+      "id": "color_coralpalette",
+      "label": "Coral Brand Color Palette (珊瑚橙系)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Color.kt",
+      "source_location": "lines 5-9",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "珊瑚橙系暖色调配色，为情侣App营造温暖亲密感；Primary=#FF7E67, PrimaryVariant=#FF6B50, Secondary=#FFB5A7, Tertiary=#FCD5CE"
+    },
+    {
+      "id": "color_warmneutrals",
+      "label": "Warm Neutral Color Tokens (暖调)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Color.kt",
+      "source_location": "lines 11-19",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "color_darkmode",
+      "label": "Dark Mode Color Scheme",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Color.kt",
+      "source_location": "lines 21-29",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "color_functional",
+      "label": "Functional Colors (Error, Success, Warning)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Color.kt",
+      "source_location": "lines 31-35",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "color_legacyaliases",
+      "label": "Legacy Color Aliases (兼容旧代码)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Color.kt",
+      "source_location": "lines 37-46",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "向后兼容旧代码的别名：Orange→Primary, Charcoal→OnBackground, Gray→OnSurfaceVariant 等"
+    },
+    {
+      "id": "theme_standbyustheme",
+      "label": "StandByUsTheme Composable",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Theme.kt",
+      "source_location": "lines 52-73",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Material3主题入口，根据系统暗色模式切换LightColorScheme/DarkColorScheme；SideEffect设置状态栏颜色以匹配主题背景"
+    },
+    {
+      "id": "theme_lightcolorscheme",
+      "label": "LightColorScheme (Material3 lightColorScheme)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Theme.kt",
+      "source_location": "lines 14-31",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "theme_darkcolorscheme",
+      "label": "DarkColorScheme (Material3 darkColorScheme)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Theme.kt",
+      "source_location": "lines 33-50",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "type_standbytypography",
+      "label": "StandByTypography (Material3 Typography)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Type.kt",
+      "source_location": "lines 8-16",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "自定义字体比例：displayLarge=32sp Bold, headlineLarge=24sp SemiBold, headlineMedium=18sp Medium, bodyLarge=16sp, bodyMedium=14sp, labelLarge=14sp Medium, labelSmall=12sp Medium"
+    },
+    {
+      "id": "widget_standbywidget",
+      "label": "StandByWidget (GlanceAppWidget)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/widget/StandByWidget.kt",
+      "source_location": "lines 17-72",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Glance桌面小组件，从widget_cache SharedPreferences读取缓存状态并渲染：显示feelingEmoji（48sp）、feeling名称（18sp Bold）、doing/customDoing（14sp）、note（12sp）；背景色使用feelingColor，默认#FFD93D"
+    },
+    {
+      "id": "widget_widgetcache",
+      "label": "widget_cache SharedPreferences",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/widget/StandByWidget.kt",
+      "source_location": "lines 60-71",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "每次状态更新时写入，Glance widget读取此缓存显示最新状态，避免widget查询数据库的开销"
+    },
+    {
+      "id": "widget_standbywidgetreceiver",
+      "label": "StandByWidgetReceiver (GlanceAppWidgetReceiver)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/widget/StandByWidgetReceiver.kt",
+      "source_location": "lines 9-32",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "GlanceAppWidgetReceiver子类，实例化StandByWidget()作为glanceAppWidget；在onUpdate/onEnabled/onDisabled中添加日志便于调试"
+    },
+    {
+      "id": "drawable_launcherbackground",
+      "label": "Launcher Icon Background Layer",
+      "file_type": "image",
+      "source_file": "app/src/main/res/drawable/ic_launcher_background.xml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "108dp纯色#FAFAFA白色背景，作为adaptive icon的底层"
+    },
+    {
+      "id": "drawable_launcherforeground",
+      "label": "Launcher Icon Foreground Heart Shape",
+      "file_type": "image",
+      "source_file": "app/src/main/res/drawable/ic_launcher_foreground.xml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "心形矢量路径，填充色#FF9F43（与品牌珊瑚橙系Primary=#FF7E67相近），108dp视口内绘制心形表示情侣应用主题"
+    },
+    {
+      "id": "mipmap_launcher",
+      "label": "Adaptive Launcher Icon (ic_launcher.xml)",
+      "file_type": "image",
+      "source_file": "app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Android adaptive icon组合background+foreground图层，背景为白色，前景为橙色心形"
+    },
+    {
+      "id": "mipmap_hdpilauncher",
+      "label": "HDPI Launcher Icon Raster (ic_launcher.webp)",
+      "file_type": "image",
+      "source_file": "app/src/main/res/mipmap-hdpi/ic_launcher.webp",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "mipmap_hdpilauncherround",
+      "label": "HDPI Round Launcher Icon Raster (ic_launcher_round.webp)",
+      "file_type": "image",
+      "source_file": "app/src/main/res/mipmap-hdpi/ic_launcher_round.webp",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "xml_widgetinfo",
+      "label": "Widget Provider Configuration (standby_widget_info.xml)",
+      "file_type": "document",
+      "source_file": "app/src/main/res/xml/standby_widget_info.xml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "小组件配置：最小250dp×250dp，目标4×4单元格，更新周期30分钟(1800000ms)，类别home_screen，初始布局widget_loading"
+    },
+    {
+      "id": "manifest_androidmanifest",
+      "label": "AndroidManifest.xml - App Entry Points",
+      "file_type": "document",
+      "source_file": "app/src/main/AndroidManifest.xml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "声明INTERNET和POST_NOTIFICATIONS权限；StandByApplication作为application name；MainActivity为主Activity（LAUNCHER intent-filter）；StandByWidgetReceiver注册为APPWIDGET_UPDATE receiver并引用standby_widget_info"
+    },
+    {
+      "id": "agents_archdoc",
+      "label": "StandByUs Architecture Documentation (AGENTS.md)",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "定义项目架构：单module，4个导航目的地(home/post_status/history/settings)，设备UUID身份，6秒轮询，Room缓存，widget_cache SharedPreferences，Supabase REST API + OkHttp（无SDK），无测试"
+    },
+    {
+      "id": "agents_deviceidentity",
+      "label": "Device-Based Identity (No User Accounts)",
+      "file_type": "rationale",
+      "source_file": "AGENTS.md",
+      "source_location": "line 24",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "无用户账户系统；设备UUID存储在supabase_device SharedPreferences中作为userId；两台设备通过交换6位字母数字配对码进行连接"
+    },
+    {
+      "id": "agents_supabasehttp",
+      "label": "Supabase via Raw HTTP (OkHttp, No SDK)",
+      "file_type": "rationale",
+      "source_file": "AGENTS.md",
+      "source_location": "line 29",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "不依赖Supabase Kotlin SDK；直接使用OkHttp调用Supabase REST API，手写JSON序列化；表：statuses（用户状态）和pairs（配对关系）；无实时订阅，通过callbackFlow每6秒轮询"
+    },
+    {
+      "id": "agents_polling",
+      "label": "6-Second Status Polling (callbackFlow)",
+      "file_type": "rationale",
+      "source_file": "AGENTS.md",
+      "source_location": "line 31",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "不使用Supabase实时订阅；通过Kotlin callbackFlow每6秒轮询Supabase REST API获取对方状态更新"
+    },
+    {
+      "id": "agents_roomcache",
+      "label": "Room Local Cache (status_cache table)",
+      "file_type": "rationale",
+      "source_file": "AGENTS.md",
+      "source_location": "line 34",
+      "source_url": null,
+      "captured_at": null,
+      "contributor": null,
+      "rationale": "AppDatabase仅有status_cache表；fallbackToDestructiveMigration()策略，schema变更时丢弃数据"
+    },
+    {
+      "id": "agents_conventions",
+      "label": "UI Conventions (Simplified Chinese, Feeling/Doing Enums)",
+      "file_type": "rationale",
+      "source_file": "AGENTS.md",
+      "source_location": "lines 42-45",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "全程简体中文UI；Feeling枚举9个值(开心/难过/疲惫/生病/悠闲/想你了/睡觉/奋斗/思考)；Doing枚举12个值(搬砖/加班/学习/睡觉/干饭/运动/通勤/看电影/玩游戏/发呆/桌游/自定义)，自定义doing最多20字符；庆祝覆盖层基于MM/dd日期"
+    },
+    {
+      "id": "readme_project",
+      "label": "StandBy Us Project README",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "情侣状态分享App；灵感来源StandBy.vip；Kotlin+Jetpack Compose+Supabase技术栈；MVVM架构+Hilt DI+Room本地缓存+Glance桌面小组件；最低Android 12(API 31)，目标Android 15(API 35)"
+    },
+    {
+      "id": "readme_techstack",
+      "label": "Tech Stack (README)",
+      "file_type": "rationale",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "表格化技术栈：UI=Jetpack Compose+Material3，架构=MVVM(ViewModel+Repository)，DI=Hilt，本地存储=Room，后端=Supabase REST API，网络=OkHttp，小组件=Glance"
+    },
+    {
+      "id": "firebase_setup",
+      "label": "Firebase Setup Guide (Superseded)",
+      "file_type": "document",
+      "source_file": "FIREBASE_SETUP.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Firebase设置步骤文档（匿名认证+Firestore），但AGENTS.md明确指出应用不使用Firebase SDK，已切换至Supabase"
+    },
+    {
+      "id": "graph_report",
+      "label": "Graph Analysis Report (2026-05-12)",
+      "file_type": "document",
+      "source_file": "graphify-out/GRAPH_REPORT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "上一次graphify分析结果：239节点, 260边, 35社区；84% EXTRACTED, 16% INFERRED；存在Chunk 01的提取数据"
+    },
+    {
+      "id": "versions_libs",
+      "label": "Dependency Version Catalog (libs.versions.toml)",
+      "file_type": "code",
+      "source_file": "gradle/libs.versions.toml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "集中管理依赖版本：AGP 8.7.3, Kotlin 2.1.0, Compose BOM 2024.12.01, Hilt 2.53.1, Room 2.6.1, OkHttp 4.12.0, Glance 1.1.1, Navigation 2.8.5, Lifecycle 2.8.7, Coroutines 1.9.0, Coil 2.7.0"
+    },
+    {
+      "id": "gradle_properties",
+      "label": "Gradle Build Properties",
+      "file_type": "code",
+      "source_file": "gradle.properties",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "userstatus_model",
+      "label": "UserStatus Data Model",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/data/model/UserStatus.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "数据实体包含doing, customDoing, feeling, feelingColor, feelingEmoji, note, updatedAt字段；由StandByWidget.loadCachedStatus()通过widget_cache构造"
+    }
+  ],
+  "edges": [
+    {
+      "source": "theme_lightcolorscheme",
+      "target": "color_coralpalette",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "LightColorScheme的primary/secondary/tertiary直接引用Color.kt的Primary/Secondary/Tertiary珊瑚色系"
+    },
+    {
+      "source": "theme_lightcolorscheme",
+      "target": "color_warmneutrals",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "LightColorScheme的background/surface/onBackground/onSurface等直接引用Color.kt暖调中性色"
+    },
+    {
+      "source": "theme_lightcolorscheme",
+      "target": "color_functional",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "LightColorScheme的error/onError引用Color.kt的Error/OnError功能色"
+    },
+    {
+      "source": "theme_darkcolorscheme",
+      "target": "color_coralpalette",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "DarkColorScheme也使用Primary/Secondary/Tertiary品牌珊瑚色作为primary/secondary/tertiary"
+    },
+    {
+      "source": "theme_darkcolorscheme",
+      "target": "color_darkmode",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "DarkColorScheme的background/surface/onBackground等引用Color.kt暗色模式颜色"
+    },
+    {
+      "source": "theme_darkcolorscheme",
+      "target": "color_functional",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "DarkColorScheme的error/onError引用Error/OnError功能色"
+    },
+    {
+      "source": "theme_standbyustheme",
+      "target": "theme_lightcolorscheme",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StandByUsTheme在非暗色模式下选择LightColorScheme"
+    },
+    {
+      "source": "theme_standbyustheme",
+      "target": "theme_darkcolorscheme",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StandByUsTheme在暗色模式下选择DarkColorScheme"
+    },
+    {
+      "source": "theme_standbyustheme",
+      "target": "type_standbytypography",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StandByUsTheme将StandByTypography传递给MaterialTheme的typography参数"
+    },
+    {
+      "source": "color_legacyaliases",
+      "target": "color_coralpalette",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "Orange别名直接引用Primary"
+    },
+    {
+      "source": "color_legacyaliases",
+      "target": "color_warmneutrals",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "Charcoal/BackgroundLight/CardWhite等别名引用OnBackground/Background/Surface"
+    },
+    {
+      "source": "color_legacyaliases",
+      "target": "color_darkmode",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "DarkCard/DarkText/DarkGray别名引用DarkSurface/DarkOnBackground/DarkOnSurfaceVariant"
+    },
+    {
+      "source": "widget_standbywidgetreceiver",
+      "target": "widget_standbywidget",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StandByWidgetReceiver的glanceAppWidget属性返回StandByWidget()实例"
+    },
+    {
+      "source": "widget_standbywidget",
+      "target": "widget_widgetcache",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "loadCachedStatus()通过context.getSharedPreferences(\"widget_cache\")读取缓存状态"
+    },
+    {
+      "source": "widget_standbywidget",
+      "target": "userstatus_model",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "loadCachedStatus()构造并返回UserStatus对象"
+    },
+    {
+      "source": "manifest_androidmanifest",
+      "target": "widget_standbywidgetreceiver",
+      "type": "contains",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AndroidManifest中声明StandByWidgetReceiver为APPWIDGET_UPDATE的receiver"
+    },
+    {
+      "source": "manifest_androidmanifest",
+      "target": "xml_widgetinfo",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "receiver的meta-data通过android:resource引用@xml/standby_widget_info"
+    },
+    {
+      "source": "mipmap_launcher",
+      "target": "drawable_launcherbackground",
+      "type": "contains",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "adaptive-icon的background子元素引用@drawable/ic_launcher_background"
+    },
+    {
+      "source": "mipmap_launcher",
+      "target": "drawable_launcherforeground",
+      "type": "contains",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "adaptive-icon的foreground子元素引用@drawable/ic_launcher_foreground"
+    },
+    {
+      "source": "mipmap_launcher",
+      "target": "mipmap_hdpilauncher",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.85,
+      "evidence": "INFERRED",
+      "rationale": "mipmap-hdpi/ic_launcher.webp是adaptive icon在API<26设备上的栅格回退版本"
+    },
+    {
+      "source": "drawable_launcherforeground",
+      "target": "color_coralpalette",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.75,
+      "evidence": "INFERRED",
+      "rationale": "前景心形填充色#FF9F43与品牌珊瑚色Primary=#FF7E67相近，体现情侣应用的温暖视觉主题"
+    },
+    {
+      "source": "readme_project",
+      "target": "agents_archdoc",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.85,
+      "evidence": "INFERRED",
+      "rationale": "README和AGENTS.md都描述项目架构、技术栈和组件结构，内容高度重叠"
+    },
+    {
+      "source": "firebase_setup",
+      "target": "agents_supabasehttp",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.2,
+      "evidence": "AMBIGUOUS",
+      "rationale": "FIREBASE_SETUP.md是遗留文档，应用已切换到Supabase；二者代表被替代和新方案的后端选择"
+    },
+    {
+      "source": "agents_supabasehttp",
+      "target": "agents_polling",
+      "type": "references",
+      "confidence_score": 0.95,
+      "evidence": "INFERRED",
+      "rationale": "Supabase HTTP方案和6秒轮询是数据同步的两个协同方面：无SDK实时订阅导致必须使用轮询"
+    },
+    {
+      "source": "agents_archdoc",
+      "target": "agents_deviceidentity",
+      "type": "contains",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "设备UUID身份是AGENTS.md中Identity章节的核心描述"
+    },
+    {
+      "source": "agents_archdoc",
+      "target": "agents_roomcache",
+      "type": "contains",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "Room缓存是AGENTS.md中Data layer章节的描述"
+    },
+    {
+      "source": "agents_archdoc",
+      "target": "widget_widgetcache",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AGENTS.md明确描述widget_cache SharedPreferences在状态更新时写入，Glance widget读取"
+    },
+    {
+      "source": "versions_libs",
+      "target": "gradle_properties",
+      "type": "references",
+      "confidence_score": 0.65,
+      "evidence": "INFERRED",
+      "rationale": "libs.versions.toml和gradle.properties共同构成Gradle构建系统配置，协同管理依赖和构建参数"
+    },
+    {
+      "source": "readme_techstack",
+      "target": "versions_libs",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.85,
+      "evidence": "INFERRED",
+      "rationale": "README技术栈表格所列技术（Hilt, Room, OkHttp, Glance, Compose）与libs.versions.toml中声明的依赖版本一一对应"
+    },
+    {
+      "source": "readme_project",
+      "target": "readme_techstack",
+      "type": "contains",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "技术栈表格是README.md内的一个章节"
+    },
+    {
+      "source": "xml_widgetinfo",
+      "target": "widget_standbywidget",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "standby_widget_info.xml定义了小组件元数据(尺寸/更新周期)，由Android系统在实例化StandByWidget时读取"
+    },
+    {
+      "source": "graph_report",
+      "target": "agents_archdoc",
+      "type": "references",
+      "confidence_score": 0.55,
+      "evidence": "INFERRED",
+      "rationale": "GRAPH_REPORT中的StandBy Us App god node和AGENTS.md架构描述指向同一个项目整体"
+    },
+    {
+      "source": "mipmap_hdpilauncher",
+      "target": "mipmap_hdpilauncherround",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.95,
+      "evidence": "INFERRED",
+      "rationale": "两者是同一应用图标的方形和圆形裁剪版本，仅shape不同"
+    }
+  ],
+  "hyperedges": [
+    {
+      "label": "Material3 Theme Pipeline",
+      "rationale": "Color.kt定义颜色token → Theme.kt组装Light/Dark ColorScheme → StandByUsTheme组合Typography+ColorScheme注入MaterialTheme",
+      "nodes": ["color_coralpalette", "color_warmneutrals", "color_darkmode", "color_functional", "theme_standbyustheme", "type_standbytypography"]
+    },
+    {
+      "label": "Widget Display Chain",
+      "rationale": "AndroidManifest注册StandByWidgetReceiver → StandByWidgetReceiver返回StandByWidget() → StandByWidget读取widget_cache SharedPreferences → 构造UserStatus渲染UI",
+      "nodes": ["manifest_androidmanifest", "widget_standbywidgetreceiver", "widget_standbywidget", "widget_widgetcache", "userstatus_model"]
+    },
+    {
+      "label": "Launcher Icon Composition",
+      "rationale": "ic_launcher.xml作为adaptive-icon容器 → background层(白色) + foreground层(橙色心形) → 回退到mipmap-hdpi栅格图标",
+      "nodes": ["mipmap_launcher", "drawable_launcherbackground", "drawable_launcherforeground", "mipmap_hdpilauncher"]
+    }
+  ]
+}

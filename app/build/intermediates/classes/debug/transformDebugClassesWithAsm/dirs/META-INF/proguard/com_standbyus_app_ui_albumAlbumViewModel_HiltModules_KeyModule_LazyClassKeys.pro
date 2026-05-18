@@ -1,0 +1,2 @@
+-keep,allowobfuscation,allowshrinking class com.standbyus.app.ui.album.AlbumViewModel
+-keep,allowobfuscation,allowshrinking class com.standbyus.app.ui.album.AlbumViewModel

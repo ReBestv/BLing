@@ -22,6 +22,8 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.standbyus.app.data.model.Feeling
 import com.standbyus.app.ui.theme.EmojiThemeManager
+import com.standbyus.app.ui.theme.StandByUsLightColors
+import com.standbyus.app.ui.theme.StandByUsSpacing
 
 private fun isEmoji(text: String) = !text.startsWith("http")
 
@@ -34,59 +36,57 @@ fun FeelingPicker(
     emojiGetter: ((Feeling) -> String)? = null
 ) {
     val context = LocalContext.current
-    val resolvedEmojiGetter = emojiGetter ?: { feeling -> EmojiThemeManager.getEmoji(context, feeling.displayName) }
+    val resolvedEmojiGetter = emojiGetter ?: { feeling ->
+        EmojiThemeManager.getEmoji(context, feeling.displayName)
+    }
 
     LazyVerticalGrid(
-        columns = GridCells.Fixed(4),
+        columns = GridCells.Fixed(3),
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        contentPadding = PaddingValues(vertical = 8.dp)
+        horizontalArrangement = Arrangement.spacedBy(StandByUsSpacing.md),
+        verticalArrangement = Arrangement.spacedBy(StandByUsSpacing.md),
+        contentPadding = PaddingValues(StandByUsSpacing.sm)
     ) {
         items(feelings) { feeling ->
             val isSelected = feeling == selectedFeeling
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .padding(4.dp)
-                    .clickable { onFeelingSelected(feeling) }
+                modifier = Modifier.clickable { onFeelingSelected(feeling) }
             ) {
                 Box(
                     modifier = Modifier
                         .size(56.dp)
                         .clip(CircleShape)
                         .background(
-                            if (isSelected) feeling.color
-                            else feeling.color.copy(alpha = 0.2f)
+                            if (isSelected) StandByUsLightColors.accent
+                            else StandByUsLightColors.accentBg
                         )
                         .border(
-                            width = if (isSelected) 3.dp else 0.dp,
-                            color = feeling.color,
+                            width = if (isSelected) 2.dp else 1.dp,
+                            color = if (isSelected) StandByUsLightColors.accent
+                                    else MaterialTheme.colorScheme.outline,
                             shape = CircleShape
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    val emojiText = resolvedEmojiGetter(feeling)
-                    if (isEmoji(emojiText)) {
-                        Text(text = emojiText, fontSize = 26.sp)
+                    val emoji = resolvedEmojiGetter(feeling)
+                    if (isEmoji(emoji)) {
+                        Text(text = emoji, fontSize = 20.sp)
                     } else {
                         AsyncImage(
                             model = ImageRequest.Builder(context)
-                                .data(emojiText).crossfade(true).build(),
+                                .data(emoji)
+                                .crossfade(true)
+                                .build(),
                             contentDescription = feeling.displayName,
-                            modifier = Modifier.size(36.dp),
-                            contentScale = ContentScale.Fit
+                            modifier = Modifier
+                                .size(28.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Crop
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = feeling.displayName,
-                    fontSize = 11.sp,
-                    color = if (isSelected) MaterialTheme.colorScheme.onBackground
-                            else MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
         }
     }

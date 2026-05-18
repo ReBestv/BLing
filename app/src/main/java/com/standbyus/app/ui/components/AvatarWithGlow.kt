@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.standbyus.app.ui.theme.StandByUsLightColors
+import com.standbyus.app.ui.theme.StandByUsMotion
 
 @Composable
 fun AvatarWithGlow(
@@ -29,7 +31,7 @@ fun AvatarWithGlow(
         initialValue = 0f,
         targetValue = 12f,
         animationSpec = infiniteRepeatable(
-            animation = tween(1500, easing = EaseInOutCubic),
+            animation = tween(StandByUsMotion.DUR_BREATH, easing = EaseInOutCubic),
             repeatMode = RepeatMode.Reverse
         )
     )
@@ -39,7 +41,7 @@ fun AvatarWithGlow(
             .size(size)
             .shadow(glowRadius.dp, CircleShape, ambientColor = glowColor)
             .clip(CircleShape)
-            .background(Color.White),
+            .background(StandByUsLightColors.accentBg),
         contentAlignment = Alignment.Center
     ) {
         Text(text = emoji, fontSize = (size.value * 0.45).sp)

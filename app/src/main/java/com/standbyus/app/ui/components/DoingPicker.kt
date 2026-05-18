@@ -1,18 +1,18 @@
 package com.standbyus.app.ui.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.standbyus.app.data.model.Doing
 import com.standbyus.app.data.model.Feeling
+import com.standbyus.app.ui.theme.StandByUsLightColors
 
 @Composable
 fun DoingPicker(
@@ -26,27 +26,32 @@ fun DoingPicker(
     Column(modifier = modifier) {
         Text(
             "此刻状态（可选）",
-            fontSize = 14.sp,
+            fontSize = 13.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = customDoing,
-            onValueChange = { if (it.length <= 30) onCustomDoingChanged(it) },
+            onValueChange = { if (it.length <= 20) onCustomDoingChanged(it) },
             placeholder = {
                 Text(
                     "布宁布宁在干嘛…",
-                    fontSize = 15.sp
+                    fontSize = 15.sp,
+                    color = StandByUsLightColors.placeholder
                 )
             },
+            textStyle = TextStyle(fontSize = 15.sp),
             singleLine = true,
-            shape = RoundedCornerShape(20.dp),
-            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.medium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 48.dp),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = selectedFeeling.color,
-                cursorColor = selectedFeeling.color
+                focusedBorderColor = StandByUsLightColors.accent,
+                unfocusedBorderColor = StandByUsLightColors.border,
+                cursorColor = StandByUsLightColors.accent
             )
         )
     }

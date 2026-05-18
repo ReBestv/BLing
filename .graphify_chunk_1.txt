@@ -1,0 +1,15 @@
+E:\AndroidProject\StandByUs\app\src\main\java\com\standbyus\app\ui\components\AGENTS.md
+E:\AndroidProject\StandByUs\app\src\main\java\com\standbyus\app\ui\history\AGENTS.md
+E:\AndroidProject\StandByUs\app\src\main\java\com\standbyus\app\ui\home\AGENTS.md
+E:\AndroidProject\StandByUs\app\src\main\java\com\standbyus\app\ui\poststatus\AGENTS.md
+E:\AndroidProject\StandByUs\app\src\main\java\com\standbyus\app\ui\settings\AGENTS.md
+E:\AndroidProject\StandByUs\app\src\main\java\com\standbyus\app\ui\theme\AGENTS.md
+E:\AndroidProject\StandByUs\app\src\main\java\com\standbyus\app\widget\AGENTS.md
+E:\AndroidProject\StandByUs\conversations\20260512-19-42-22-项目理解确认.md
+E:\AndroidProject\StandByUs\conversations\20260512-20-54-12-根据NewUI方案重构项目UI.md
+E:\AndroidProject\StandByUs\conversations\20260513-15-32-22-Figma-Make-UI重设计提示词.md
+E:\AndroidProject\StandByUs\conversations\20260513-15-32-22-New-session-2026-05-13T07-32-2.md
+E:\AndroidProject\StandByUs\docs\design\ui-redesign-2026-05-11.md
+E:\AndroidProject\StandByUs\docs\preview\album-preview.html
+E:\AndroidProject\StandByUs\docs\preview\celebration-preview.html
+E:\AndroidProject\StandByUs\docs\superpowers\plans\2026-05-07-birthday-celebration-plan.md

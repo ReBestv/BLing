@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.standbyus.app-mergeDebugResources-68:/values-v29/values-v29.xml",
+            "outputFile": "com.standbyus.app-mergeDebugResources-70:/values-v29/values-v29.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\0005fba7ad350c01c0f443f732460807\\transformed\\glance-appwidget-1.1.1\\res\\values-v29\\values-v29.xml",
+                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\88c2493d37b676e483ee3e37bf701cf5\\transformed\\glance-appwidget-1.1.1\\res\\values-v29\\values-v29.xml",
                     "from": {
                         "startLines": "2,5,19,22,25,26,27",
                         "startColumns": "4,4,4,4,4,4,4",

@@ -5,5 +5,6 @@ object Routes {
     const val ALBUM = "album"
     const val POST_STATUS = "post_status"
     const val HISTORY = "history"
+    const val CHECKIN = "checkin"
     const val SETTINGS = "settings"
 }

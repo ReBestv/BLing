@@ -1,5 +1,6 @@
 package com.standbyus.app.ui.history
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,6 +8,7 @@ import com.standbyus.app.data.model.UserStatus
 import com.standbyus.app.data.remote.SupabaseService
 import com.standbyus.app.data.repository.PairingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,8 +18,11 @@ import javax.inject.Inject
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
     private val supabaseService: SupabaseService,
-    private val pairingRepository: PairingRepository
+    private val pairingRepository: PairingRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    private val prefs = context.getSharedPreferences("pairing", Context.MODE_PRIVATE)
 
     private val _statusHistory = MutableStateFlow<List<UserStatus>>(emptyList())
     val statusHistory: StateFlow<List<UserStatus>> = _statusHistory.asStateFlow()
@@ -27,6 +32,9 @@ class HistoryViewModel @Inject constructor(
 
     private val _partnerName = MutableStateFlow("对方")
     val partnerName: StateFlow<String> = _partnerName.asStateFlow()
+
+    private val _myId = MutableStateFlow("")
+    val myId: StateFlow<String> = _myId.asStateFlow()
 
     init {
         loadHistory()
@@ -39,6 +47,7 @@ class HistoryViewModel @Inject constructor(
             _loading.value = true
             try {
                 val myId = supabaseService.getCachedDeviceId()
+                _myId.value = myId
                 if (myId.isEmpty()) {
                     _loading.value = false
                     return@launch
@@ -53,23 +62,27 @@ class HistoryViewModel @Inject constructor(
                     try { UserStatus.fromMap(raw) } catch (_: Exception) { null }
                 }
 
-                // 获取对方的状态
-                val pair = pairingRepository.findPairByUserId(myId)
-                val partnerHistory = if (pair != null) {
-                    val partnerId = when {
-                        pair.user1Id == myId && pair.user2Id.isNotEmpty() -> pair.user2Id
-                        pair.user2Id == myId && pair.user1Id.isNotEmpty() -> pair.user1Id
+                // 获取对方的状态 — 优先使用缓存的 partner_id
+                val cachedPartnerId = prefs.getString("partner_id", null)
+                val partnerId = if (!cachedPartnerId.isNullOrEmpty()) {
+                    cachedPartnerId
+                } else {
+                    val pair = pairingRepository.findPairByUserId(myId)
+                    when {
+                        pair?.user1Id == myId && pair.user2Id.isNotEmpty() -> pair.user2Id
+                        pair?.user2Id == myId && pair.user1Id.isNotEmpty() -> pair.user1Id
                         else -> null
                     }
-                    if (partnerId != null) {
-                        val pResults = supabaseService.query(
-                            "statuses",
-                            "userId=eq.$partnerId&order=updatedAt.desc&limit=30"
-                        )
-                        pResults.mapNotNull { raw ->
-                            try { UserStatus.fromMap(raw) } catch (_: Exception) { null }
-                        }
-                    } else emptyList()
+                }
+
+                val partnerHistory = if (partnerId != null) {
+                    val pResults = supabaseService.query(
+                        "statuses",
+                        "userId=eq.$partnerId&order=updatedAt.desc&limit=30" // 扩大显示
+                    )
+                    pResults.mapNotNull { raw ->
+                        try { UserStatus.fromMap(raw) } catch (_: Exception) { null }
+                    }
                 } else emptyList()
 
                 // 合并并按时间降序排序

@@ -2,6 +2,7 @@ R_DEF: Internal format may change without notice
 local
 drawable ic_launcher_background
 drawable ic_launcher_foreground
+layout widget_loading
 mipmap ic_launcher
 string app_name
 style Theme.StandByUs

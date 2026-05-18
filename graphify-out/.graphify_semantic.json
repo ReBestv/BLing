@@ -1,0 +1,2169 @@
+{
+  "nodes": [
+    {
+      "id": "build_gradle_kts_StandByUs_project",
+      "label": "StandByUs Root Project",
+      "file_type": "code",
+      "source_file": "build.gradle.kts",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Top-level Gradle project declaring android.application, kotlin.android, kotlin.compose, hilt, ksp plugins applied with apply false - each subproject declares them explicitly."
+    },
+    {
+      "id": "settings_gradle_kts_root_settings",
+      "label": "StandByUs Settings",
+      "file_type": "code",
+      "source_file": "settings.gradle.kts",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Repositories: google, mavenCentral, gradlePluginPortal. RepositoriesMode.FAIL_ON_PROJECT_REPOS enforces central resolution. Single :app module."
+    },
+    {
+      "id": "app_build_gradle_kts_app_module",
+      "label": ":app Module Build",
+      "file_type": "code",
+      "source_file": "app/build.gradle.kts",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "compileSdk=35, minSdk=31, targetSdk=35, Java 17, Compose enabled. Dependencies: Compose BOM, Hilt, Room, OkHttp, Glance, Coroutines, Coil. ProGuard minification on release."
+    },
+    {
+      "id": "MainActivity_MainActivity",
+      "label": "MainActivity",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/MainActivity.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "@AndroidEntryPoint ComponentActivity. Entry point with edge-to-edge display, 4-tab bottom navigation (Home/Album/History/Settings), NavHost routing, and celebration overlay integration."
+    },
+    {
+      "id": "StandByApplication_StandByApplication",
+      "label": "StandByApplication",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/StandByApplication.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "@HiltAndroidApp Application subclass. Eagerly initializes SupabaseService.getDeviceId() on create. Triggers Glance widget update via StandByWidget().updateAll() using CoroutineScope(SupervisorJob+Main)."
+    },
+    {
+      "id": "AppDatabase_AppDatabase",
+      "label": "AppDatabase (Room)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/data/local/AppDatabase.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Room database with single entity StatusEntity, version=1, exportSchema=false. fallbackToDestructiveMigration() - schema changes wipe data. Write-through cache, not source of truth."
+    },
+    {
+      "id": "StatusDao_StatusDao",
+      "label": "StatusDao",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/data/local/StatusDao.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Room DAO: getStatus(userId) SELECT, upsertStatus REPLACE on conflict, clearAll DELETE FROM. Single-table access layer."
+    },
+    {
+      "id": "StatusEntity_StatusEntity",
+      "label": "StatusEntity",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/data/local/StatusEntity.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Room @Entity with tableName=status_cache. Fields: userId (PK), doing, customDoing, feeling, feelingColor, feelingEmoji, note, updatedAt, source. Maps bidirectionally to UserStatus via extension functions."
+    },
+    {
+      "id": "AlbumPhoto_AlbumPhoto",
+      "label": "AlbumPhoto",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/data/model/AlbumPhoto.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Photo metadata data class (id, deviceId, url, caption, createdAt) with companion fromMap(Map). Used by AlbumRepository for our-story photo album feature."
+    },
+    {
+      "id": "Doing_Doing",
+      "label": "Doing Enum",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/data/model/Doing.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "12 activity presets in Chinese: WORKING, OVERTIME, STUDYING, SLEEPING, EATING, EXERCISING, COMMUTING, MOVIE, GAMING, DAYDREAMING, BOARD_GAME, CUSTOM. Includes fromDisplayName lookup."
+    },
+    {
+      "id": "Feeling_Feeling",
+      "label": "Feeling Enum",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/data/model/Feeling.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "16 mood presets in Chinese with emoji, color, gradientStart, gradientEnd: HAPPY, MISSING, KISS, LOVE, RELAXED, HUSTLING, THINKING, WATCHING, SAD, UPSET, ANGRY, ANXIOUS, TIRED, SICK, BORED, SLEEPING. Includes fromDisplayName and fromEmoji lookups."
+    },
+    {
+      "id": "PairingInfo_PairingInfo",
+      "label": "PairingInfo",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/data/model/PairingInfo.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Pair link data class (pairId, user1Id, user2Id, user1Name, user2Name). Hand-written toMap()/fromMap() serialization. Links exactly two devices."
+    },
+    {
+      "id": "UserStatus_UserStatus",
+      "label": "UserStatus",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/data/model/UserStatus.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Core domain model for status data. Fields: userId, doing, customDoing, feeling, feelingColor, feelingEmoji, note, updatedAt, source. Hand-written toMap()/fromMap() for JSON via org.json. Used across all layers (Supabase, Room, Widget)."
+    },
+    {
+      "id": "StickerManager_StickerManager",
+      "label": "StickerManager",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/data/remote/StickerManager.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Uploads feeling sticker images to Supabase Storage bucket stickers. Reads image bytes from content resolver, generates filename with feeling+UUID, delegates to supabaseService.uploadFile()."
+    },
+    {
+      "id": "SupabaseConfig_SupabaseConfig",
+      "label": "SupabaseConfig",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/data/remote/SupabaseConfig.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Hardcoded Supabase project config: SUPABASE_URL, ANON_KEY (publishable), REST_URL (computed). No runtime config or environment variable abstraction."
+    },
+    {
+      "id": "SupabaseService_SupabaseService",
+      "label": "SupabaseService",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/data/remote/SupabaseService.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "@Singleton REST client using raw OkHttp (no Supabase Kotlin SDK). Two OkHttpClients: main (5s timeouts, JSON Content-Type, Prefer return=representation) and uploadClient (60s write timeout). Auth via apikey + Bearer headers referencing SupabaseConfig.ANON_KEY. API: getDeviceId (SharedPreferences UUID), create/update/delete (REST), query (GET), uploadFile/deleteFile/getPublicUrl (Storage). JSON via org.json."
+    },
+    {
+      "id": "AlbumRepository_AlbumRepository",
+      "label": "AlbumRepository",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/data/repository/AlbumRepository.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "@Singleton repository for shared photo album feature. Uploads photos to Supabase Storage bucket our-story, records metadata in photos table. compressImage() resizes to max 1920px JPEG quality 80. getPhotos() fetches both users photos."
+    },
+    {
+      "id": "PairingRepository_PairingRepository",
+      "label": "PairingRepository",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/data/repository/PairingRepository.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "@Singleton repository for device pairing. generatePairingCode() creates 6-char alphanumeric code (excluded ambiguous chars 0/O/1/I). createPairingCode/joinPair/unpair/findPairByUserId/getPairInfo operate on pairs table. Two devices pair without authentication."
+    },
+    {
+      "id": "StatusRepository_StatusRepository",
+      "label": "StatusRepository",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/data/repository/StatusRepository.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "@Singleton repository orchestrating full status sync pipeline. updateStatus writes to Supabase (upsert via query-then-create-or-update), Room cache, widget_cache SharedPreferences. observeStatus provides callbackFlow polling at 6s intervals: fetch from Supabase, upsert Room, emit via Flow. Falls back to Room cache on network failure."
+    },
+    {
+      "id": "AppModule_AppModule",
+      "label": "AppModule (Hilt DI)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/di/AppModule.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Hilt @Module installed in SingletonComponent. Provides @Singleton AppDatabase via Room.databaseBuilder (standbyus_db). Provides StatusDao via database.statusDao(). fallbackToDestructiveMigration for schema changes."
+    },
+    {
+      "id": "StatusRepository_widget_cache",
+      "label": "widget_cache SharedPreferences",
+      "file_type": "rationale",
+      "source_file": "app/src/main/java/com/standbyus/app/data/repository/StatusRepository.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "SharedPreferences cache written on every status update with keys: doing, customDoing, feeling, feelingColor, feelingEmoji, note, updatedAt. Glance app widget reads from this cache."
+    },
+    {
+      "id": "StatusEntity_user_status_conversion",
+      "label": "UserStatus <-> StatusEntity Conversion",
+      "file_type": "rationale",
+      "source_file": "app/src/main/java/com/standbyus/app/data/local/StatusEntity.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Bidirectional extension function conversion between domain model (UserStatus) and persistence model (StatusEntity). No mapper class - simple extension functions toEntity() and toUserStatus() defined in StatusEntity.kt."
+    },
+    {
+      "id": "SupabaseService_device_id",
+      "label": "Device-Based Identity",
+      "file_type": "rationale",
+      "source_file": "app/src/main/java/com/standbyus/app/data/remote/SupabaseService.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "No user accounts. UUID stored in supabase_device SharedPreferences serves as device permanent identity (userId). Generated once on first launch, cached in memory. Two devices pair by exchanging 6-char code - no auth required."
+    },
+    {
+      "id": "MainActivity_celebration_overlay",
+      "label": "Celebration Overlay System",
+      "file_type": "rationale",
+      "source_file": "app/src/main/java/com/standbyus/app/MainActivity.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Date-based celebration overlay shown once per day. checkCelebrationDay() matches current MM/dd against CelebrationConfig. Full-screen particle animation before main content. Tracked via celebration SharedPreferences."
+    },
+    {
+      "id": "supabasemodule",
+      "label": "SupabaseModule",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/di/SupabaseModule.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "routes",
+      "label": "Routes",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/navigation/Routes.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "albumscreen",
+      "label": "AlbumScreen",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/album/AlbumScreen.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "albumviewmodel",
+      "label": "AlbumViewModel",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/album/AlbumViewModel.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Uploads photos to Supabase Storage via AlbumRepository; resolves partner ID via PairingRepository to fetch shared album."
+    },
+    {
+      "id": "celebrationconfig",
+      "label": "CelebrationConfig",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/celebration/CelebrationConfig.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Predefined celebratory dates (birthday, Christmas, Valentine's) — hardcoded because app targets a specific couple."
+    },
+    {
+      "id": "celebrationday",
+      "label": "CelebrationDay",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/celebration/CelebrationDay.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "celebrationoverlay",
+      "label": "CelebrationOverlay",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/celebration/CelebrationOverlay.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Fullscreen particle animation overlay; auto-dismisses after 4 seconds. Shown once per day via SharedPreferences date flag."
+    },
+    {
+      "id": "avatarwithglow",
+      "label": "AvatarWithGlow",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/components/AvatarWithGlow.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "doingpicker",
+      "label": "DoingPicker",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/components/DoingPicker.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Free-text activity input capped at 30 characters; references selected Feeling for contextual placeholder."
+    },
+    {
+      "id": "feelingpicker",
+      "label": "FeelingPicker",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/components/FeelingPicker.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "3-column grid of Feeling entries; resolves emoji via EmojiThemeManager supporting theme-switchable emoji sets."
+    },
+    {
+      "id": "statuscard",
+      "label": "StatusCard",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/components/StatusCard.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Gradient card displaying partner status — feeling drives gradient colors via Feeling.gradientStart/gradientEnd; breathing glow animation on shadow."
+    },
+    {
+      "id": "historyscreen",
+      "label": "HistoryScreen",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/history/HistoryScreen.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "historyviewmodel",
+      "label": "HistoryViewModel",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/history/HistoryViewModel.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Fetches merged timeline of own + partner statuses from Supabase; resolves partnerId via PairingRepository; limits to 20 entries each."
+    },
+    {
+      "id": "homescreen",
+      "label": "HomeScreen",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/home/HomeScreen.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "homeviewmodel",
+      "label": "HomeViewModel",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/home/HomeViewModel.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Polls Supabase every 6s via callbackFlow for real-time-like updates; caches partner ID in SharedPreferences; observes own + partner status from Room via flatMapLatest."
+    },
+    {
+      "id": "settingsscreen",
+      "label": "SettingsScreen",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/settings/SettingsScreen.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "settingsviewmodel",
+      "label": "SettingsViewModel",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/settings/SettingsViewModel.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Manages 6-char pairing code generation/join; emoji theme selection via EmojiThemeManager; caches paired state in SharedPreferences."
+    },
+    {
+      "id": "device_uuid_identity",
+      "label": "Device-UUID Identity",
+      "file_type": "rationale",
+      "source_file": null,
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "No user accounts — device UUID from SharedPreferences serves as userId. Two devices pair by exchanging a 6-character alphanumeric code. Rationale: couples app, no auth needed."
+    },
+    {
+      "id": "polling_based_sync",
+      "label": "Polling-based Sync",
+      "file_type": "rationale",
+      "source_file": null,
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "No real-time subscriptions (WebSocket/SSE). Status updates use polling every 6 seconds via callbackFlow. Trade-off: simpler implementation vs slightly delayed updates."
+    },
+    {
+      "id": "color_coralpalette",
+      "label": "Coral Brand Color Palette (珊瑚橙系)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Color.kt",
+      "source_location": "lines 5-9",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "珊瑚橙系暖色调配色，为情侣App营造温暖亲密感；Primary=#FF7E67, PrimaryVariant=#FF6B50, Secondary=#FFB5A7, Tertiary=#FCD5CE"
+    },
+    {
+      "id": "color_warmneutrals",
+      "label": "Warm Neutral Color Tokens (暖调)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Color.kt",
+      "source_location": "lines 11-19",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "color_darkmode",
+      "label": "Dark Mode Color Scheme",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Color.kt",
+      "source_location": "lines 21-29",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "color_functional",
+      "label": "Functional Colors (Error, Success, Warning)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Color.kt",
+      "source_location": "lines 31-35",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "color_legacyaliases",
+      "label": "Legacy Color Aliases (兼容旧代码)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Color.kt",
+      "source_location": "lines 37-46",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "向后兼容旧代码的别名：Orange→Primary, Charcoal→OnBackground, Gray→OnSurfaceVariant 等"
+    },
+    {
+      "id": "theme_standbyustheme",
+      "label": "StandByUsTheme Composable",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Theme.kt",
+      "source_location": "lines 52-73",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Material3主题入口，根据系统暗色模式切换LightColorScheme/DarkColorScheme；SideEffect设置状态栏颜色以匹配主题背景"
+    },
+    {
+      "id": "theme_lightcolorscheme",
+      "label": "LightColorScheme (Material3 lightColorScheme)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Theme.kt",
+      "source_location": "lines 14-31",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "theme_darkcolorscheme",
+      "label": "DarkColorScheme (Material3 darkColorScheme)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Theme.kt",
+      "source_location": "lines 33-50",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "type_standbytypography",
+      "label": "StandByTypography (Material3 Typography)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/ui/theme/Type.kt",
+      "source_location": "lines 8-16",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "自定义字体比例：displayLarge=32sp Bold, headlineLarge=24sp SemiBold, headlineMedium=18sp Medium, bodyLarge=16sp, bodyMedium=14sp, labelLarge=14sp Medium, labelSmall=12sp Medium"
+    },
+    {
+      "id": "widget_standbywidget",
+      "label": "StandByWidget (GlanceAppWidget)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/widget/StandByWidget.kt",
+      "source_location": "lines 17-72",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Glance桌面小组件，从widget_cache SharedPreferences读取缓存状态并渲染：显示feelingEmoji（48sp）、feeling名称（18sp Bold）、doing/customDoing（14sp）、note（12sp）；背景色使用feelingColor，默认#FFD93D"
+    },
+    {
+      "id": "widget_widgetcache",
+      "label": "widget_cache SharedPreferences",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/widget/StandByWidget.kt",
+      "source_location": "lines 60-71",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "每次状态更新时写入，Glance widget读取此缓存显示最新状态，避免widget查询数据库的开销"
+    },
+    {
+      "id": "widget_standbywidgetreceiver",
+      "label": "StandByWidgetReceiver (GlanceAppWidgetReceiver)",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/widget/StandByWidgetReceiver.kt",
+      "source_location": "lines 9-32",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "GlanceAppWidgetReceiver子类，实例化StandByWidget()作为glanceAppWidget；在onUpdate/onEnabled/onDisabled中添加日志便于调试"
+    },
+    {
+      "id": "drawable_launcherbackground",
+      "label": "Launcher Icon Background Layer",
+      "file_type": "image",
+      "source_file": "app/src/main/res/drawable/ic_launcher_background.xml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "108dp纯色#FAFAFA白色背景，作为adaptive icon的底层"
+    },
+    {
+      "id": "drawable_launcherforeground",
+      "label": "Launcher Icon Foreground Heart Shape",
+      "file_type": "image",
+      "source_file": "app/src/main/res/drawable/ic_launcher_foreground.xml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "心形矢量路径，填充色#FF9F43（与品牌珊瑚橙系Primary=#FF7E67相近），108dp视口内绘制心形表示情侣应用主题"
+    },
+    {
+      "id": "mipmap_launcher",
+      "label": "Adaptive Launcher Icon (ic_launcher.xml)",
+      "file_type": "image",
+      "source_file": "app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Android adaptive icon组合background+foreground图层，背景为白色，前景为橙色心形"
+    },
+    {
+      "id": "mipmap_hdpilauncher",
+      "label": "HDPI Launcher Icon Raster (ic_launcher.webp)",
+      "file_type": "image",
+      "source_file": "app/src/main/res/mipmap-hdpi/ic_launcher.webp",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "mipmap_hdpilauncherround",
+      "label": "HDPI Round Launcher Icon Raster (ic_launcher_round.webp)",
+      "file_type": "image",
+      "source_file": "app/src/main/res/mipmap-hdpi/ic_launcher_round.webp",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "xml_widgetinfo",
+      "label": "Widget Provider Configuration (standby_widget_info.xml)",
+      "file_type": "document",
+      "source_file": "app/src/main/res/xml/standby_widget_info.xml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "小组件配置：最小250dp×250dp，目标4×4单元格，更新周期30分钟(1800000ms)，类别home_screen，初始布局widget_loading"
+    },
+    {
+      "id": "manifest_androidmanifest",
+      "label": "AndroidManifest.xml - App Entry Points",
+      "file_type": "document",
+      "source_file": "app/src/main/AndroidManifest.xml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "声明INTERNET和POST_NOTIFICATIONS权限；StandByApplication作为application name；MainActivity为主Activity（LAUNCHER intent-filter）；StandByWidgetReceiver注册为APPWIDGET_UPDATE receiver并引用standby_widget_info"
+    },
+    {
+      "id": "agents_archdoc",
+      "label": "StandByUs Architecture Documentation (AGENTS.md)",
+      "file_type": "document",
+      "source_file": "AGENTS.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "定义项目架构：单module，4个导航目的地(home/post_status/history/settings)，设备UUID身份，6秒轮询，Room缓存，widget_cache SharedPreferences，Supabase REST API + OkHttp（无SDK），无测试"
+    },
+    {
+      "id": "agents_deviceidentity",
+      "label": "Device-Based Identity (No User Accounts)",
+      "file_type": "rationale",
+      "source_file": "AGENTS.md",
+      "source_location": "line 24",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "无用户账户系统；设备UUID存储在supabase_device SharedPreferences中作为userId；两台设备通过交换6位字母数字配对码进行连接"
+    },
+    {
+      "id": "agents_supabasehttp",
+      "label": "Supabase via Raw HTTP (OkHttp, No SDK)",
+      "file_type": "rationale",
+      "source_file": "AGENTS.md",
+      "source_location": "line 29",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "不依赖Supabase Kotlin SDK；直接使用OkHttp调用Supabase REST API，手写JSON序列化；表：statuses（用户状态）和pairs（配对关系）；无实时订阅，通过callbackFlow每6秒轮询"
+    },
+    {
+      "id": "agents_polling",
+      "label": "6-Second Status Polling (callbackFlow)",
+      "file_type": "rationale",
+      "source_file": "AGENTS.md",
+      "source_location": "line 31",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "不使用Supabase实时订阅；通过Kotlin callbackFlow每6秒轮询Supabase REST API获取对方状态更新"
+    },
+    {
+      "id": "agents_roomcache",
+      "label": "Room Local Cache (status_cache table)",
+      "file_type": "rationale",
+      "source_file": "AGENTS.md",
+      "source_location": "line 34",
+      "source_url": null,
+      "captured_at": null,
+      "contributor": null,
+      "rationale": "AppDatabase仅有status_cache表；fallbackToDestructiveMigration()策略，schema变更时丢弃数据"
+    },
+    {
+      "id": "agents_conventions",
+      "label": "UI Conventions (Simplified Chinese, Feeling/Doing Enums)",
+      "file_type": "rationale",
+      "source_file": "AGENTS.md",
+      "source_location": "lines 42-45",
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "全程简体中文UI；Feeling枚举9个值(开心/难过/疲惫/生病/悠闲/想你了/睡觉/奋斗/思考)；Doing枚举12个值(搬砖/加班/学习/睡觉/干饭/运动/通勤/看电影/玩游戏/发呆/桌游/自定义)，自定义doing最多20字符；庆祝覆盖层基于MM/dd日期"
+    },
+    {
+      "id": "readme_project",
+      "label": "StandBy Us Project README",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "情侣状态分享App；灵感来源StandBy.vip；Kotlin+Jetpack Compose+Supabase技术栈；MVVM架构+Hilt DI+Room本地缓存+Glance桌面小组件；最低Android 12(API 31)，目标Android 15(API 35)"
+    },
+    {
+      "id": "readme_techstack",
+      "label": "Tech Stack (README)",
+      "file_type": "rationale",
+      "source_file": "README.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "表格化技术栈：UI=Jetpack Compose+Material3，架构=MVVM(ViewModel+Repository)，DI=Hilt，本地存储=Room，后端=Supabase REST API，网络=OkHttp，小组件=Glance"
+    },
+    {
+      "id": "firebase_setup",
+      "label": "Firebase Setup Guide (Superseded)",
+      "file_type": "document",
+      "source_file": "FIREBASE_SETUP.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "Firebase设置步骤文档（匿名认证+Firestore），但AGENTS.md明确指出应用不使用Firebase SDK，已切换至Supabase"
+    },
+    {
+      "id": "graph_report",
+      "label": "Graph Analysis Report (2026-05-12)",
+      "file_type": "document",
+      "source_file": "graphify-out/GRAPH_REPORT.md",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "上一次graphify分析结果：239节点, 260边, 35社区；84% EXTRACTED, 16% INFERRED；存在Chunk 01的提取数据"
+    },
+    {
+      "id": "versions_libs",
+      "label": "Dependency Version Catalog (libs.versions.toml)",
+      "file_type": "code",
+      "source_file": "gradle/libs.versions.toml",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "集中管理依赖版本：AGP 8.7.3, Kotlin 2.1.0, Compose BOM 2024.12.01, Hilt 2.53.1, Room 2.6.1, OkHttp 4.12.0, Glance 1.1.1, Navigation 2.8.5, Lifecycle 2.8.7, Coroutines 1.9.0, Coil 2.7.0"
+    },
+    {
+      "id": "gradle_properties",
+      "label": "Gradle Build Properties",
+      "file_type": "code",
+      "source_file": "gradle.properties",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "userstatus_model",
+      "label": "UserStatus Data Model",
+      "file_type": "code",
+      "source_file": "app/src/main/java/com/standbyus/app/data/model/UserStatus.kt",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null,
+      "rationale": "数据实体包含doing, customDoing, feeling, feelingColor, feelingEmoji, note, updatedAt字段；由StandByWidget.loadCachedStatus()通过widget_cache构造"
+    },
+    {
+      "id": "icon_motion",
+      "label": "ic-motion.svg — Sunburst/Radiate Icon (8-ray starburst pattern)",
+      "file_type": "image",
+      "source_file": "NewUI/icons/ic-motion.svg"
+    },
+    {
+      "id": "icon_post",
+      "label": "ic-post.svg — Pencil/Edit Icon (angled pencil with rule lines)",
+      "file_type": "image",
+      "source_file": "NewUI/icons/ic-post.svg"
+    },
+    {
+      "id": "icon_ruler",
+      "label": "ic-ruler.svg — Ruler/Pencil Icon (angled measuring tool)",
+      "file_type": "image",
+      "source_file": "NewUI/icons/ic-ruler.svg"
+    },
+    {
+      "id": "icon_send",
+      "label": "ic-send.svg — Paper Plane/Send Icon (triangular plane with trail)",
+      "file_type": "image",
+      "source_file": "NewUI/icons/ic-send.svg"
+    },
+    {
+      "id": "icon_settings",
+      "label": "ic-settings.svg — Gear/Cog Icon (toothed circle with center hub)",
+      "file_type": "image",
+      "source_file": "NewUI/icons/ic-settings.svg"
+    },
+    {
+      "id": "icon_signal",
+      "label": "ic-signal.svg — Signal Bars Icon (4 vertical bars ascending height)",
+      "file_type": "image",
+      "source_file": "NewUI/icons/ic-signal.svg"
+    },
+    {
+      "id": "icon_sparkle",
+      "label": "ic-sparkle.svg — Sparkle/Star Icon (4-point radiant star)",
+      "file_type": "image",
+      "source_file": "NewUI/icons/ic-sparkle.svg"
+    },
+    {
+      "id": "icon_sun",
+      "label": "ic-sun.svg — Sun Icon (circle with 8 radiating rays)",
+      "file_type": "image",
+      "source_file": "NewUI/icons/ic-sun.svg"
+    },
+    {
+      "id": "icon_timeline",
+      "label": "ic-timeline.svg — Clock/Timeline Icon (circle with clock hands at ~01:00)",
+      "file_type": "image",
+      "source_file": "NewUI/icons/ic-timeline.svg"
+    },
+    {
+      "id": "icon_trash",
+      "label": "ic-trash.svg — Trash/Delete Icon (can with lid and vertical slit lines)",
+      "file_type": "image",
+      "source_file": "NewUI/icons/ic-trash.svg"
+    },
+    {
+      "id": "newui_design_system",
+      "label": "NewUI Design System Refactor",
+      "file_type": "concept",
+      "source_file": "NewUI/"
+    },
+    {
+      "id": "newui_icons_dir",
+      "label": "NewUI Icons Directory",
+      "file_type": "directory",
+      "source_file": "NewUI/icons/"
+    },
+    {
+      "id": "feature_post_status",
+      "label": "Post Status Screen (Navigation Destination)",
+      "file_type": "concept",
+      "source_file": "ui/poststatus/"
+    },
+    {
+      "id": "feature_settings",
+      "label": "Settings Screen (Navigation Destination)",
+      "file_type": "concept",
+      "source_file": "ui/settings/"
+    },
+    {
+      "id": "feature_history",
+      "label": "History Screen (Navigation Destination)",
+      "file_type": "concept",
+      "source_file": "ui/history/"
+    },
+    {
+      "id": "feature_home",
+      "label": "Home Screen (Navigation Destination)",
+      "file_type": "concept",
+      "source_file": "ui/home/"
+    },
+    {
+      "id": "feature_celebration",
+      "label": "Celebration Overlay System",
+      "file_type": "concept",
+      "source_file": "ui/celebration/"
+    },
+    {
+      "id": "feeling_enum",
+      "label": "Feeling Enum (9 values: 开心/难过/疲惫/生病/悠闲/想你了/睡觉/奋斗/思考)",
+      "file_type": "source",
+      "source_file": "data/model/Feeling.kt"
+    },
+    {
+      "id": "pairing_feature",
+      "label": "Device Pairing (6-char alphanumeric code exchange)",
+      "file_type": "concept",
+      "source_file": "data/repository/PairingRepository.kt"
+    },
+    {
+      "id": "status_polling",
+      "label": "Status Polling (6s callbackFlow via Supabase REST)",
+      "file_type": "concept",
+      "source_file": "ui/home/HomeViewModel.kt"
+    },
+    {
+      "id": "custom_doing",
+      "label": "Custom Doing Text Input (max 20 chars)",
+      "file_type": "concept",
+      "source_file": "data/model/Doing.kt"
+    }
+  ],
+  "edges": [
+    {
+      "source": "settings_gradle_kts_root_settings",
+      "target": "app_build_gradle_kts_app_module",
+      "type": "contains",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "settings.gradle.kts explicitly includes :app module."
+    },
+    {
+      "source": "app_build_gradle_kts_app_module",
+      "target": "build_gradle_kts_StandByUs_project",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "app/build.gradle.kts applies plugins declared in root build.gradle.kts."
+    },
+    {
+      "source": "AppModule_AppModule",
+      "target": "AppDatabase_AppDatabase",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AppModule.provideDatabase() constructs AppDatabase via Room.databaseBuilder."
+    },
+    {
+      "source": "AppModule_AppModule",
+      "target": "StatusDao_StatusDao",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AppModule.provideStatusDao() calls database.statusDao() to provide StatusDao."
+    },
+    {
+      "source": "AppDatabase_AppDatabase",
+      "target": "StatusEntity_StatusEntity",
+      "type": "contains",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AppDatabase declares StatusEntity in @Database annotation."
+    },
+    {
+      "source": "AppDatabase_AppDatabase",
+      "target": "StatusDao_StatusDao",
+      "type": "contains",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AppDatabase defines abstract fun statusDao() returning StatusDao."
+    },
+    {
+      "source": "StatusDao_StatusDao",
+      "target": "StatusEntity_StatusEntity",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StatusDao queries operate on status_cache table mapped to StatusEntity."
+    },
+    {
+      "source": "StatusEntity_StatusEntity",
+      "target": "UserStatus_UserStatus",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StatusEntity.kt imports and references UserStatus in extension conversion functions."
+    },
+    {
+      "source": "StatusEntity_user_status_conversion",
+      "target": "StatusEntity_StatusEntity",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "Conversion functions operate on StatusEntity and UserStatus."
+    },
+    {
+      "source": "StatusEntity_user_status_conversion",
+      "target": "UserStatus_UserStatus",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "Conversion functions create/read UserStatus instances."
+    },
+    {
+      "source": "SupabaseService_SupabaseService",
+      "target": "SupabaseConfig_SupabaseConfig",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "SupabaseService references SupabaseConfig constants for URL and ANON_KEY in HTTP request construction."
+    },
+    {
+      "source": "SupabaseService_SupabaseService",
+      "target": "SupabaseService_device_id",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "SupabaseService.getDeviceId() implements the device identity mechanism."
+    },
+    {
+      "source": "StickerManager_StickerManager",
+      "target": "SupabaseService_SupabaseService",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StickerManager.uploadSticker() calls supabaseService.uploadFile() to upload image bytes to storage."
+    },
+    {
+      "source": "AlbumRepository_AlbumRepository",
+      "target": "SupabaseService_SupabaseService",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AlbumRepository calls supabaseService methods: uploadFile, create, query, delete, deleteFile for photo CRUD."
+    },
+    {
+      "source": "AlbumRepository_AlbumRepository",
+      "target": "AlbumPhoto_AlbumPhoto",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AlbumRepository imports AlbumPhoto and calls AlbumPhoto.fromMap() to parse Supabase query results."
+    },
+    {
+      "source": "PairingRepository_PairingRepository",
+      "target": "SupabaseService_SupabaseService",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "PairingRepository calls supabaseService methods: create, query, update, delete on pairs table."
+    },
+    {
+      "source": "PairingRepository_PairingRepository",
+      "target": "PairingInfo_PairingInfo",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "PairingRepository imports PairingInfo and calls PairingInfo.fromMap()."
+    },
+    {
+      "source": "StatusRepository_StatusRepository",
+      "target": "SupabaseService_SupabaseService",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StatusRepository calls supabaseService.query(), .create(), .update() on statuses table."
+    },
+    {
+      "source": "StatusRepository_StatusRepository",
+      "target": "StatusDao_StatusDao",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StatusRepository calls statusDao.upsertStatus(), .getStatus(), .clearAll() for local cache operations."
+    },
+    {
+      "source": "StatusRepository_StatusRepository",
+      "target": "UserStatus_UserStatus",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StatusRepository imports UserStatus, calls .toMap() and UserStatus.fromMap()."
+    },
+    {
+      "source": "StatusRepository_StatusRepository",
+      "target": "StatusRepository_widget_cache",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StatusRepository.updateWidgetCache() writes status fields to widget_cache SharedPreferences."
+    },
+    {
+      "source": "StatusRepository_StatusRepository",
+      "target": "StatusEntity_user_status_conversion",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StatusRepository calls userStatus.toEntity() and statusEntity.toUserStatus() conversion functions."
+    },
+    {
+      "source": "StandByApplication_StandByApplication",
+      "target": "SupabaseService_SupabaseService",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StandByApplication injects SupabaseService and calls supabaseService.getDeviceId(this) in onCreate()."
+    },
+    {
+      "source": "MainActivity_MainActivity",
+      "target": "MainActivity_celebration_overlay",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "MainActivity calls checkCelebrationDay() and conditionally shows CelebrationOverlay composable."
+    },
+    {
+      "source": "PairingRepository_PairingRepository",
+      "target": "SupabaseService_device_id",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "PairingRepository uses device identity (via SupabaseService.getDeviceId) as creatorUserId and userId parameters."
+    },
+    {
+      "source": "StatusRepository_StatusRepository",
+      "target": "SupabaseService_device_id",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StatusRepository uses device identity for userId-based status queries and updates."
+    },
+    {
+      "source": "StatusEntity_StatusEntity",
+      "target": "UserStatus_UserStatus",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.95,
+      "evidence": "INFERRED",
+      "rationale": "Identical field structure (userId, doing, customDoing, feeling, feelingColor, feelingEmoji, note, updatedAt, source). StatusEntity is persistence model; UserStatus is domain model. Bidirectional conversion functions confirm same concept."
+    },
+    {
+      "source": "UserStatus_UserStatus",
+      "target": "PairingInfo_PairingInfo",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.85,
+      "evidence": "INFERRED",
+      "rationale": "Both use identical hand-written Map serialization pattern (toMap() returning Map<String,Any>, companion fromMap(Map)). Same org.json approach, no Moshi or Kotlinx Serialization."
+    },
+    {
+      "source": "Doing_Doing",
+      "target": "Feeling_Feeling",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.85,
+      "evidence": "INFERRED",
+      "rationale": "Both are enum-based preset lists with displayName, companion fromDisplayName lookup, and Chinese display values. Doing has 12 activities; Feeling has 16 moods with additional gradient color properties."
+    },
+    {
+      "source": "AlbumPhoto_AlbumPhoto",
+      "target": "UserStatus_UserStatus",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.75,
+      "evidence": "INFERRED",
+      "rationale": "Both data classes use companion fromMap(Map) for hand-written JSON deserialization from Supabase query results."
+    },
+    {
+      "source": "AlbumRepository_AlbumRepository",
+      "target": "StatusRepository_StatusRepository",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.75,
+      "evidence": "INFERRED",
+      "rationale": "Both follow the Repository pattern: inject SupabaseService, call Supabase REST API, handle domain model conversion. Both use hand-written JSON serialization."
+    },
+    {
+      "source": "PairingRepository_PairingRepository",
+      "target": "StatusRepository_StatusRepository",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.75,
+      "evidence": "INFERRED",
+      "rationale": "Both are @Singleton repositories injecting SupabaseService, operating on Supabase tables via raw REST calls with query/create/update/delete pattern."
+    },
+    {
+      "source": "StickerManager_StickerManager",
+      "target": "AlbumRepository_AlbumRepository",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.75,
+      "evidence": "INFERRED",
+      "rationale": "Both upload files to Supabase Storage via supabaseService.uploadFile(), handling ContentResolver URI reading and MIME type detection."
+    },
+    {
+      "source": "StatusRepository_widget_cache",
+      "target": "StatusEntity_StatusEntity",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.75,
+      "evidence": "INFERRED",
+      "rationale": "Both store the same status data fields (doing, customDoing, feeling, feelingColor, feelingEmoji, note, updatedAt). Room cache and widget SharedPreferences serve as redundant local caches for different consumers."
+    },
+    {
+      "source": "albumscreen",
+      "target": "albumviewmodel",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AlbumScreen obtains viewModel via hiltViewModel<AlbumViewModel>()"
+    },
+    {
+      "source": "historyscreen",
+      "target": "historyviewmodel",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HistoryScreen obtains viewModel via hiltViewModel<HistoryViewModel>()"
+    },
+    {
+      "source": "homescreen",
+      "target": "homeviewmodel",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HomeScreen obtains viewModel via hiltViewModel<HomeViewModel>()"
+    },
+    {
+      "source": "settingsscreen",
+      "target": "settingsviewmodel",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "SettingsScreen obtains viewModel via hiltViewModel<SettingsViewModel>()"
+    },
+    {
+      "source": "homescreen",
+      "target": "statuscard",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HomeScreen embeds StatusCard composable to display partner status"
+    },
+    {
+      "source": "settingsscreen",
+      "target": "celebrationoverlay",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "SettingsScreen shows CelebrationOverlay when justPaired flag is true"
+    },
+    {
+      "source": "settingsscreen",
+      "target": "celebrationday",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "SettingsScreen imports and uses CelebrationDay data class for overlay"
+    },
+    {
+      "source": "statuscard",
+      "target": "feeling_enum",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StatusCard calls Feeling.fromDisplayName() and uses feeling.emoji/gradientStart/gradientEnd at runtime"
+    },
+    {
+      "source": "feelingpicker",
+      "target": "feeling_enum",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "FeelingPicker iterates Feeling.entries and renders each in a grid"
+    },
+    {
+      "source": "feelingpicker",
+      "target": "emojithememanager",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "FeelingPicker calls EmojiThemeManager.getEmoji() to resolve theme-aware emoji"
+    },
+    {
+      "source": "settingsviewmodel",
+      "target": "emojithememanager",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "SettingsViewModel calls EmojiThemeManager.getCurrentTheme() and reads EmojiThemeManager.themes"
+    },
+    {
+      "source": "celebrationconfig",
+      "target": "celebrationday",
+      "type": "contains",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "CelebrationConfig.days is a list of CelebrationDay instances"
+    },
+    {
+      "source": "celebrationoverlay",
+      "target": "celebrationday",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "CelebrationOverlay accepts CelebrationDay as parameter"
+    },
+    {
+      "source": "albumviewmodel",
+      "target": "supabaseservice",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AlbumViewModel injects SupabaseService and calls getCachedDeviceId(), upload/delete operations"
+    },
+    {
+      "source": "homeviewmodel",
+      "target": "supabaseservice",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HomeViewModel injects SupabaseService and calls getCachedDeviceId() and polling methods"
+    },
+    {
+      "source": "historyviewmodel",
+      "target": "supabaseservice",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HistoryViewModel injects SupabaseService and calls getCachedDeviceId() and query()"
+    },
+    {
+      "source": "settingsviewmodel",
+      "target": "supabaseservice",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "SettingsViewModel injects SupabaseService and calls getCachedDeviceId() and pairing operations"
+    },
+    {
+      "source": "albumviewmodel",
+      "target": "pairingrepository",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AlbumViewModel injects PairingRepository and calls findPairByUserId() to resolve partner"
+    },
+    {
+      "source": "homeviewmodel",
+      "target": "pairingrepository",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HomeViewModel injects PairingRepository and calls findPairByUserId() to resolve partner"
+    },
+    {
+      "source": "historyviewmodel",
+      "target": "pairingrepository",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HistoryViewModel injects PairingRepository and calls findPairByUserId() to resolve partner"
+    },
+    {
+      "source": "settingsviewmodel",
+      "target": "pairingrepository",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "SettingsViewModel injects PairingRepository and calls findPairByUserId(), createPair(), joinPair()"
+    },
+    {
+      "source": "albumviewmodel",
+      "target": "albumrepository",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AlbumViewModel injects AlbumRepository for photo CRUD operations"
+    },
+    {
+      "source": "homeviewmodel",
+      "target": "statusrepository",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HomeViewModel injects StatusRepository and calls observeStatus() for Room-backed reactive status"
+    },
+    {
+      "source": "doingpicker",
+      "target": "feeling_enum",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "DoingPicker accepts selectedFeeling: Feeling parameter for contextual display"
+    },
+    {
+      "source": "avatarwithglow",
+      "target": "standbyusmotion",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AvatarWithGlow uses StandByUsMotion.DUR_BREATH for breathing animation timing"
+    },
+    {
+      "source": "statuscard",
+      "target": "standbyusmotion",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StatusCard uses StandByUsMotion.DUR_BREATH for breathing glow animation"
+    },
+    {
+      "source": "celebrationoverlay",
+      "target": "standbyuslightcolors",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "CelebrationOverlay uses StandByUsLightColors accent/success/warn for particle colors"
+    },
+    {
+      "source": "doingpicker",
+      "target": "feelingpicker",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.75,
+      "evidence": "INFERRED",
+      "rationale": "Both are status-input composable components: FeelingPicker selects mood, DoingPicker inputs activity text; together they form the PostStatus input composable pair"
+    },
+    {
+      "source": "avatarwithglow",
+      "target": "statuscard",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.75,
+      "evidence": "INFERRED",
+      "rationale": "Both use breathing animation with identical StandByUsMotion.DUR_BREATH timing, creating a consistent visual language for status/avatar glow effects"
+    },
+    {
+      "source": "albumviewmodel",
+      "target": "historyviewmodel",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.85,
+      "evidence": "INFERRED",
+      "rationale": "Both resolve partner via identical pattern: getCachedDeviceId() then findPairByUserId() then determine partnerId; both fetch data scoped to the pair"
+    },
+    {
+      "source": "homeviewmodel",
+      "target": "historyviewmodel",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.85,
+      "evidence": "INFERRED",
+      "rationale": "Both resolve partner via the same PairingRepository.findPairByUserId() pattern to determine partnerId"
+    },
+    {
+      "source": "device_uuid_identity",
+      "target": "homeviewmodel",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HomeViewModel calls supabaseService.getCachedDeviceId() to obtain device UUID as identity"
+    },
+    {
+      "source": "device_uuid_identity",
+      "target": "albumviewmodel",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AlbumViewModel calls supabaseService.getCachedDeviceId() for identity"
+    },
+    {
+      "source": "device_uuid_identity",
+      "target": "historyviewmodel",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HistoryViewModel calls supabaseService.getCachedDeviceId() for identity"
+    },
+    {
+      "source": "device_uuid_identity",
+      "target": "settingsviewmodel",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "SettingsViewModel calls supabaseService.getCachedDeviceId() for identity"
+    },
+    {
+      "source": "polling_based_sync",
+      "target": "homeviewmodel",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "HomeViewModel polls Supabase every 6s via callbackFlow — the sole implementation of the polling sync strategy"
+    },
+    {
+      "source": "theme_lightcolorscheme",
+      "target": "color_coralpalette",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "LightColorScheme的primary/secondary/tertiary直接引用Color.kt的Primary/Secondary/Tertiary珊瑚色系"
+    },
+    {
+      "source": "theme_lightcolorscheme",
+      "target": "color_warmneutrals",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "LightColorScheme的background/surface/onBackground/onSurface等直接引用Color.kt暖调中性色"
+    },
+    {
+      "source": "theme_lightcolorscheme",
+      "target": "color_functional",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "LightColorScheme的error/onError引用Color.kt的Error/OnError功能色"
+    },
+    {
+      "source": "theme_darkcolorscheme",
+      "target": "color_coralpalette",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "DarkColorScheme也使用Primary/Secondary/Tertiary品牌珊瑚色作为primary/secondary/tertiary"
+    },
+    {
+      "source": "theme_darkcolorscheme",
+      "target": "color_darkmode",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "DarkColorScheme的background/surface/onBackground等引用Color.kt暗色模式颜色"
+    },
+    {
+      "source": "theme_darkcolorscheme",
+      "target": "color_functional",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "DarkColorScheme的error/onError引用Error/OnError功能色"
+    },
+    {
+      "source": "theme_standbyustheme",
+      "target": "theme_lightcolorscheme",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StandByUsTheme在非暗色模式下选择LightColorScheme"
+    },
+    {
+      "source": "theme_standbyustheme",
+      "target": "theme_darkcolorscheme",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StandByUsTheme在暗色模式下选择DarkColorScheme"
+    },
+    {
+      "source": "theme_standbyustheme",
+      "target": "type_standbytypography",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StandByUsTheme将StandByTypography传递给MaterialTheme的typography参数"
+    },
+    {
+      "source": "color_legacyaliases",
+      "target": "color_coralpalette",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "Orange别名直接引用Primary"
+    },
+    {
+      "source": "color_legacyaliases",
+      "target": "color_warmneutrals",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "Charcoal/BackgroundLight/CardWhite等别名引用OnBackground/Background/Surface"
+    },
+    {
+      "source": "color_legacyaliases",
+      "target": "color_darkmode",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "DarkCard/DarkText/DarkGray别名引用DarkSurface/DarkOnBackground/DarkOnSurfaceVariant"
+    },
+    {
+      "source": "widget_standbywidgetreceiver",
+      "target": "widget_standbywidget",
+      "type": "calls",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "StandByWidgetReceiver的glanceAppWidget属性返回StandByWidget()实例"
+    },
+    {
+      "source": "widget_standbywidget",
+      "target": "widget_widgetcache",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "loadCachedStatus()通过context.getSharedPreferences(\"widget_cache\")读取缓存状态"
+    },
+    {
+      "source": "widget_standbywidget",
+      "target": "userstatus_model",
+      "type": "uses",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "loadCachedStatus()构造并返回UserStatus对象"
+    },
+    {
+      "source": "manifest_androidmanifest",
+      "target": "widget_standbywidgetreceiver",
+      "type": "contains",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AndroidManifest中声明StandByWidgetReceiver为APPWIDGET_UPDATE的receiver"
+    },
+    {
+      "source": "manifest_androidmanifest",
+      "target": "xml_widgetinfo",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "receiver的meta-data通过android:resource引用@xml/standby_widget_info"
+    },
+    {
+      "source": "mipmap_launcher",
+      "target": "drawable_launcherbackground",
+      "type": "contains",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "adaptive-icon的background子元素引用@drawable/ic_launcher_background"
+    },
+    {
+      "source": "mipmap_launcher",
+      "target": "drawable_launcherforeground",
+      "type": "contains",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "adaptive-icon的foreground子元素引用@drawable/ic_launcher_foreground"
+    },
+    {
+      "source": "mipmap_launcher",
+      "target": "mipmap_hdpilauncher",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.85,
+      "evidence": "INFERRED",
+      "rationale": "mipmap-hdpi/ic_launcher.webp是adaptive icon在API<26设备上的栅格回退版本"
+    },
+    {
+      "source": "drawable_launcherforeground",
+      "target": "color_coralpalette",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.75,
+      "evidence": "INFERRED",
+      "rationale": "前景心形填充色#FF9F43与品牌珊瑚色Primary=#FF7E67相近，体现情侣应用的温暖视觉主题"
+    },
+    {
+      "source": "readme_project",
+      "target": "agents_archdoc",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.85,
+      "evidence": "INFERRED",
+      "rationale": "README和AGENTS.md都描述项目架构、技术栈和组件结构，内容高度重叠"
+    },
+    {
+      "source": "firebase_setup",
+      "target": "agents_supabasehttp",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.2,
+      "evidence": "AMBIGUOUS",
+      "rationale": "FIREBASE_SETUP.md是遗留文档，应用已切换到Supabase；二者代表被替代和新方案的后端选择"
+    },
+    {
+      "source": "agents_supabasehttp",
+      "target": "agents_polling",
+      "type": "references",
+      "confidence_score": 0.95,
+      "evidence": "INFERRED",
+      "rationale": "Supabase HTTP方案和6秒轮询是数据同步的两个协同方面：无SDK实时订阅导致必须使用轮询"
+    },
+    {
+      "source": "agents_archdoc",
+      "target": "agents_deviceidentity",
+      "type": "contains",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "设备UUID身份是AGENTS.md中Identity章节的核心描述"
+    },
+    {
+      "source": "agents_archdoc",
+      "target": "agents_roomcache",
+      "type": "contains",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "Room缓存是AGENTS.md中Data layer章节的描述"
+    },
+    {
+      "source": "agents_archdoc",
+      "target": "widget_widgetcache",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "AGENTS.md明确描述widget_cache SharedPreferences在状态更新时写入，Glance widget读取"
+    },
+    {
+      "source": "versions_libs",
+      "target": "gradle_properties",
+      "type": "references",
+      "confidence_score": 0.65,
+      "evidence": "INFERRED",
+      "rationale": "libs.versions.toml和gradle.properties共同构成Gradle构建系统配置，协同管理依赖和构建参数"
+    },
+    {
+      "source": "readme_techstack",
+      "target": "versions_libs",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.85,
+      "evidence": "INFERRED",
+      "rationale": "README技术栈表格所列技术（Hilt, Room, OkHttp, Glance, Compose）与libs.versions.toml中声明的依赖版本一一对应"
+    },
+    {
+      "source": "readme_project",
+      "target": "readme_techstack",
+      "type": "contains",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "技术栈表格是README.md内的一个章节"
+    },
+    {
+      "source": "xml_widgetinfo",
+      "target": "widget_standbywidget",
+      "type": "references",
+      "confidence_score": 1.0,
+      "evidence": "EXTRACTED",
+      "rationale": "standby_widget_info.xml定义了小组件元数据(尺寸/更新周期)，由Android系统在实例化StandByWidget时读取"
+    },
+    {
+      "source": "graph_report",
+      "target": "agents_archdoc",
+      "type": "references",
+      "confidence_score": 0.55,
+      "evidence": "INFERRED",
+      "rationale": "GRAPH_REPORT中的StandBy Us App god node和AGENTS.md架构描述指向同一个项目整体"
+    },
+    {
+      "source": "mipmap_hdpilauncher",
+      "target": "mipmap_hdpilauncherround",
+      "type": "semantically_similar_to",
+      "confidence_score": 0.95,
+      "evidence": "INFERRED",
+      "rationale": "两者是同一应用图标的方形和圆形裁剪版本，仅shape不同"
+    },
+    {
+      "source": "icon_motion",
+      "target": "newui_icons_dir",
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "evidence": "File physically located in NewUI/icons/ directory"
+    },
+    {
+      "source": "icon_post",
+      "target": "newui_icons_dir",
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "evidence": "File physically located in NewUI/icons/ directory"
+    },
+    {
+      "source": "icon_ruler",
+      "target": "newui_icons_dir",
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "evidence": "File physically located in NewUI/icons/ directory"
+    },
+    {
+      "source": "icon_send",
+      "target": "newui_icons_dir",
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "evidence": "File physically located in NewUI/icons/ directory"
+    },
+    {
+      "source": "icon_settings",
+      "target": "newui_icons_dir",
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "evidence": "File physically located in NewUI/icons/ directory"
+    },
+    {
+      "source": "icon_signal",
+      "target": "newui_icons_dir",
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "evidence": "File physically located in NewUI/icons/ directory"
+    },
+    {
+      "source": "icon_sparkle",
+      "target": "newui_icons_dir",
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "evidence": "File physically located in NewUI/icons/ directory"
+    },
+    {
+      "source": "icon_sun",
+      "target": "newui_icons_dir",
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "evidence": "File physically located in NewUI/icons/ directory"
+    },
+    {
+      "source": "icon_timeline",
+      "target": "newui_icons_dir",
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "evidence": "File physically located in NewUI/icons/ directory"
+    },
+    {
+      "source": "icon_trash",
+      "target": "newui_icons_dir",
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "evidence": "File physically located in NewUI/icons/ directory"
+    },
+    {
+      "source": "newui_icons_dir",
+      "target": "newui_design_system",
+      "relation": "part_of",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "evidence": "NewUI/icons/ is a subdirectory of the NewUI design system refactor root"
+    },
+    {
+      "source": "icon_post",
+      "target": "feature_post_status",
+      "relation": "represents",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "evidence": "Pencil/edit icon named ic-post directly corresponds to the post_status navigation destination where users compose status updates"
+    },
+    {
+      "source": "icon_settings",
+      "target": "feature_settings",
+      "relation": "represents",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "evidence": "Gear/cog icon named ic-settings is the standard settings symbol; maps to the settings navigation destination"
+    },
+    {
+      "source": "icon_timeline",
+      "target": "feature_history",
+      "relation": "represents",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.95,
+      "evidence": "Clock icon named ic-timeline represents time-based views; history screen renders a timeline list of past statuses"
+    },
+    {
+      "source": "icon_send",
+      "target": "feature_post_status",
+      "relation": "part_of",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "evidence": "Paper-plane send icon is the standard submit/publish affordance within the post_status flow"
+    },
+    {
+      "source": "icon_trash",
+      "target": "feature_history",
+      "relation": "part_of",
+      "confidence": "AMBIGUOUS",
+      "confidence_score": 0.55,
+      "evidence": "Trash icon may delete individual history entries; could also be for unpairing or clearing status — exact target needs UI review"
+    },
+    {
+      "source": "icon_motion",
+      "target": "feature_celebration",
+      "relation": "represents",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "evidence": "Sunburst/8-ray radiate pattern visually resembles the particle burst animation in CelebrationOverlay (CelebrationOverlay.kt renders full-screen particle effects)"
+    },
+    {
+      "source": "icon_sparkle",
+      "target": "feature_celebration",
+      "relation": "represents",
+      "confidence": "EXTRACTED",
+      "confidence_score": 0.9,
+      "evidence": "Sparkle icon named ic-sparkle represents celebration/highlight moments; CelebrationOverlay triggers on configured MM/dd dates once per day"
+    },
+    {
+      "source": "icon_sun",
+      "target": "feeling_enum",
+      "relation": "represents",
+      "confidence": "AMBIGUOUS",
+      "confidence_score": 0.5,
+      "evidence": "Sun icon may represent Feeling.开心 (happy/sunny mood) in the FeelingPicker component; could also be a generic weather/mood indicator — needs UI mockup confirmation"
+    },
+    {
+      "source": "icon_signal",
+      "target": "feature_home",
+      "relation": "represents",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "evidence": "Signal bars represent connectivity/paired-device status; home screen displays partner's status via polling and pairing state"
+    },
+    {
+      "source": "icon_signal",
+      "target": "pairing_feature",
+      "relation": "represents",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "evidence": "Signal strength icon may indicate pairing connection health; devices pair via 6-char code exchange tracked in pairs table"
+    },
+    {
+      "source": "icon_signal",
+      "target": "status_polling",
+      "relation": "represents",
+      "confidence": "INFERRED",
+      "confidence_score": 0.65,
+      "evidence": "Signal bars may visualize polling/live-connection status; HomeViewModel polls Supabase every 6s via callbackFlow"
+    },
+    {
+      "source": "icon_ruler",
+      "target": "custom_doing",
+      "relation": "represents",
+      "confidence": "AMBIGUOUS",
+      "confidence_score": 0.4,
+      "evidence": "Ruler icon may relate to measuring/constraining custom Doing text input (capped at 20 characters); alternatively a design/layout tool — purpose unclear from icon alone"
+    },
+    {
+      "source": "icon_ruler",
+      "target": "feature_post_status",
+      "relation": "part_of",
+      "confidence": "AMBIGUOUS",
+      "confidence_score": 0.3,
+      "evidence": "If ruler represents the custom Doing text constraint, it belongs to post_status where Doing is selected; very low confidence — review needed"
+    },
+    {
+      "source": "icon_sun",
+      "target": "feature_home",
+      "relation": "represents",
+      "confidence": "INFERRED",
+      "confidence_score": 0.6,
+      "evidence": "Sun icon likely decorates the home screen mood display or FeelingPicker; home screen shows current feeling and status on StatusCard"
+    }
+  ],
+  "hyperedges": [
+    {
+      "nodes": [
+        "StatusRepository_StatusRepository",
+        "SupabaseService_SupabaseService",
+        "StatusDao_StatusDao",
+        "StatusRepository_widget_cache"
+      ],
+      "label": "Write-Through Status Sync Pipeline",
+      "rationale": "StatusRepository.updateStatus() writes to three layers in sequence: (1) Supabase REST API via SupabaseService (remote), (2) Room cache via StatusDao.upsertStatus (local persistence), (3) widget_cache SharedPreferences (widget render cache). All three must succeed for a complete update. The poll path reads from Supabase, caches to Room, and emits via Flow."
+    },
+    {
+      "nodes": [
+        "UserStatus_UserStatus",
+        "PairingInfo_PairingInfo",
+        "AlbumPhoto_AlbumPhoto"
+      ],
+      "label": "Hand-Written Map Serialization Convention",
+      "rationale": "All three data models use hand-written toMap()/fromMap() companion functions for JSON serialization via org.json.JSONObject, rather than Moshi or Kotlinx Serialization. This is a project-wide convention - no serialization library is used."
+    },
+    {
+      "nodes": [
+        "Feeling_Feeling",
+        "Doing_Doing",
+        "UserStatus_UserStatus"
+      ],
+      "label": "Status Preset System",
+      "rationale": "UserStatus stores feeling and doing as string identifiers that correspond to Feeling enum (16 moods with emoji+colors) and Doing enum (12 activities). The enums provide display names, emoji, and gradient colors consumed by the UI layer for status rendering."
+    },
+    {
+      "label": "MVVM+StateFlow Architecture Pattern",
+      "node_ids": [
+        "albumviewmodel",
+        "homeviewmodel",
+        "historyviewmodel",
+        "settingsviewmodel"
+      ],
+      "description": "All four ViewModels follow identical pattern: @HiltViewModel with @Inject constructor receiving repositories/services; expose state via MutableStateFlow/StateFlow; run initialization in init{} block; use viewModelScope for coroutine launching."
+    },
+    {
+      "label": "Celebration Display Pipeline",
+      "node_ids": [
+        "celebrationconfig",
+        "celebrationday",
+        "celebrationoverlay",
+        "settingsscreen"
+      ],
+      "description": "CelebrationConfig defines static CelebrationDay instances. CelebrationOverlay renders fullscreen particle animation with spring scale and auto-dismiss after 4s. SettingsScreen embeds CelebrationOverlay when justPaired flag triggers after successful pairing."
+    },
+    {
+      "label": "Partner Identity Resolution Pattern",
+      "node_ids": [
+        "pairingrepository",
+        "homeviewmodel",
+        "albumviewmodel",
+        "historyviewmodel"
+      ],
+      "description": "All three ViewModels resolve the partner's userId via the same pattern: call supabaseService.getCachedDeviceId() for self-ID, call pairingRepository.findPairByUserId(selfId), determine partnerId from pair.user1Id/user2Id. SettingsViewModel also uses this in checkExistingPair()."
+    },
+    {
+      "label": "Material3 Theme Pipeline",
+      "rationale": "Color.kt定义颜色token → Theme.kt组装Light/Dark ColorScheme → StandByUsTheme组合Typography+ColorScheme注入MaterialTheme",
+      "nodes": [
+        "color_coralpalette",
+        "color_warmneutrals",
+        "color_darkmode",
+        "color_functional",
+        "theme_standbyustheme",
+        "type_standbytypography"
+      ]
+    },
+    {
+      "label": "Widget Display Chain",
+      "rationale": "AndroidManifest注册StandByWidgetReceiver → StandByWidgetReceiver返回StandByWidget() → StandByWidget读取widget_cache SharedPreferences → 构造UserStatus渲染UI",
+      "nodes": [
+        "manifest_androidmanifest",
+        "widget_standbywidgetreceiver",
+        "widget_standbywidget",
+        "widget_widgetcache",
+        "userstatus_model"
+      ]
+    },
+    {
+      "label": "Launcher Icon Composition",
+      "rationale": "ic_launcher.xml作为adaptive-icon容器 → background层(白色) + foreground层(橙色心形) → 回退到mipmap-hdpi栅格图标",
+      "nodes": [
+        "mipmap_launcher",
+        "drawable_launcherbackground",
+        "drawable_launcherforeground",
+        "mipmap_hdpilauncher"
+      ]
+    },
+    {
+      "id": "group_celebration_icons",
+      "label": "Celebration Theme Icons",
+      "members": [
+        "icon_motion",
+        "icon_sparkle"
+      ],
+      "description": "Both icons relate to the celebration overlay system: motion for particle burst, sparkle for highlight/special moments"
+    },
+    {
+      "id": "group_navigation_icons",
+      "label": "Navigation Destination Icons",
+      "members": [
+        "icon_post",
+        "icon_settings",
+        "icon_timeline"
+      ],
+      "description": "These three icons correspond to the four declared navigation destinations (home, post_status, history, settings); home is excluded as no specific home icon was found in this chunk"
+    },
+    {
+      "id": "group_action_icons",
+      "label": "Action Icons",
+      "members": [
+        "icon_send",
+        "icon_trash"
+      ],
+      "description": "Send and trash represent key user actions: publishing a status update and deleting entries"
+    },
+    {
+      "id": "group_status_icons",
+      "label": "Status/Mood Indicator Icons",
+      "members": [
+        "icon_signal",
+        "icon_sun"
+      ],
+      "description": "Signal represents connectivity/paired status; sun may represent mood (Feeling) — both contribute to the home screen status display"
+    }
+  ]
+}

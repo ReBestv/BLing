@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import com.standbyus.app.ui.theme.EmojiTheme
+import com.standbyus.app.ui.theme.EmojiThemeSet
 import com.standbyus.app.ui.theme.EmojiThemeManager
 import javax.inject.Inject
 
@@ -38,7 +38,7 @@ class SettingsViewModel @Inject constructor(
     val isPaired: StateFlow<Boolean> = _isPaired.asStateFlow()
 
     private val _currentTheme = MutableStateFlow(EmojiThemeManager.getCurrentTheme(context))
-    val currentTheme: StateFlow<EmojiTheme> = _currentTheme.asStateFlow()
+    val currentTheme: StateFlow<EmojiThemeSet> = _currentTheme.asStateFlow()
 
     val availableThemes = EmojiThemeManager.themes
 

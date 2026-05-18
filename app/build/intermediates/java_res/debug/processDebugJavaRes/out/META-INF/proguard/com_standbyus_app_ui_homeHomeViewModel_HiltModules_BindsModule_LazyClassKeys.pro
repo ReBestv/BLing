@@ -1,3 +1,7 @@
+-keep,allowobfuscation,allowshrinking class com.standbyus.app.ui.album.AlbumViewModel
+-keep,allowobfuscation,allowshrinking class com.standbyus.app.ui.album.AlbumViewModel
+-keep,allowobfuscation,allowshrinking class com.standbyus.app.ui.checkin.CheckinViewModel
+-keep,allowobfuscation,allowshrinking class com.standbyus.app.ui.checkin.CheckinViewModel
 -keep,allowobfuscation,allowshrinking class com.standbyus.app.ui.history.HistoryViewModel
 -keep,allowobfuscation,allowshrinking class com.standbyus.app.ui.history.HistoryViewModel
 -keep,allowobfuscation,allowshrinking class com.standbyus.app.ui.home.HomeViewModel

@@ -76,8 +76,8 @@ class AlbumRepository @Inject constructor(
 
     private fun compressImage(uri: Uri): ByteArray {
         val inputStream = context.contentResolver.openInputStream(uri) ?: return ByteArray(0)
-        val bitmap = BitmapFactory.decodeStream(inputStream)
-        inputStream.close()
+        val bitmap = inputStream.use { BitmapFactory.decodeStream(it) }
+            ?: return ByteArray(0)
 
         // 按比例缩小
         val (newW, newH) = if (bitmap.width > MAX_WIDTH || bitmap.height > MAX_WIDTH) {
