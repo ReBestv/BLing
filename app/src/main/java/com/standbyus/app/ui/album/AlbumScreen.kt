@@ -41,6 +41,11 @@ import coil.request.ImageRequest
 import com.standbyus.app.data.model.AlbumPhoto
 import com.standbyus.app.ui.components.AppHeader
 
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.graphics.graphicsLayer
+
 @Composable
 fun AlbumScreen(
     onBack: () -> Unit,
@@ -272,6 +277,78 @@ fun AlbumScreen(
                 }
             }
         }
+
+        // 全屏查看图片
+        fullScreenPhoto?.let { photo ->
+            var scale by remember { mutableFloatStateOf(1f) }
+            var offset by remember { mutableStateOf(Offset.Zero) }
+            
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+                    .pointerInput(Unit) {
+                        detectTransformGestures { _, pan, zoom, _ ->
+                            scale = (scale * zoom).coerceIn(1f, 5f)
+                            if (scale > 1f) {
+                                offset += pan
+                            } else {
+                                offset = Offset.Zero
+                            }
+                        }
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(photo.url)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = photo.caption,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .graphicsLayer(
+                            scaleX = scale,
+                            scaleY = scale,
+                            translationX = offset.x,
+                            translationY = offset.y
+                        )
+                        .clickable(
+                            interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                            indication = null
+                        ) { fullScreenPhoto = null },
+                    contentScale = ContentScale.Fit
+                )
+                
+                // 返回按钮
+                IconButton(
+                    onClick = { fullScreenPhoto = null },
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(top = 32.dp, start = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "返回",
+                        tint = Color.White,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+                
+                // 标题
+                if (photo.caption.isNotEmpty()) {
+                    Text(
+                        text = photo.caption,
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(bottom = 48.dp)
+                            .padding(horizontal = 24.dp)
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -279,6 +356,7 @@ fun AlbumScreen(
 @Composable
 private fun PhotoCard(
     photo: AlbumPhoto,
+    onClick: () -> Unit = {},
     onDelete: () -> Unit = {}
 ) {
     var showConfirm by remember { mutableStateOf(false) }
@@ -287,7 +365,7 @@ private fun PhotoCard(
         modifier = Modifier
             .clip(RoundedCornerShape(12.dp))
             .combinedClickable(
-                onClick = { },
+                onClick = onClick,
                 onLongClick = { showConfirm = true }
             )
     ) {

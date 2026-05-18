@@ -1,8 +1,0 @@
--keep,allowobfuscation,allowshrinking class com.standbyus.app.ui.history.HistoryViewModel
--keep,allowobfuscation,allowshrinking class com.standbyus.app.ui.history.HistoryViewModel
--keep,allowobfuscation,allowshrinking class com.standbyus.app.ui.home.HomeViewModel
--keep,allowobfuscation,allowshrinking class com.standbyus.app.ui.home.HomeViewModel
--keep,allowobfuscation,allowshrinking class com.standbyus.app.ui.poststatus.PostStatusViewModel
--keep,allowobfuscation,allowshrinking class com.standbyus.app.ui.poststatus.PostStatusViewModel
--keep,allowobfuscation,allowshrinking class com.standbyus.app.ui.settings.SettingsViewModel
--keep,allowobfuscation,allowshrinking class com.standbyus.app.ui.settings.SettingsViewModel

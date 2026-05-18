@@ -15,14 +15,14 @@ class PairingRepository @Inject constructor(
         private const val TABLE = "pairs"
     }
 
-    suspend fun createPairingCode(creatorUserId: String): String {
+    suspend fun createPairingCode(creatorUserId: String, creatorName: String): String {
         val pairId = generatePairingCode()
         Log.d(TAG, "Creating pairing code: $pairId for user $creatorUserId")
         val data = mapOf(
             "pairId" to pairId,
             "user1Id" to creatorUserId,
             "user2Id" to "",
-            "user1Name" to "",
+            "user1Name" to creatorName,
             "user2Name" to ""
         )
         try {
@@ -37,7 +37,7 @@ class PairingRepository @Inject constructor(
 
     data class JoinResult(val success: Boolean, val partnerId: String = "")
 
-    suspend fun joinPair(pairId: String, userId: String): JoinResult {
+    suspend fun joinPair(pairId: String, userId: String, joinerName: String): JoinResult {
         val results = supabaseService.query(
             TABLE,
             "pairId=eq.$pairId&limit=1"
@@ -49,10 +49,10 @@ class PairingRepository @Inject constructor(
         val existingUser2 = obj["user2Id"] as? String ?: ""
 
         return if (existingUser1.isEmpty()) {
-            supabaseService.update(TABLE, "pairId=eq.$pairId", mapOf("user1Id" to userId))
+            supabaseService.update(TABLE, "pairId=eq.$pairId", mapOf("user1Id" to userId, "user1Name" to joinerName))
             JoinResult(true, "")
         } else if (existingUser2.isEmpty()) {
-            supabaseService.update(TABLE, "pairId=eq.$pairId", mapOf("user2Id" to userId))
+            supabaseService.update(TABLE, "pairId=eq.$pairId", mapOf("user2Id" to userId, "user2Name" to joinerName))
             JoinResult(true, existingUser1)
         } else {
             JoinResult(false)
