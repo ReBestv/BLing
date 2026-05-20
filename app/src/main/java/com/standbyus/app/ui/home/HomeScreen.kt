@@ -37,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -157,7 +158,7 @@ private fun PartnerStatusCard(
     modifier: Modifier = Modifier
 ) {
     val feeling = Feeling.fromKey(status.feelingKey) ?: Feeling.HAPPY
-    val cardGradient = cardGradientFor(feeling)
+    val cardGradient = HomePartnerStatusCardSurfaceStyle.gradientColorsFor(feeling)
 
     // Float animation for emoji: 3s ease-in-out, -8px
     val infiniteTransition = rememberInfiniteTransition(label = "emojiFloat")
@@ -190,7 +191,18 @@ private fun PartnerStatusCard(
                         end = Offset(size.width, 0f)
                     )
                 )
+                drawOval(
+                    color = HomePartnerStatusCardSurfaceStyle.topGlowColor,
+                    topLeft = Offset(-size.width * 0.18f, -size.height * 0.22f),
+                    size = Size(size.width * 0.82f, size.height * 0.46f)
+                )
+                drawOval(
+                    color = HomePartnerStatusCardSurfaceStyle.warmGlowColor,
+                    topLeft = Offset(size.width * 0.48f, size.height * 0.68f),
+                    size = Size(size.width * 0.66f, size.height * 0.38f)
+                )
             }
+            .border(1.dp, HomePartnerStatusCardSurfaceStyle.borderColor, cardShape)
             .padding(vertical = 56.dp, horizontal = 24.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -411,27 +423,6 @@ private fun EmptyPartnerState(
             )
         }
     }
-}
-
-// ── Emotion-based card gradient (feelings → warm colors) ───
-
-private fun cardGradientFor(feeling: Feeling): List<Color> = when(feeling) {
-    // 恋爱/开心/想你 → 粉色渐变
-    Feeling.HAPPY, Feeling.LOVE, Feeling.KISS, Feeling.MISSING ->
-        listOf(Color(0xFFFFD1DC), Color(0xFFFFB6C1))
-    // 难过/生病/沮丧/焦虑/哭哭 → 淡蓝色
-    Feeling.SAD, Feeling.SICK, Feeling.UPSET, Feeling.ANXIOUS, Feeling.CRYING ->
-        listOf(Color(0xFFD4E6F1), Color(0xFFA9CCE3))
-    // 生气 → 柔和红色
-    Feeling.ANGRY ->
-        listOf(Color(0xFFFFE0E0), Color(0xFFFFC8C8))
-    // 疲惫/睡觉 → 薰衣草
-    Feeling.TIRED, Feeling.SLEEPING ->
-        listOf(Color(0xFFE8DAEF), Color(0xFFD2B4DE))
-    // 其他（悠闲/奋斗/思考/追剧/无聊）→ 温暖蜜桃
-    Feeling.RELAXED, Feeling.HUSTLING, Feeling.THINKING,
-    Feeling.WATCHING, Feeling.BORED ->
-        listOf(Color(0xFFFFE5CC), Color(0xFFFFD1A8))
 }
 
 // ── Helpers ─────────────────────────────────────────────────
