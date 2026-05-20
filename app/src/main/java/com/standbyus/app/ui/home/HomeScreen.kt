@@ -61,6 +61,9 @@ private val PrimaryColor  = Color(0xFFFFB4A2)
 private val TextPrimary   = Color(0xFF5A4A42)
 private val TextSecondary = Color(0xFF9E8E86)
 private val BorderColor   = Color(0xFFF0EAE6)
+private val HomeBackgroundGradient = Brush.verticalGradient(
+    colors = HomeBackgroundStyle.gradientColors
+)
 
 // ── Main screen ─────────────────────────────────────────────
 
@@ -77,7 +80,7 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(BgColor)
+            .background(HomeBackgroundGradient)
     ) {
         // ── Sticky app bar ──
         AppHeader(
