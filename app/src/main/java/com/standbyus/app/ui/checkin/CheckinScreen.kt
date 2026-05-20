@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -32,11 +31,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,7 +51,6 @@ private val TextPrimary = Color(0xFF5A4A42)
 private val TextSecondary = Color(0xFF9E8E86)
 private val BorderColor = Color(0xFFF0EAE6)
 private val WinAccent = Color(0xFFE8B84B)
-private val DangerAccent = Color(0xFFE07070)
 
 // ── Main Screen ──
 
@@ -75,43 +73,43 @@ fun CheckinScreen(
                 showDivider = false // Usually matching home/other pages?
             )
 
-            // ── Fixed information area (scales to available screen space) ──
+            // ── Fixed content area (adapts proportions to available screen space) ──
             BoxWithConstraints(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
+                    .fillMaxWidth()
             ) {
-                val scale = CheckinLayout.infoScale(
+                val metrics = CheckinLayout.metrics(
                     availableWidthDp = maxWidth.value,
                     availableHeightDp = maxHeight.value
                 )
-                CheckinInfoPanel(
-                    state = state,
-                    modifier = Modifier
-                        .requiredSize(
-                            width = CheckinLayout.NATURAL_INFO_WIDTH_DP.dp,
-                            height = CheckinLayout.NATURAL_INFO_HEIGHT_DP.dp
+                Column(modifier = Modifier.fillMaxSize()) {
+                    CheckinInfoPanel(
+                        state = state,
+                        metrics = metrics,
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    )
+
+                    // ── Big Checkin Button (fixed, not scrollable) ──
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = metrics.buttonBottomPaddingDp.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        BigCheckinButton(
+                            onClick = { viewModel.checkIn() },
+                            isCheckingIn = state.isCheckingIn,
+                            sizeDp = metrics.buttonSizeDp
                         )
-                        .scale(scale)
-                )
-            }
+                    }
 
-            // ── Big Checkin Button (fixed, not scrollable) ──
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                BigCheckinButton(
-                    onClick = { viewModel.checkIn() },
-                    isCheckingIn = state.isCheckingIn
-                )
+                    // Space for bottom nav
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
-
-            // Space for bottom nav
-            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
@@ -119,33 +117,45 @@ fun CheckinScreen(
 @Composable
 private fun CheckinInfoPanel(
     state: CheckinUiState,
+    metrics: CheckinLayoutMetrics,
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.padding(top = 8.dp, bottom = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
         // ── PK Section (top) ──
         if (state.isPaired && state.pkStats != null) {
-            PKCard(stats = state.pkStats)
+            PKCard(
+                stats = state.pkStats,
+                widthDp = metrics.cardWidthDp,
+                verticalPaddingDp = metrics.pkVerticalPaddingDp
+            )
         } else {
-            EmptyPKCard()
+            EmptyPKCard(
+                widthDp = metrics.cardWidthDp,
+                verticalPaddingDp = metrics.pkVerticalPaddingDp
+            )
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(metrics.cardGapDp.dp))
 
         // ── Today Stats Card ──
         ThreeColCard(
+            widthDp = metrics.cardWidthDp,
+            verticalPaddingDp = metrics.statVerticalPaddingDp,
             col1 = { StatCell("💩", "${state.todayCount} 次", "已记录", PrimaryColor.copy(alpha = 0.15f)) },
             col2 = { StatCell("⏰", state.lastInterval, "间隔", Color(0xFFE3F2FD)) },
             col3 = { StatCell(state.riskLevel.emoji, state.riskLevel.label, "便秘风险", Color(0xFFFFF8E1)) }
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(metrics.cardGapDp.dp))
 
         // ── This Week Stats Card ──
         ThreeColCard(
+            widthDp = metrics.cardWidthDp,
+            verticalPaddingDp = metrics.statVerticalPaddingDp,
             col1 = { StatCell("📊", "${state.weeklyTotal} 次", "总共", Color(0xFFE3F2FD)) },
             col2 = { StatCell("📈", "${state.weeklyAverage}/天", "平均", Color(0xFFE8F5E9)) },
             col3 = { StatCell("🔥", "${state.streak} 天", "连续打卡", Color(0xFFFFF3E0)) }
@@ -157,14 +167,15 @@ private fun CheckinInfoPanel(
 
 @Composable
 private fun ThreeColCard(
+    widthDp: Float,
+    verticalPaddingDp: Float,
     col1: @Composable () -> Unit,
     col2: @Composable () -> Unit,
     col3: @Composable () -> Unit
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
+            .width(widthDp.dp)
             .shadow(
                 elevation = 16.dp,
                 shape = RoundedCornerShape(24.dp),
@@ -173,7 +184,7 @@ private fun ThreeColCard(
             )
             .clip(RoundedCornerShape(24.dp))
             .background(SurfaceColor)
-            .padding(vertical = 24.dp),
+            .padding(vertical = verticalPaddingDp.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         Box(Modifier.weight(1f), contentAlignment = Alignment.Center) { col1() }
@@ -218,14 +229,16 @@ private fun StatCell(
         }
         Text(
             text = value,
-            fontSize = 16.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = TextPrimary
+            color = TextPrimary,
+            textAlign = TextAlign.Center
         )
         Text(
             text = label,
-            fontSize = 12.sp,
-            color = TextSecondary
+            fontSize = 13.sp,
+            color = TextSecondary,
+            textAlign = TextAlign.Center
         )
     }
 }
@@ -233,14 +246,17 @@ private fun StatCell(
 // ── PK Card ──
 
 @Composable
-private fun PKCard(stats: PKStats) {
+private fun PKCard(
+    stats: PKStats,
+    widthDp: Float,
+    verticalPaddingDp: Float
+) {
     val isMeWinning = stats.winner == "me"
     val isTie = stats.winner == null
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
+            .width(widthDp.dp)
             .shadow(
                 elevation = 16.dp,
                 shape = RoundedCornerShape(24.dp),
@@ -249,7 +265,7 @@ private fun PKCard(stats: PKStats) {
             )
             .clip(RoundedCornerShape(24.dp))
             .background(SurfaceColor)
-            .padding(vertical = 32.dp, horizontal = 20.dp),
+            .padding(vertical = verticalPaddingDp.dp, horizontal = 22.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -280,7 +296,7 @@ private fun PKCard(stats: PKStats) {
                 )
                 Text(
                     text = "${stats.myCount} 次",
-                    fontSize = 24.sp,
+                    fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (isMeWinning) WinAccent else TextPrimary
                 )
@@ -306,7 +322,7 @@ private fun PKCard(stats: PKStats) {
                 )
                 Text(
                     text = "${stats.partnerCount} 次",
-                    fontSize = 24.sp,
+                    fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (!isMeWinning && !isTie) WinAccent else TextPrimary
                 )
@@ -357,11 +373,13 @@ private fun PKCard(stats: PKStats) {
 }
 
 @Composable
-private fun EmptyPKCard() {
+private fun EmptyPKCard(
+    widthDp: Float,
+    verticalPaddingDp: Float
+) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
+            .width(widthDp.dp)
             .shadow(
                 elevation = 16.dp,
                 shape = RoundedCornerShape(24.dp),
@@ -370,7 +388,7 @@ private fun EmptyPKCard() {
             )
             .clip(RoundedCornerShape(24.dp))
             .background(SurfaceColor)
-            .padding(vertical = 32.dp, horizontal = 20.dp),
+            .padding(vertical = verticalPaddingDp.dp, horizontal = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -394,6 +412,7 @@ private fun EmptyPKCard() {
 private fun BigCheckinButton(
     onClick: () -> Unit,
     isCheckingIn: Boolean = false,
+    sizeDp: Float = 112f,
     modifier: Modifier = Modifier
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "ripple")
@@ -428,24 +447,24 @@ private fun BigCheckinButton(
 
     Box(
         modifier = modifier
-            .size(100.dp)
+            .size(sizeDp.dp)
             .drawBehind {
                 val rippleAlpha = (1f - rippleProgress1) * 0.4f
-                val rippleScale = 1f + rippleProgress1 * 0.5f
+                val rippleScale = 1f + rippleProgress1 * 0.35f
                 drawCircle(
                     color = PrimaryColor.copy(alpha = rippleAlpha),
                     radius = size.minDimension / 2f * rippleScale,
                     style = Stroke(width = 2.dp.toPx())
                 )
                 val rippleAlpha2 = (1f - rippleProgress2) * 0.4f
-                val rippleScale2 = 1f + rippleProgress2 * 0.5f
+                val rippleScale2 = 1f + rippleProgress2 * 0.35f
                 drawCircle(
                     color = PrimaryColor.copy(alpha = rippleAlpha2),
                     radius = size.minDimension / 2f * rippleScale2,
                     style = Stroke(width = 2.dp.toPx())
                 )
                 val rippleAlpha3 = (1f - rippleProgress3) * 0.4f
-                val rippleScale3 = 1f + rippleProgress3 * 0.5f
+                val rippleScale3 = 1f + rippleProgress3 * 0.35f
                 drawCircle(
                     color = PrimaryColor.copy(alpha = rippleAlpha3),
                     radius = size.minDimension / 2f * rippleScale3,
@@ -467,6 +486,6 @@ private fun BigCheckinButton(
             .clickable(enabled = !isCheckingIn) { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        Text(text = "💩", fontSize = 40.sp)
+        Text(text = "💩", fontSize = (sizeDp * 0.42f).sp)
     }
 }

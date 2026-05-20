@@ -12,9 +12,12 @@ object StatusEmoji {
                 lower.endsWith(".webp"))
     }
 
-    fun textFallback(value: String?, feelingName: String?): String {
+    fun textFallback(value: String?, feelingKeyOrLabel: String?, fallbackEmoji: String? = null): String {
         val raw = value.orEmpty().trim()
         if (raw.isNotEmpty() && !isRemoteImage(raw)) return raw
-        return Feeling.fromDisplayName(feelingName.orEmpty())?.emoji ?: "✨"
+        return fallbackEmoji
+            ?: Feeling.fromKey(feelingKeyOrLabel.orEmpty())?.emoji
+            ?: Feeling.fromLegacyLabel(feelingKeyOrLabel.orEmpty())?.emoji
+            ?: "✨"
     }
 }

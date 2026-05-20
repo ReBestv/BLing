@@ -16,9 +16,9 @@ class StatusEmojiTest {
     }
 
     @Test
-    fun `falls back to feeling emoji when stored value is a url`() {
-        assertEquals("😊", StatusEmoji.textFallback("https://example.com/happy.png", "开心"))
-        assertEquals("🥰", StatusEmoji.textFallback("", "想你"))
+    fun `falls back to saved fallback emoji when stored value is a url`() {
+        assertEquals("😞", StatusEmoji.textFallback("https://example.com/upset.png", "upset", "😞"))
+        assertEquals("🥰", StatusEmoji.textFallback("", "missing"))
         assertEquals("✨", StatusEmoji.textFallback("", ""))
     }
 }

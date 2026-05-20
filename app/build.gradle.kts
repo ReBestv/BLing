@@ -62,4 +62,5 @@ dependencies {
     implementation(libs.coroutines.android)
     implementation(libs.coil)
     testImplementation(libs.junit)
+    testImplementation(libs.json)
 }

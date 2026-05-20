@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "themes": [
     {
       "id": "xiaoxin",
@@ -7,28 +7,23 @@
       "bucket": "xiaoxin",
       "icon": "happy.png",
       "feelings": [
-        "开心", "难过", "疲惫", "生病", "悠闲", "想你", "睡觉",
-        "奋斗", "思考", "爱你", "亲亲", "焦虑", "生气", "哭哭",
-        "无聊", "追剧"
-      ],
-      "fileNameMap": {
-        "开心": "happy",
-        "难过": "sad",
-        "疲惫": "tired",
-        "生病": "sick",
-        "悠闲": "relaxed",
-        "想你": "missyou",
-        "睡觉": "sleep",
-        "奋斗": "hustle",
-        "思考": "think",
-        "爱你": "love",
-        "亲亲": "kiss",
-        "焦虑": "anxious",
-        "生气": "angry",
-        "哭哭": "crying",
-        "无聊": "bored",
-        "追剧": "drama"
-      }
+        { "key": "happy", "label": "开心", "asset": "happy.png" },
+        { "key": "missing", "label": "想你", "asset": "missyou.png" },
+        { "key": "kiss", "label": "亲亲", "asset": "kiss.png" },
+        { "key": "love", "label": "爱你", "asset": "love.png" },
+        { "key": "relaxed", "label": "悠闲", "asset": "relaxed.png" },
+        { "key": "hustling", "label": "奋斗", "asset": "hustle.png" },
+        { "key": "thinking", "label": "思考", "asset": "think.png" },
+        { "key": "watching", "label": "追剧", "asset": "drama.png" },
+        { "key": "sad", "label": "难过", "asset": "sad.png" },
+        { "key": "upset", "label": "沮丧", "asset": "crying.png" },
+        { "key": "angry", "label": "生气", "asset": "angry.png" },
+        { "key": "anxious", "label": "焦虑", "asset": "anxious.png" },
+        { "key": "tired", "label": "疲惫", "asset": "tired.png" },
+        { "key": "sick", "label": "生病", "asset": "sick.png" },
+        { "key": "bored", "label": "无聊", "asset": "bored.png" },
+        { "key": "sleeping", "label": "睡觉", "asset": "sleep.png" }
+      ]
     }
   ]
 }

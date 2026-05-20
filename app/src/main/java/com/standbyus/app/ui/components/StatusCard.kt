@@ -29,7 +29,7 @@ fun StatusCard(
     userName: String,
     modifier: Modifier = Modifier
 ) {
-    val feeling = status?.let { Feeling.fromDisplayName(it.feeling) } ?: Feeling.HAPPY
+    val feeling = status?.let { Feeling.fromKey(it.feelingKey) } ?: Feeling.HAPPY
 
     val infiniteTransition = rememberInfiniteTransition()
     val glowAlpha by infiniteTransition.animateFloat(
@@ -57,15 +57,17 @@ fun StatusCard(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             StatusEmojiImage(
-                value = status?.feelingEmoji,
-                feelingName = status?.feeling,
+                value = status?.feelingAsset,
+                feelingKey = status?.feelingKey,
+                feelingLabel = status?.feelingLabel,
                 size = 132.dp,
                 textSize = 96.sp,
-                tintColor = feeling.color
+                tintColor = feeling.color,
+                fallbackEmoji = status?.feelingFallbackEmoji
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = status?.let { it.customDoing.ifEmpty { it.doing }.ifEmpty { it.feeling } } ?: "—",
+                text = status?.let { it.customDoing.ifEmpty { it.doing }.ifEmpty { it.feelingLabel } } ?: "—",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = StandByUsLightColors.fg

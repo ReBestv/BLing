@@ -147,8 +147,8 @@ fun PostStatusScreen(
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
-                                val emoji = remember(themeVersion, feeling.displayName) {
-                                    EmojiThemeManager.getEmoji(context, feeling.displayName)
+                                val emoji = remember(themeVersion, feeling.key) {
+                                    EmojiThemeManager.getEmoji(context, feeling.key)
                                 }
                                 if (isEmoji(emoji)) {
                                     Text(text = emoji, fontSize = 32.sp)

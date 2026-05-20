@@ -2,6 +2,10 @@
 
 Couples status-sharing Android app. Kotlin + Jetpack Compose + Hilt.
 
+## Project skills
+
+- **ui-ux-pro-max** (`E:\opencode\skills\ui-ux-pro-max\SKILL.md`) — use for UI/UX design, Jetpack Compose screens/components, visual design decisions, interaction patterns, accessibility, responsive layout, and interface quality review. The project also has a local Claude plugin copy at `.claude/plugins/ui-ux-pro-max` and enables `ui-ux-pro-max@local` in `.claude/settings.json`.
+
 ## Build & run
 
 ```

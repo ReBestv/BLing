@@ -48,19 +48,22 @@ class StatusRepository @Inject constructor(
         // Room 缓存
         statusDao.upsertStatus(userStatus.toEntity())
         // Widget 缓存
-        updateWidgetCache(userStatus)
     }
 
     private val widgetScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    private fun updateWidgetCache(status: UserStatus) {
+    fun updateWidgetCache(status: UserStatus) {
         val prefs = context.getSharedPreferences("widget_cache", Context.MODE_PRIVATE)
         prefs.edit().apply {
             putString("doing", status.doing)
             putString("customDoing", status.customDoing)
-            putString("feeling", status.feeling)
+            putString("themeId", status.themeId)
+            putString("themeName", status.themeName)
+            putString("feelingKey", status.feelingKey)
+            putString("feelingLabel", status.feelingLabel)
+            putString("feelingAsset", status.feelingAsset)
+            putString("feelingFallbackEmoji", status.feelingFallbackEmoji)
             putString("feelingColor", status.feelingColor)
-            putString("feelingEmoji", status.feelingEmoji)
             putString("note", status.note)
             putLong("updatedAt", status.updatedAt)
             apply()

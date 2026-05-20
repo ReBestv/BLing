@@ -16,14 +16,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-private fun androidx.compose.ui.graphics.Color.toHex(): String {
-    val a = (alpha * 255).toInt()
-    val r = (red * 255).toInt()
-    val g = (green * 255).toInt()
-    val b = (blue * 255).toInt()
-    return "#${a.toString(16).padStart(2, '0')}${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}"
-}
-
 @HiltViewModel
 class PostStatusViewModel @Inject constructor(
     private val statusRepository: StatusRepository,
@@ -51,14 +43,22 @@ class PostStatusViewModel @Inject constructor(
             error = ""
 
             val userId = supabaseService.getCachedDeviceId()
+            val snapshot = EmojiThemeManager.createSnapshot(
+                theme = EmojiThemeManager.getCurrentTheme(context),
+                feelingKey = selectedFeeling.key
+            )
 
             val status = UserStatus(
                 userId = userId,
-                doing = customDoing,
+                doing = customDoing.ifEmpty { snapshot.feelingLabel },
                 customDoing = customDoing,
-                feeling = selectedFeeling.displayName,
-                feelingColor = selectedFeeling.color.toHex(),
-                feelingEmoji = EmojiThemeManager.getEmoji(context, selectedFeeling.displayName),
+                themeId = snapshot.themeId,
+                themeName = snapshot.themeName,
+                feelingKey = snapshot.feelingKey,
+                feelingLabel = snapshot.feelingLabel,
+                feelingAsset = snapshot.feelingAsset,
+                feelingFallbackEmoji = snapshot.feelingFallbackEmoji,
+                feelingColor = snapshot.feelingColor,
                 note = ""
             )
             try {

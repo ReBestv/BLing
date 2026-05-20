@@ -20,11 +20,13 @@ import com.standbyus.app.ui.theme.StatusEmoji
 @Composable
 fun StatusEmojiImage(
     value: String?,
-    feelingName: String?,
+    feelingKey: String?,
+    feelingLabel: String?,
     size: Dp,
     textSize: androidx.compose.ui.unit.TextUnit,
     modifier: Modifier = Modifier,
-    tintColor: Color = Color.Unspecified
+    tintColor: Color = Color.Unspecified,
+    fallbackEmoji: String? = null
 ) {
     val context = LocalContext.current
     val raw = value.orEmpty().trim()
@@ -34,7 +36,7 @@ fun StatusEmojiImage(
                 .data(raw)
                 .crossfade(true)
                 .build(),
-            contentDescription = feelingName,
+            contentDescription = feelingLabel,
             loading = {
                 Box(modifier = Modifier.size(size), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(
@@ -46,7 +48,7 @@ fun StatusEmojiImage(
             },
             error = {
                 Text(
-                    text = StatusEmoji.textFallback(value, feelingName),
+                    text = StatusEmoji.textFallback(value, feelingKey, fallbackEmoji),
                     fontSize = textSize
                 )
             },
@@ -55,7 +57,7 @@ fun StatusEmojiImage(
         )
     } else {
         Text(
-            text = StatusEmoji.textFallback(value, feelingName),
+            text = StatusEmoji.textFallback(value, feelingKey, fallbackEmoji),
             fontSize = textSize,
             modifier = modifier
         )

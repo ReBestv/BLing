@@ -39,7 +39,7 @@ fun FeelingPicker(
 ) {
     val context = LocalContext.current
     val resolvedEmojiGetter = emojiGetter ?: { feeling ->
-        EmojiThemeManager.getEmoji(context, feeling.displayName)
+        EmojiThemeManager.getEmoji(context, feeling.key)
     }
 
     LazyVerticalGrid(

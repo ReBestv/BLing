@@ -1,5 +1,6 @@
 package com.standbyus.app.ui.theme
 
+import com.standbyus.app.data.model.ThemeFeeling
 import com.standbyus.app.data.model.ThemePack
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -11,16 +12,14 @@ class EmojiThemeTest {
         val theme = EmojiThemeSet(
             id = "xiaoxin",
             name = "小新",
+            bucket = "xiaoxin",
             icon = "happy.png",
-            isDefault = false,
-            feelingNames = listOf("开心"),
-            fileNameMap = mapOf("开心" to "happy"),
-            bucket = "xiaoxin"
+            feelings = listOf(ThemeFeeling("happy", "开心", "happy.png"))
         )
 
         assertEquals(
             "https://dxwnnskelbygqdvjlorj.supabase.co/storage/v1/object/public/themes/xiaoxin/happy.png",
-            theme.stickerUrl("开心")
+            theme.stickerUrl("happy")
         )
     }
 
@@ -33,14 +32,14 @@ class EmojiThemeTest {
                     name = "小新",
                     bucket = "xiaoxin",
                     icon = "happy.png",
-                    feelings = listOf("开心")
+                    feelings = listOf(ThemeFeeling("happy", "开心", "happy.png"))
                 )
             )
         )
 
         assertEquals(
             "https://dxwnnskelbygqdvjlorj.supabase.co/storage/v1/object/public/themes/xiaoxin/happy.png",
-            EmojiThemeManager.themes.last().icon
+            EmojiThemeManager.themes.last().resolvedIcon
         )
     }
 }

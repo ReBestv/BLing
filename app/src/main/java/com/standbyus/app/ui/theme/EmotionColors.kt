@@ -21,7 +21,6 @@ fun feelingBackgroundColor(feeling: Feeling, isDark: Boolean = false): Color {
         Feeling.ANGRY -> Color(0xFFFF5252)
         Feeling.ANXIOUS -> Color(0xFFCFD8DC)
         Feeling.BORED -> Color(0xFFD7CCC8)
-        Feeling.CRYING -> Color(0xFF74B9FF)
     }
     return if (isDark) base.copy(alpha = 0.7f) else base
 }

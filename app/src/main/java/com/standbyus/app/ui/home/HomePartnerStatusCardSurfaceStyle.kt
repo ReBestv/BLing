@@ -12,7 +12,7 @@ object HomePartnerStatusCardSurfaceStyle {
         Feeling.HAPPY, Feeling.LOVE, Feeling.KISS, Feeling.MISSING ->
             listOf(Color(0xFFFFEFF4), Color(0xFFFFB9CA), Color(0xFFFFD9C8))
 
-        Feeling.SAD, Feeling.SICK, Feeling.UPSET, Feeling.ANXIOUS, Feeling.CRYING ->
+        Feeling.SAD, Feeling.SICK, Feeling.UPSET, Feeling.ANXIOUS ->
             listOf(Color(0xFFE8F6FF), Color(0xFFB8DDF1), Color(0xFFDCD7FA))
 
         Feeling.ANGRY ->

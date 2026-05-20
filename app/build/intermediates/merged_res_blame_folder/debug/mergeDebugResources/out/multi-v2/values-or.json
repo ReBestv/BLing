@@ -4,7 +4,7 @@
             "outputFile": "com.standbyus.app-mergeDebugResources-70:/values-or/values-or.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\e6cb6826df19af7b3e77899d262c651b\\transformed\\material3-release\\res\\values-or\\values-or.xml",
+                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\ba9e5053de4da1e5897550611d3c7bbf\\transformed\\material3-release\\res\\values-or\\values-or.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\95f3c8fc25d75cb896faf2e9175c05fb\\transformed\\core-1.13.1\\res\\values-or\\values-or.xml",
+                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\fd488a676d104169ef1e3f4b347d3553\\transformed\\core-1.13.1\\res\\values-or\\values-or.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",
@@ -38,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\6bfa6dc7a9fd13f70729968a3a8d8617\\transformed\\foundation-release\\res\\values-or\\values-or.xml",
+                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\383571f423a9e680809a5f58e12028a9\\transformed\\foundation-release\\res\\values-or\\values-or.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",
@@ -55,24 +55,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\98098217206533b54750f55ccffc599b\\transformed\\ui-release\\res\\values-or\\values-or.xml",
-                    "from": {
-                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "105,202,289,381,481,567,644,742,830,917,995,1077,1147,1222,1299,1375,1458,1525",
-                        "endColumns": "96,86,91,99,85,76,97,87,86,77,81,69,74,76,75,82,66,118",
-                        "endOffsets": "197,284,376,476,562,639,737,825,912,990,1072,1142,1217,1294,1370,1453,1520,1639"
-                    },
-                    "to": {
-                        "startLines": "9,10,11,12,13,17,18,76,77,78,79,80,81,82,83,85,86,87",
-                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
-                        "startOffsets": "840,937,1024,1116,1216,1732,1809,8269,8357,8444,8522,8604,8674,8749,8826,9003,9086,9153",
-                        "endColumns": "96,86,91,99,85,76,97,87,86,77,81,69,74,76,75,82,66,118",
-                        "endOffsets": "932,1019,1111,1211,1297,1804,1902,8352,8439,8517,8599,8669,8744,8821,8897,9081,9148,9267"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\fe3454d8ba4c5eb9789d64463a18070c\\transformed\\glance-appwidget-1.1.1\\res\\values-or\\values-or.xml",
+                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\36081491214fcbf486b1213222e5feb7\\transformed\\glance-appwidget-1.1.1\\res\\values-or\\values-or.xml",
                     "from": {
                         "startLines": "2,3,4",
                         "startColumns": "4,4,4",
@@ -86,6 +69,23 @@
                         "startOffsets": "1302,1501,1616",
                         "endColumns": "198,114,115",
                         "endOffsets": "1496,1611,1727"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\d5b7a31246ba436d1f1b005f6e2aaace\\transformed\\ui-release\\res\\values-or\\values-or.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "105,202,289,381,481,567,644,742,830,917,995,1077,1147,1222,1299,1375,1458,1525",
+                        "endColumns": "96,86,91,99,85,76,97,87,86,77,81,69,74,76,75,82,66,118",
+                        "endOffsets": "197,284,376,476,562,639,737,825,912,990,1072,1142,1217,1294,1370,1453,1520,1639"
+                    },
+                    "to": {
+                        "startLines": "9,10,11,12,13,17,18,76,77,78,79,80,81,82,83,85,86,87",
+                        "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+                        "startOffsets": "840,937,1024,1116,1216,1732,1809,8269,8357,8444,8522,8604,8674,8749,8826,9003,9086,9153",
+                        "endColumns": "96,86,91,99,85,76,97,87,86,77,81,69,74,76,75,82,66,118",
+                        "endOffsets": "932,1019,1111,1211,1297,1804,1902,8352,8439,8517,8599,8669,8744,8821,8897,9081,9148,9267"
                     }
                 }
             ]

@@ -24,51 +24,67 @@ data class ThemeManifest(
     }
 }
 
+data class ThemeFeeling(
+    val key: String,
+    val label: String,
+    val asset: String? = null
+)
+
 /**
  * 单个主题包定义。
  * @param id          主题唯一标识
  * @param name        UI 展示名
  * @param bucket      Supabase Storage bucket 名称（主题图片所在 bucket）
  * @param icon        主题图标文件名（相对于 bucket 根），null 表示无图标
- * @param feelings    该主题覆盖的心情 displayName 列表
- * @param fileNameMap displayName → 英文文件名的映射（不含 .png 后缀）。
- *                    未在 map 中的心情默认用 "{displayName}.png"
+ * @param feelings    该主题覆盖的心情 key/label/asset 列表
  */
 data class ThemePack(
     val id: String,
     val name: String,
     val bucket: String,
     val icon: String?,
-    val feelings: List<String>,
-    val fileNameMap: Map<String, String> = emptyMap()
+    val feelings: List<ThemeFeeling>
 ) {
-    /** 根据 displayName 获取 Storage 上的文件名（含 .png 扩展名） */
-    fun fileName(feelingName: String): String {
-        return (fileNameMap[feelingName] ?: feelingName) + ".png"
-    }
+    fun feelingByKey(key: String): ThemeFeeling? = feelings.find { it.key == key }
+
+    fun fileName(feelingKey: String): String = feelingByKey(feelingKey)?.asset ?: "$feelingKey.png"
 
     companion object {
         fun fromJson(obj: JSONObject): ThemePack {
             val feelingsArray = obj.getJSONArray("feelings")
-            val feelings = mutableListOf<String>()
-            for (i in 0 until feelingsArray.length()) {
-                feelings.add(feelingsArray.getString(i))
-            }
-            val fileNameMap = mutableMapOf<String, String>()
-            if (obj.has("fileNameMap")) {
-                val mapObj = obj.getJSONObject("fileNameMap")
-                for (key in mapObj.keys()) {
-                    fileNameMap[key] = mapObj.getString(key)
-                }
-            }
+            val feelings = parseFeelings(feelingsArray, obj.optJSONObject("fileNameMap"))
             return ThemePack(
                 id = obj.getString("id"),
                 name = obj.getString("name"),
                 bucket = obj.optString("bucket", "themes"),
                 icon = obj.optString("icon", "").takeIf { it.isNotEmpty() },
-                feelings = feelings,
-                fileNameMap = fileNameMap
+                feelings = feelings
             )
+        }
+
+        private fun parseFeelings(
+            feelingsArray: JSONArray,
+            legacyFileNameMap: JSONObject?
+        ): List<ThemeFeeling> {
+            return (0 until feelingsArray.length()).map { index ->
+                val raw = feelingsArray.get(index)
+                if (raw is JSONObject) {
+                    ThemeFeeling(
+                        key = raw.getString("key"),
+                        label = raw.getString("label"),
+                        asset = raw.optString("asset", "").takeIf { it.isNotEmpty() }
+                    )
+                } else {
+                    val legacyLabel = raw.toString()
+                    val feeling = Feeling.fromLegacyLabel(legacyLabel) ?: Feeling.HAPPY
+                    val mappedName = legacyFileNameMap?.optString(legacyLabel, "").orEmpty()
+                    ThemeFeeling(
+                        key = feeling.key,
+                        label = legacyLabel,
+                        asset = mappedName.takeIf { it.isNotEmpty() }?.let { "$it.png" } ?: "${feeling.key}.png"
+                    )
+                }
+            }
         }
     }
 }

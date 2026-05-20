@@ -35,6 +35,10 @@ class HomeViewModel @Inject constructor(
 
     val partnerStatus: StateFlow<UserStatus?> = _partnerUserId.flatMapLatest { id ->
         if (id.isEmpty()) flowOf(null) else statusRepository.observeStatus(id)
+    }.onEach { status ->
+        if (status != null) {
+            statusRepository.updateWidgetCache(status)
+        }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     private val _partnerDisplayName = MutableStateFlow("对方")

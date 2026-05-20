@@ -4,7 +4,7 @@
             "outputFile": "com.standbyus.app-mergeDebugResources-70:/values-v29/values-v29.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\fe3454d8ba4c5eb9789d64463a18070c\\transformed\\glance-appwidget-1.1.1\\res\\values-v29\\values-v29.xml",
+                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\36081491214fcbf486b1213222e5feb7\\transformed\\glance-appwidget-1.1.1\\res\\values-v29\\values-v29.xml",
                     "from": {
                         "startLines": "2,5,19,22,25,26,27",
                         "startColumns": "4,4,4,4,4,4,4",

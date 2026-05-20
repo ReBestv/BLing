@@ -176,10 +176,10 @@ private fun TimelineEntry(
     partnerName: String,
     myAvatar: String
 ) {
-    val feeling = Feeling.fromDisplayName(status.feeling)
+    val feeling = Feeling.fromKey(status.feelingKey)
     val feelingColor = feeling?.color ?: Color(0xFFFFD180)
-    val moodName = feeling?.displayName ?: status.feeling
-    val activityText = status.customDoing.ifEmpty { status.doing }.ifEmpty { status.feeling }
+    val moodName = status.feelingLabel.ifEmpty { feeling?.displayName ?: "开心" }
+    val activityText = status.customDoing.ifEmpty { status.doing }.ifEmpty { moodName }
     val formattedTime = SimpleDateFormat("HH:mm", Locale.getDefault())
         .format(Date(status.updatedAt))
     val bubbleModifier = when (val width = HistoryEntryLayout.bubbleWidth(isMe)) {
@@ -217,11 +217,13 @@ private fun TimelineEntry(
                 contentAlignment = Alignment.Center
             ) {
                 StatusEmojiImage(
-                    value = status.feelingEmoji,
-                    feelingName = status.feeling,
+                    value = status.feelingAsset,
+                    feelingKey = status.feelingKey,
+                    feelingLabel = status.feelingLabel,
                     size = 28.dp,
                     textSize = 24.sp,
-                    tintColor = feelingColor
+                    tintColor = feelingColor,
+                    fallbackEmoji = status.feelingFallbackEmoji
                 )
             }
         }
@@ -252,11 +254,13 @@ private fun TimelineEntry(
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             StatusEmojiImage(
-                                value = status.feelingEmoji,
-                                feelingName = status.feeling,
+                                value = status.feelingAsset,
+                                feelingKey = status.feelingKey,
+                                feelingLabel = status.feelingLabel,
                                 size = 20.dp,
                                 textSize = 16.sp,
-                                tintColor = feelingColor
+                                tintColor = feelingColor,
+                                fallbackEmoji = status.feelingFallbackEmoji
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(

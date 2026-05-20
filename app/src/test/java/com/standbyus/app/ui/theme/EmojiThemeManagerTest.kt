@@ -1,5 +1,6 @@
 package com.standbyus.app.ui.theme
 
+import com.standbyus.app.data.model.ThemeFeeling
 import com.standbyus.app.data.model.ThemePack
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -18,8 +19,7 @@ class EmojiThemeManagerTest {
                     name = "小新",
                     bucket = "xiaoxin",
                     icon = "happy.png",
-                    feelings = listOf("开心"),
-                    fileNameMap = mapOf("开心" to "happy")
+                    feelings = listOf(ThemeFeeling("happy", "开心", "happy.png"))
                 )
             )
         )

@@ -596,10 +596,11 @@ private fun ThemeRow(
                     .background(Color(0xFFF5F0ED)),
                 contentAlignment = Alignment.Center
             ) {
-                if (theme.icon != null && theme.icon.startsWith("http")) {
+                val icon = theme.resolvedIcon
+                if (icon != null && icon.startsWith("http")) {
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
-                            .data(theme.icon)
+                            .data(icon)
                             .crossfade(true)
                             .build(),
                         contentDescription = theme.name,
@@ -607,7 +608,7 @@ private fun ThemeRow(
                     )
                 } else {
                     Text(
-                        text = theme.icon ?: "🎨",
+                        text = icon ?: "🎨",
                         fontSize = 20.sp
                     )
                 }

@@ -12,6 +12,7 @@ lifecycle = "2.8.7"
 coroutines = "1.9.0"
 coil = "2.7.0"
 junit = "4.13.2"
+json = "20240303"
 
 [libraries]
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose-bom" }
@@ -36,6 +37,7 @@ glance-material3 = { group = "androidx.glance", name = "glance-material3", versi
 coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+json = { group = "org.json", name = "json", version.ref = "json" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
