@@ -153,7 +153,7 @@ private fun PartnerStatusCard(
     userName: String,
     modifier: Modifier = Modifier
 ) {
-    val feeling = Feeling.fromDisplayName(status.feeling) ?: Feeling.HAPPY
+    val feeling = Feeling.fromKey(status.feelingKey) ?: Feeling.HAPPY
     val cardGradient = cardGradientFor(feeling)
 
     // Float animation for emoji: 3s ease-in-out, -8px
@@ -197,18 +197,20 @@ private fun PartnerStatusCard(
         ) {
             // Large emoji with float animation
             StatusEmojiImage(
-                value = status.feelingEmoji,
-                feelingName = status.feeling,
-                size = 132.dp,
-                textSize = 80.sp,
+                value = status.feelingAsset,
+                feelingKey = status.feelingKey,
+                feelingLabel = status.feelingLabel,
+                size = HomePartnerStatusCardStyle.emojiSizeDp.dp,
+                textSize = HomePartnerStatusCardStyle.emojiTextSizeSp.sp,
                 tintColor = feeling.color,
+                fallbackEmoji = status.feelingFallbackEmoji,
                 modifier = Modifier.offset(y = floatOffset.dp)
             )
 
             // Mood text (28sp bold, white, with text-shadow)
             Text(
-                text = status.feeling.ifEmpty { feeling.displayName },
-                fontSize = 28.sp,
+                text = status.feelingLabel.ifEmpty { feeling.displayName },
+                fontSize = HomePartnerStatusCardStyle.moodTextSizeSp.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
                 style = TextStyle(
@@ -225,7 +227,7 @@ private fun PartnerStatusCard(
             if (doing.isNotEmpty()) {
                 Text(
                     text = doing,
-                    fontSize = 16.sp,
+                    fontSize = HomePartnerStatusCardStyle.doingTextSizeSp.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.White.copy(alpha = 0.9f)
                 )
@@ -235,7 +237,7 @@ private fun PartnerStatusCard(
             if (status.note.isNotEmpty()) {
                 Text(
                     text = status.note,
-                    fontSize = 14.sp,
+                    fontSize = HomePartnerStatusCardStyle.noteTextSizeSp.sp,
                     fontStyle = FontStyle.Italic,
                     color = Color.White.copy(alpha = 0.8f),
                     textAlign = TextAlign.Center,
@@ -294,16 +296,18 @@ private fun MyStatusStrip(
         ) {
             // Emoji
             StatusEmojiImage(
-                value = status?.feelingEmoji,
-                feelingName = status?.feeling,
+                value = status?.feelingAsset,
+                feelingKey = status?.feelingKey,
+                feelingLabel = status?.feelingLabel,
                 size = 48.dp,
-                textSize = 40.sp
+                textSize = 40.sp,
+                fallbackEmoji = status?.feelingFallbackEmoji
             )
 
             // Text
             val doing = status?.customDoing
                 ?.ifEmpty { status.doing }
-                ?.ifEmpty { status.feeling }
+                ?.ifEmpty { status.feelingLabel }
                 ?: "点击发布我的状态"
             Text(
                 text = doing,
