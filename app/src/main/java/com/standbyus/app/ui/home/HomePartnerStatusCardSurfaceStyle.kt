@@ -10,18 +10,18 @@ object HomePartnerStatusCardSurfaceStyle {
 
     fun gradientColorsFor(feeling: Feeling): List<Color> = when (feeling) {
         Feeling.HAPPY, Feeling.LOVE, Feeling.KISS, Feeling.MISSING ->
-            listOf(Color(0xFFFFDCE5), Color(0xFFFFB8C7), Color(0xFFFFD8C8))
+            listOf(Color(0xFFFFEFF4), Color(0xFFFFB9CA), Color(0xFFFFD9C8))
 
         Feeling.SAD, Feeling.SICK, Feeling.UPSET, Feeling.ANXIOUS, Feeling.CRYING ->
             listOf(Color(0xFFE8F6FF), Color(0xFFB8DDF1), Color(0xFFDCD7FA))
 
         Feeling.ANGRY ->
-            listOf(Color(0xFFFFE5E0), Color(0xFFFFBFC0), Color(0xFFFFD5C2))
+            listOf(Color(0xFFFFF0EA), Color(0xFFFFB8B8), Color(0xFFFFD1B5))
 
         Feeling.TIRED, Feeling.SLEEPING ->
-            listOf(Color(0xFFF4ECFF), Color(0xFFD8C8EF), Color(0xFFC9E4F2))
+            listOf(Color(0xFFF8F1FF), Color(0xFFD9C3F3), Color(0xFFC7E6F4))
 
         Feeling.RELAXED, Feeling.HUSTLING, Feeling.THINKING, Feeling.WATCHING, Feeling.BORED ->
-            listOf(Color(0xFFFFF0D9), Color(0xFFFFD3AA), Color(0xFFFFE4C9))
+            listOf(Color(0xFFFFF4DD), Color(0xFFFFD2A1), Color(0xFFFFE6CE))
     }
 }
