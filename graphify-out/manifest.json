@@ -16,36 +16,48 @@
     "hash": "b3c37fdaf65f3bac98941928041c0b13"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\MainActivity.kt": {
-    "mtime": 1778495641.2326615,
-    "hash": "3c047330a4bc43fc185c068780d47c72"
+    "mtime": 1778734528.242013,
+    "hash": "4a6b9cee4ba54f11ccaf9e9ccd07493b"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\StandByApplication.kt": {
-    "mtime": 1778141505.4875789,
-    "hash": "c3ba37e24d57dc11650c6088ab6eb80b"
+    "mtime": 1778636439.7512078,
+    "hash": "76b6fe6749f7d11491cfb75b197fd54e"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\data\\local\\AppDatabase.kt": {
-    "mtime": 1778557411.5171494,
-    "hash": "65f1e6434ce8bc03dc459cf4d0f930e5"
+    "mtime": 1779095818.1937258,
+    "hash": "47717c87bcdc62a20e6bd6667d194bb6"
+  },
+  "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\data\\local\\CheckinDao.kt": {
+    "mtime": 1779094912.466234,
+    "hash": "a1b29c851b310c4e2e9e37e8737b07b6"
+  },
+  "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\data\\local\\CheckinRecordEntity.kt": {
+    "mtime": 1779095609.6103745,
+    "hash": "67f371d694723dcbdb1ef699850537ba"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\data\\local\\StatusDao.kt": {
-    "mtime": 1778557405.0134337,
-    "hash": "a6142623e936b16795bc6255e2973faa"
+    "mtime": 1778592799.685164,
+    "hash": "2526c1d6876b0a33c1edd1fc6e44e772"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\data\\local\\StatusEntity.kt": {
-    "mtime": 1778557398.6958115,
-    "hash": "e6fcda8eff8fcf122ffbb3b1a1d1288e"
+    "mtime": 1778592799.685164,
+    "hash": "160b772a0b781d2b46033e0de3ca4dd9"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\data\\model\\AlbumPhoto.kt": {
     "mtime": 1778483303.4932408,
     "hash": "33f05a6916b8614d67eb8c338347968b"
+  },
+  "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\data\\model\\CheckinData.kt": {
+    "mtime": 1779090078.2575648,
+    "hash": "298d1af4f7b7baa337bd5e9ff04940d1"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\data\\model\\Doing.kt": {
     "mtime": 1778132472.2732134,
     "hash": "8a90e7a49466915d9d1ecec6a7bd03f1"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\data\\model\\Feeling.kt": {
-    "mtime": 1778557355.1293488,
-    "hash": "3b97f896009152f2cbc918661a8b0d27"
+    "mtime": 1778661935.0998237,
+    "hash": "d67d88e35647d6f7e5e4557272fbe956"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\data\\model\\PairingInfo.kt": {
     "mtime": 1778132472.3044252,
@@ -68,36 +80,40 @@
     "hash": "48eda349d83de5b6d9eb7f40776970df"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\data\\repository\\AlbumRepository.kt": {
-    "mtime": 1778495741.2955403,
-    "hash": "484189d8cff5be7994c52c9625585ed5"
+    "mtime": 1778666376.761047,
+    "hash": "e4b3d21c4fc9706725e12630aa9f2b11"
+  },
+  "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\data\\repository\\CheckinRepository.kt": {
+    "mtime": 1779094914.0427597,
+    "hash": "7a02ad6e039825a3fd1b43e3c9dccb35"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\data\\repository\\PairingRepository.kt": {
-    "mtime": 1778479652.3838594,
-    "hash": "73398716bfc41e6445f5e2423615843b"
+    "mtime": 1779101605.5597544,
+    "hash": "313d94516175020c3a187c1afb7c081a"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\data\\repository\\StatusRepository.kt": {
-    "mtime": 1778557380.127609,
-    "hash": "e0d6ad53141533d898f961bc469dc6e3"
+    "mtime": 1779088359.9079895,
+    "hash": "cc65c9a13fd90eacc23dc993d9f7d8c0"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\di\\AppModule.kt": {
-    "mtime": 1778132547.7981234,
-    "hash": "59e0bd6d33b434c8c07e1d28ba293ff0"
+    "mtime": 1779090526.2124994,
+    "hash": "8e32f2a90f9f4b4a9c9946daff5d6886"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\di\\SupabaseModule.kt": {
     "mtime": 1778141413.5925379,
     "hash": "97fbc2738bb41c30f371c1a092aad8b2"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\navigation\\Routes.kt": {
-    "mtime": 1778483420.593124,
-    "hash": "f4ff627546282d219442ba551edf200b"
+    "mtime": 1778726226.8144462,
+    "hash": "be7218fd2acfd89a2a9e15b6eb8e502c"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\album\\AlbumScreen.kt": {
-    "mtime": 1778495861.7753334,
-    "hash": "2aff8684ac78eac1331231c34b37a15a"
+    "mtime": 1779096710.1737816,
+    "hash": "dd14dcb9772cc115af45fc484994e386"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\album\\AlbumViewModel.kt": {
-    "mtime": 1778495734.5494246,
-    "hash": "008345680d2c2c0e81ce97476946c48b"
+    "mtime": 1778663311.0511541,
+    "hash": "ad84643a3fd86fad2a9080145eb2462a"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\celebration\\CelebrationConfig.kt": {
     "mtime": 1778145004.4892793,
@@ -108,96 +124,120 @@
     "hash": "562c94915df0e60e1151a2a9576a6900"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\celebration\\CelebrationOverlay.kt": {
-    "mtime": 1778145126.4749343,
-    "hash": "206b6a8d07607573372ca8a11002c8e6"
+    "mtime": 1778593664.0523777,
+    "hash": "abecd804fdefad07bb43c0722434be52"
+  },
+  "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\checkin\\CheckinScreen.kt": {
+    "mtime": 1779117099.0458286,
+    "hash": "c3346d8d1c1b6ea7e45de66cac8141ac"
+  },
+  "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\checkin\\CheckinViewModel.kt": {
+    "mtime": 1779095609.6103745,
+    "hash": "034455e7d964f2f54a6f401eeae5bc18"
+  },
+  "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\components\\AppHeader.kt": {
+    "mtime": 1779025593.5448565,
+    "hash": "c8737a2c1156ce54ca17afd15df48a93"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\components\\AvatarWithGlow.kt": {
-    "mtime": 1778132731.1722817,
-    "hash": "f0b9c5d144988623180a792f25133e0b"
+    "mtime": 1778593042.871184,
+    "hash": "35ce7b86c35039b37e81c914eefc50df"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\components\\DoingPicker.kt": {
-    "mtime": 1778554505.7060833,
-    "hash": "32fbc34e1acf0b72e85f6e9a796df976"
+    "mtime": 1778666368.390719,
+    "hash": "9473dfc22a438d8791eda66b93730960"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\components\\FeelingPicker.kt": {
-    "mtime": 1778495971.0141363,
-    "hash": "94502a819e7a00760dbca3485067578b"
+    "mtime": 1778657416.7377584,
+    "hash": "009e14a839e220f32c9b44e6149a8fd9"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\components\\StatusCard.kt": {
-    "mtime": 1778553544.811142,
-    "hash": "5b0394ba4c3e1bfac4e88dc9170f136f"
+    "mtime": 1778666352.4908009,
+    "hash": "f9f46439bda8c9d22c6c07eee845c63c"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\history\\HistoryScreen.kt": {
-    "mtime": 1778481566.8350503,
-    "hash": "88e71a2b0732552f2c7dd44606d6979a"
+    "mtime": 1779096628.949195,
+    "hash": "e08116e8153e11d01ceffbbc64d3226d"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\history\\HistoryViewModel.kt": {
-    "mtime": 1778481539.105654,
-    "hash": "62fa60ba583b39d59a22c0cd936cfc4a"
+    "mtime": 1778759818.7803178,
+    "hash": "74566d31197751bad3f19a407ac6b175"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\home\\HomeScreen.kt": {
-    "mtime": 1778553544.812142,
-    "hash": "d68fca9105f9084841951abcced4e6ed"
+    "mtime": 1779103225.6882346,
+    "hash": "0c4d00f77194722a0f8d8a960980f23e"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\home\\HomeViewModel.kt": {
-    "mtime": 1778146413.9908276,
-    "hash": "76a1738c69b985c0be23db8965cb7151"
+    "mtime": 1779102010.935043,
+    "hash": "efbea60f085bfb10da07c58877d8419b"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\poststatus\\PostStatusScreen.kt": {
-    "mtime": 1778557371.8993087,
-    "hash": "456fc83f1237996390d7df8663058eb2"
+    "mtime": 1779087562.7775612,
+    "hash": "aa64acaa2a2d1a14049a0cd45984fafc"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\poststatus\\PostStatusViewModel.kt": {
-    "mtime": 1778554310.916621,
-    "hash": "f48c21c0ad37af42dc27797bc942aec8"
+    "mtime": 1778666336.8780158,
+    "hash": "92d1071237a495b080dc878cbdeae65d"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\settings\\SettingsScreen.kt": {
-    "mtime": 1778495383.7603135,
-    "hash": "9f115c84b08c0abaea37b6a61e89ab14"
+    "mtime": 1779101873.836098,
+    "hash": "4d5fb9f1847dbbad0e27fbe66e48604a"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\settings\\SettingsViewModel.kt": {
-    "mtime": 1778495364.9743888,
-    "hash": "2fe9ea5230d41ec36b7faa197a9739b6"
+    "mtime": 1779101736.5629716,
+    "hash": "d5f0b9cdc5d05533401b87d0e969755c"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\theme\\Color.kt": {
-    "mtime": 1778553544.8131425,
-    "hash": "2adbb590fe287db742a3879c0504a5d8"
+    "mtime": 1778761953.395278,
+    "hash": "e6ca84b0aad78f4a89217207a1a8e5ce"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\theme\\EmojiTheme.kt": {
-    "mtime": 1778556681.8234856,
-    "hash": "1a1c39938b1274287fdd31c36aa59217"
+    "mtime": 1778657096.585039,
+    "hash": "0d861fd2b35e026ddf54f93a21dd3d4b"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\theme\\EmotionColors.kt": {
-    "mtime": 1778556676.8160963,
-    "hash": "2bd7c6b9495bfedaa65882cf77a02ce7"
+    "mtime": 1778662005.3693142,
+    "hash": "418f0fabf1b64fd389b53ff20e8388a1"
+  },
+  "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\theme\\NavIcons.kt": {
+    "mtime": 1778737815.5874147,
+    "hash": "4bdcdb1ae559265d65fc89efe8204061"
+  },
+  "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\theme\\StandByUsTokens.kt": {
+    "mtime": 1778591564.1078582,
+    "hash": "acb7920b9e4e66d4117b5964b41e59b6"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\theme\\Theme.kt": {
-    "mtime": 1778553544.815143,
-    "hash": "d6081c2b0e76d31b239dffdf4d24536c"
+    "mtime": 1778756887.038125,
+    "hash": "982a29ebb2eb326f69130b1d9e80292f"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\ui\\theme\\Type.kt": {
-    "mtime": 1778132648.1173885,
-    "hash": "c040f9fc408978084af9d54787134d1d"
+    "mtime": 1778592799.7002854,
+    "hash": "c24e9ced2a222675b6bf3b39f0a18116"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\widget\\StandByWidget.kt": {
-    "mtime": 1778136542.845292,
-    "hash": "da25190ee4eed21a01cebb6bbeef0c22"
+    "mtime": 1778757083.6487336,
+    "hash": "e32ffd9f1f7a78aeaad9875ccdb65e9f"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\widget\\StandByWidgetReceiver.kt": {
-    "mtime": 1778136525.6112854,
-    "hash": "0ece0e1c09d904d00732f69256ff8036"
+    "mtime": 1778636367.26861,
+    "hash": "2eba2ea44f9cbc9a9a33799338925105"
   },
   "E:\\AndroidProject\\StandByUs\\AGENTS.md": {
-    "mtime": 1778556692.2122536,
-    "hash": "0fa9a8e687c845e8c98ad66277f338de"
+    "mtime": 1778592797.9070811,
+    "hash": "ea8c2f5b54da50f1f29906d1e18c8db1"
   },
   "E:\\AndroidProject\\StandByUs\\FIREBASE_SETUP.md": {
     "mtime": 1778132414.135542,
     "hash": "3a96615529044e3e71de93026f62d71d"
   },
   "E:\\AndroidProject\\StandByUs\\README.md": {
-    "mtime": 1778475645.9707983,
-    "hash": "6d1783ff2b4166897f091c0f475428f7"
+    "mtime": 1778592797.9080808,
+    "hash": "39311d05ebc09ada94290bde8990a160"
+  },
+  "E:\\AndroidProject\\StandByUs\\StandBy_Us_\u89c6\u89c9\u89c4\u8303\u6587\u6863_v1.0.md": {
+    "mtime": 1778761748.9176888,
+    "hash": "ccc2b9374d13004dc91ad55b6eed748e"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\AGENTS.md": {
     "mtime": 1778556703.6921332,
@@ -268,8 +308,56 @@
     "hash": "ce04d51cdba9a20e7ab0f75fbe2c5c4c"
   },
   "E:\\AndroidProject\\StandByUs\\app\\src\\main\\java\\com\\standbyus\\app\\widget\\AGENTS.md": {
-    "mtime": 1778556281.516395,
-    "hash": "e9ec4bf683b5b8d6359a3e50d3a90bb1"
+    "mtime": 1778573722.2436383,
+    "hash": "67e7f90fe743186d32623e9dc1c5c652"
+  },
+  "E:\\AndroidProject\\StandByUs\\conversations\\20260512-19-42-22-\u9879\u76ee\u7406\u89e3\u786e\u8ba4.md": {
+    "mtime": 1778636509.8753326,
+    "hash": "56af514719335fd02469f5a0f1611b7c"
+  },
+  "E:\\AndroidProject\\StandByUs\\conversations\\20260512-20-54-12-\u6839\u636eNewUI\u65b9\u6848\u91cd\u6784\u9879\u76eeUI.md": {
+    "mtime": 1778662180.8066938,
+    "hash": "f94109e8f162a32e6c994eea4af27426"
+  },
+  "E:\\AndroidProject\\StandByUs\\conversations\\20260513-16-56-11-\u8868\u60c5\u6587\u5b57-\u65f6\u5149\u8f74-\u76f8\u518c-\u5fc3\u60c5\u6846BUG\u4fee\u590d.md": {
+    "mtime": 1778675875.3630798,
+    "hash": "de2c3e762e82e936f583111d633d377d"
+  },
+  "E:\\AndroidProject\\StandByUs\\conversations\\20260513-20-36-24-\u7cfb\u7edf\u4efb\u52a1\u5931\u8d25\u542b\u4e49.md": {
+    "mtime": 1778675807.318135,
+    "hash": "f6a6c1076e0d2dc9a5d26098646de175"
+  },
+  "E:\\AndroidProject\\StandByUs\\conversations\\20260514-09-15-22-\u6309\u8bbe\u8ba1\u7a3f\u91cd\u67845\u4e2a\u5c4f\u5e55UI\u5e76\u81ea\u5b9a\u4e49\u5bfc\u822a.md": {
+    "mtime": 1778738557.6851199,
+    "hash": "3a6af27d4eed312137d15fefa2b556cb"
+  },
+  "E:\\AndroidProject\\StandByUs\\conversations\\20260514-14-35-37-New-session-2026-05-14T06-35-3.md": {
+    "mtime": 1778740562.2874873,
+    "hash": "08ce196654129e3ffd650b3dfc3ef4cb"
+  },
+  "E:\\AndroidProject\\StandByUs\\conversations\\20260514-19-11-21-\u63d0\u4ea4\u5f53\u524d\u4ee3\u7801.md": {
+    "mtime": 1778757252.8336363,
+    "hash": "879026ba0c6e71db0de76dd856673341"
+  },
+  "E:\\AndroidProject\\StandByUs\\conversations\\20260518-14-59-18-New-session-2026-05-18T06-59-1.md": {
+    "mtime": 1779089704.9097447,
+    "hash": "1821076ebbc97f5df19c2adae147455e"
+  },
+  "E:\\AndroidProject\\StandByUs\\conversations\\20260518-15-07-49-\u66ff\u6362\u6253\u5361\u9875\u9762\u4e3aStandByUs-UI\u8bbe\u8ba1\u6837\u5f0f.md": {
+    "mtime": 1779095105.7550604,
+    "hash": "ab32c2f66b6a5c1e463bdfab174e15cc"
+  },
+  "E:\\AndroidProject\\StandByUs\\conversations\\20260518-15-56-38-\u53ef\u89c6\u5316\u5b50agent\u6d41\u7a0b\u63d2\u4ef6\u542f\u52a8\u547d\u4ee4.md": {
+    "mtime": 1779091070.7355833,
+    "hash": "a200ce2684d7dc790483ef3b8d36f8cb"
+  },
+  "E:\\AndroidProject\\StandByUs\\conversations\\20260518-17-09-13-\u914d\u5bf9\u529f\u80fd\u6dfb\u52a0\u7528\u6237\u540d\u4e0e\u5bf9\u65b9\u5907\u6ce8.md": {
+    "mtime": 1779105015.270613,
+    "hash": "f01a37fc28ac18927ac5af56501e8013"
+  },
+  "E:\\AndroidProject\\StandByUs\\conversations\\20260519-14-52-49-graphfiy\u81ea\u52a8\u8c03\u7528\u8be2\u95ee.md": {
+    "mtime": 1779175023.796024,
+    "hash": "5e9927bb46196701d77bf0ff01003469"
   },
   "E:\\AndroidProject\\StandByUs\\docs\\design\\ui-redesign-2026-05-11.md": {
     "mtime": 1778480951.3341465,
@@ -291,6 +379,18 @@
     "mtime": 1778494892.5075376,
     "hash": "293744bea926fdbc6a02cd9cb017f156"
   },
+  "E:\\AndroidProject\\StandByUs\\docs\\superpowers\\plans\\2026-05-18-checkin-pk-implementation.md": {
+    "mtime": 1779089815.3362672,
+    "hash": "45cf71f40e75ac4d6cdb534679a80a0a"
+  },
+  "E:\\AndroidProject\\StandByUs\\docs\\superpowers\\plans\\2026-05-18-checkin-ui-polish.md": {
+    "mtime": 1779094804.3176124,
+    "hash": "265dd0e1a6ed492d99a7c2a37a3ab67b"
+  },
+  "E:\\AndroidProject\\StandByUs\\docs\\superpowers\\plans\\2026-05-18-pairing-username-nickname.md": {
+    "mtime": 1779096208.5323071,
+    "hash": "8506fc2e35c6eb7e13add93f49189ddf"
+  },
   "E:\\AndroidProject\\StandByUs\\docs\\superpowers\\specs\\2026-05-07-birthday-celebration-design.md": {
     "mtime": 1778144486.6143026,
     "hash": "fb7bb91e217c58c6ffd69bfc36ee1a3b"
@@ -302,5 +402,85 @@
   "E:\\AndroidProject\\StandByUs\\docs\\superpowers\\specs\\2026-05-11-emoji-theme-design.md": {
     "mtime": 1778494764.7630572,
     "hash": "7000392cc7b9fa5001b4f96deb67026d"
+  },
+  "E:\\AndroidProject\\StandByUs\\docs\\superpowers\\specs\\2026-05-18-checkin-redesign-design.md": {
+    "mtime": 1779089554.882612,
+    "hash": "3bb19fcec1dc5bd48ddd6f20f2fbcdf7"
+  },
+  "E:\\AndroidProject\\StandByUs\\docs\\superpowers\\specs\\2026-05-18-checkin-ui-polish-design.md": {
+    "mtime": 1779094739.4133518,
+    "hash": "fd32188fada3e4b78abe091df0a2219b"
+  },
+  "E:\\AndroidProject\\StandByUs\\docs\\superpowers\\specs\\2026-05-18-pairing-username-nickname-design.md": {
+    "mtime": 1779096115.962796,
+    "hash": "9cd1d9ec0039281bff0e74e2f38e0b83"
+  },
+  "E:\\AndroidProject\\StandByUs\\conversations\\images\\20260518-15-07-49-\u66ff\u6362\u6253\u5361\u9875\u9762\u4e3aStandByUs-UI\u8bbe\u8ba1\u6837\u5f0f-0.png": {
+    "mtime": 1779095105.7430248,
+    "hash": "a5db6e51167f4a14eb25ac6b6d88f1bb"
+  },
+  "E:\\AndroidProject\\StandByUs\\themes\\\u5c0f\u65b0\\\u4eb2\u4eb2.png": {
+    "mtime": 1779117816.6593835,
+    "hash": "6349b9a49660da7ba1720a714a333302"
+  },
+  "E:\\AndroidProject\\StandByUs\\themes\\\u5c0f\u65b0\\\u54ed\u54ed.png": {
+    "mtime": 1779117816.6865225,
+    "hash": "c679ace78eb874b8bd29b438ff7c2d74"
+  },
+  "E:\\AndroidProject\\StandByUs\\themes\\\u5c0f\u65b0\\\u594b\u6597.png": {
+    "mtime": 1779117816.671436,
+    "hash": "90d62eee128ea216c1f9befc13d30607"
+  },
+  "E:\\AndroidProject\\StandByUs\\themes\\\u5c0f\u65b0\\\u5f00\u5fc3.png": {
+    "mtime": 1779117816.6411831,
+    "hash": "7be15de7449f970e0ff5b362d25e54ef"
+  },
+  "E:\\AndroidProject\\StandByUs\\themes\\\u5c0f\u65b0\\\u601d\u8003.png": {
+    "mtime": 1779117816.6759377,
+    "hash": "4b15532119ae31fe85d385239b2c9571"
+  },
+  "E:\\AndroidProject\\StandByUs\\themes\\\u5c0f\u65b0\\\u60a0\u95f2.png": {
+    "mtime": 1779117816.667341,
+    "hash": "b67ab1509542b4643b4316f73072d0af"
+  },
+  "E:\\AndroidProject\\StandByUs\\themes\\\u5c0f\u65b0\\\u60f3\u4f60.png": {
+    "mtime": 1779117816.6457486,
+    "hash": "bc8addb465632d0603ee73810cc3bcf2"
+  },
+  "E:\\AndroidProject\\StandByUs\\themes\\\u5c0f\u65b0\\\u65e0\u804a.png": {
+    "mtime": 1779117816.7061708,
+    "hash": "a0d88b5bff543ede6d31f0d7f3acc276"
+  },
+  "E:\\AndroidProject\\StandByUs\\themes\\\u5c0f\u65b0\\\u7126\u8651.png": {
+    "mtime": 1779117816.694543,
+    "hash": "6b522fb24ae96a71fb2fa7c8a2714bb7"
+  },
+  "E:\\AndroidProject\\StandByUs\\themes\\\u5c0f\u65b0\\\u7231\u4f60.png": {
+    "mtime": 1779117816.6633387,
+    "hash": "f2efd1492537f7f0f0d985beb4f349bd"
+  },
+  "E:\\AndroidProject\\StandByUs\\themes\\\u5c0f\u65b0\\\u751f\u6c14.png": {
+    "mtime": 1779117816.6910331,
+    "hash": "9a69267f248feda0db28cff436966564"
+  },
+  "E:\\AndroidProject\\StandByUs\\themes\\\u5c0f\u65b0\\\u751f\u75c5.png": {
+    "mtime": 1779117816.7021134,
+    "hash": "a90be2db75fc9bf70f1ae69c22d133ad"
+  },
+  "E:\\AndroidProject\\StandByUs\\themes\\\u5c0f\u65b0\\\u75b2\u60eb.png": {
+    "mtime": 1779117816.697542,
+    "hash": "d8c5e9b47067a8df8fd24b4c40542605"
+  },
+  "E:\\AndroidProject\\StandByUs\\themes\\\u5c0f\u65b0\\\u7761\u89c9.png": {
+    "mtime": 1779117816.7106776,
+    "hash": "e8c98d0b100735b935067486b0d772c9"
+  },
+  "E:\\AndroidProject\\StandByUs\\themes\\\u5c0f\u65b0\\\u8ffd\u5267.png": {
+    "mtime": 1779117816.6795228,
+    "hash": "87b51c86620dd6f3f43f19d30db9a3b9"
+  },
+  "E:\\AndroidProject\\StandByUs\\themes\\\u5c0f\u65b0\\\u96be\u8fc7.png": {
+    "mtime": 1779117816.682523,
+    "hash": "e36521b4944586b410c121ba8846e194"
   }
 }

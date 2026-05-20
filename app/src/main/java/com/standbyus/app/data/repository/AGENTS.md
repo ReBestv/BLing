@@ -7,7 +7,9 @@ Orchestrates remote ↔ local sync and exposes data to ViewModels.
 ```
 repository/
 ├── StatusRepository.kt     # Status CRUD + polling + widget cache
-└── PairingRepository.kt    # Code generation + pair/join/unpair
+├── PairingRepository.kt    # Code generation + pair/join/unpair
+├── AlbumRepository.kt      # Photo upload/delete to Supabase Storage
+└── CheckinRepository.kt    # Check-in CRUD + sync
 ```
 
 ## WHERE TO LOOK
@@ -17,6 +19,8 @@ repository/
 | Change polling interval | `StatusRepository.kt` |
 | Modify pairing logic | `PairingRepository.kt` |
 | Add widget cache field | `StatusRepository.updateWidgetCache()` |
+| Album photo management | `AlbumRepository.kt` |
+| Check-in features | `CheckinRepository.kt` |
 
 ## CONVENTIONS
 

@@ -10,7 +10,9 @@ theme/
 ├── Theme.kt              # Material3 light/dark color schemes
 ├── Type.kt               # Typography scale
 ├── EmotionColors.kt      # Feeling → background color mapping
-└── EmojiTheme.kt         # Emoji set switching (default/cat)
+├── EmojiTheme.kt         # Emoji set switching (default/cat)
+├── NavIcons.kt           # Bottom nav icon composables
+└── StandByUsTokens.kt    # Design token constants (spacing, radius, etc.)
 ```
 
 ## WHERE TO LOOK
@@ -21,3 +23,5 @@ theme/
 | Add emoji theme | `EmojiTheme.kt` |
 | Modify mood colors | `EmotionColors.kt` |
 | Adjust fonts | `Type.kt` |
+| Change nav icons | `NavIcons.kt` |
+| Tweak design tokens | `StandByUsTokens.kt` |

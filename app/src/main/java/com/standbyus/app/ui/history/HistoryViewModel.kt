@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.standbyus.app.data.model.UserStatus
 import com.standbyus.app.data.remote.SupabaseService
 import com.standbyus.app.data.repository.PairingRepository
+import com.standbyus.app.ui.settings.SettingsDisplayName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +31,7 @@ class HistoryViewModel @Inject constructor(
     private val _loading = MutableStateFlow(false)
     val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
-    private val _partnerName = MutableStateFlow("对方")
+    private val _partnerName = MutableStateFlow(resolvePartnerName())
     val partnerName: StateFlow<String> = _partnerName.asStateFlow()
 
     private val _myId = MutableStateFlow("")
@@ -48,6 +49,7 @@ class HistoryViewModel @Inject constructor(
             try {
                 val myId = supabaseService.getCachedDeviceId()
                 _myId.value = myId
+                _partnerName.value = resolvePartnerName()
                 if (myId.isEmpty()) {
                     _loading.value = false
                     return@launch
@@ -93,6 +95,13 @@ class HistoryViewModel @Inject constructor(
             }
             _loading.value = false
         }
+    }
+
+    private fun resolvePartnerName(): String {
+        return SettingsDisplayName.resolvePartnerDisplayName(
+            nickname = prefs.getString("partner_nickname", ""),
+            partnerName = prefs.getString("partner_name", "")
+        )
     }
 
     companion object {

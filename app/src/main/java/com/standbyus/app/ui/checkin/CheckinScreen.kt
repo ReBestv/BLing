@@ -40,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.standbyus.app.ui.components.AppHeader
 
 // ── Design Tokens ──
 private val BgColor = Color(0xFFFFF8F5)
@@ -68,20 +69,10 @@ fun CheckinScreen(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             // ── App Bar ──
-            // No back button since this is a bottom nav tab
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(BgColor)
-                    .padding(horizontal = 20.dp, vertical = 16.dp)
-            ) {
-                Text(
-                    text = "拉了么",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextPrimary
-                )
-            }
+            AppHeader(
+                title = "拉了么",
+                showDivider = false // Usually matching home/other pages?
+            )
 
             // ── Scrollable content (takes remaining space) ──
             Column(
@@ -91,7 +82,7 @@ fun CheckinScreen(
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 // ── PK Section (top) ──
                 if (state.isPaired && state.pkStats != null) {
@@ -100,7 +91,7 @@ fun CheckinScreen(
                     EmptyPKCard()
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 // ── Today Stats Card ──
                 ThreeColCard(
@@ -109,7 +100,7 @@ fun CheckinScreen(
                     col3 = { StatCell(state.riskLevel.emoji, state.riskLevel.label, "便秘风险", Color(0xFFFFF8E1)) }
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 // ── This Week Stats Card ──
                 ThreeColCard(
@@ -118,7 +109,7 @@ fun CheckinScreen(
                     col3 = { StatCell("🔥", "${state.streak} 天", "连续打卡", Color(0xFFFFF3E0)) }
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(32.dp))
             }
 
             // ── Big Checkin Button (fixed, not scrollable) ──
@@ -160,7 +151,7 @@ private fun ThreeColCard(
             )
             .clip(RoundedCornerShape(24.dp))
             .background(SurfaceColor)
-            .padding(vertical = 16.dp),
+            .padding(vertical = 24.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         Box(Modifier.weight(1f), contentAlignment = Alignment.Center) { col1() }
@@ -176,7 +167,7 @@ private fun VerticalDivider() {
     Box(
         modifier = Modifier
             .width(1.dp)
-            .height(40.dp)
+            .height(60.dp)
             .background(BorderColor)
     )
 }
@@ -236,9 +227,9 @@ private fun PKCard(stats: PKStats) {
             )
             .clip(RoundedCornerShape(24.dp))
             .background(SurfaceColor)
-            .padding(20.dp),
+            .padding(vertical = 32.dp, horizontal = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Title
         Text(
@@ -357,9 +348,9 @@ private fun EmptyPKCard() {
             )
             .clip(RoundedCornerShape(24.dp))
             .background(SurfaceColor)
-            .padding(20.dp),
+            .padding(vertical = 32.dp, horizontal = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
             text = "🏆 本月拉屎大王对决",

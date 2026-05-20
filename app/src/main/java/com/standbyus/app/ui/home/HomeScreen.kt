@@ -51,6 +51,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import com.standbyus.app.data.model.Feeling
 import com.standbyus.app.data.model.UserStatus
 import com.standbyus.app.ui.components.AppHeader
+import com.standbyus.app.ui.components.StatusEmojiImage
 import androidx.compose.material.icons.filled.Settings
 
 // ── Design tokens (matching preview.html spec) ──────────────
@@ -71,6 +72,7 @@ fun HomeScreen(
 ) {
     val partnerStatus by viewModel.partnerStatus.collectAsState()
     val myStatus by viewModel.myStatus.collectAsState()
+    val partnerDisplayName by viewModel.partnerDisplayName.collectAsState()
 
     Column(
         modifier = Modifier
@@ -106,6 +108,7 @@ fun HomeScreen(
 
                 PartnerStatusCard(
                     status = partnerStatus!!,
+                    userName = partnerDisplayName,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
@@ -147,6 +150,7 @@ fun HomeScreen(
 @Composable
 private fun PartnerStatusCard(
     status: UserStatus,
+    userName: String,
     modifier: Modifier = Modifier
 ) {
     val feeling = Feeling.fromDisplayName(status.feeling) ?: Feeling.HAPPY
@@ -192,10 +196,12 @@ private fun PartnerStatusCard(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             // Large emoji with float animation
-            Text(
-                text = status.feelingEmoji.ifEmpty { feeling.emoji },
-                fontSize = 80.sp,
-                lineHeight = 1.sp,
+            StatusEmojiImage(
+                value = status.feelingEmoji,
+                feelingName = status.feeling,
+                size = 132.dp,
+                textSize = 80.sp,
+                tintColor = feeling.color,
                 modifier = Modifier.offset(y = floatOffset.dp)
             )
 
@@ -243,14 +249,14 @@ private fun PartnerStatusCard(
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = "她刚刚更新了这个心情 · ${formatRelativeTime(status.updatedAt)}",
+                    text = "${userName}刚刚更新了这个心情 · ${formatRelativeTime(status.updatedAt)}",
                     fontSize = 12.sp,
                     color = Color.White.copy(alpha = 0.7f)
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "需要我哄哄她吗？",
+                text = "需要我哄哄${userName}吗？",
                 fontSize = 13.sp,
                 color = Color.White.copy(alpha = 0.8f)
             )
@@ -287,10 +293,11 @@ private fun MyStatusStrip(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             // Emoji
-            Text(
-                text = status?.feelingEmoji ?: "✨",
-                fontSize = 40.sp,
-                lineHeight = 1.sp
+            StatusEmojiImage(
+                value = status?.feelingEmoji,
+                feelingName = status?.feeling,
+                size = 48.dp,
+                textSize = 40.sp
             )
 
             // Text
@@ -405,8 +412,8 @@ private fun cardGradientFor(feeling: Feeling): List<Color> = when(feeling) {
     // 恋爱/开心/想你 → 粉色渐变
     Feeling.HAPPY, Feeling.LOVE, Feeling.KISS, Feeling.MISSING ->
         listOf(Color(0xFFFFD1DC), Color(0xFFFFB6C1))
-    // 难过/生病/沮丧/焦虑 → 淡蓝色
-    Feeling.SAD, Feeling.SICK, Feeling.UPSET, Feeling.ANXIOUS ->
+    // 难过/生病/沮丧/焦虑/哭哭 → 淡蓝色
+    Feeling.SAD, Feeling.SICK, Feeling.UPSET, Feeling.ANXIOUS, Feeling.CRYING ->
         listOf(Color(0xFFD4E6F1), Color(0xFFA9CCE3))
     // 生气 → 柔和红色
     Feeling.ANGRY ->

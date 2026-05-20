@@ -14,6 +14,7 @@ import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import androidx.compose.ui.graphics.Color
 import com.standbyus.app.data.model.UserStatus
+import com.standbyus.app.ui.theme.StatusEmoji
 
 class StandByWidget : GlanceAppWidget() {
 
@@ -34,7 +35,7 @@ class StandByWidget : GlanceAppWidget() {
                 horizontalAlignment = Alignment.Horizontal.CenterHorizontally
             ) {
                 Text(
-                    text = status?.feelingEmoji ?: "💕",
+                    text = StatusEmoji.textFallback(status?.feelingEmoji, status?.feeling),
                     style = TextStyle(fontSize = 48.sp)
                 )
                 Text(

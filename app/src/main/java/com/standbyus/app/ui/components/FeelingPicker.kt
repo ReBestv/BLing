@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,6 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.standbyus.app.data.model.Feeling
 import com.standbyus.app.ui.theme.EmojiThemeManager
@@ -74,12 +76,26 @@ fun FeelingPicker(
                     if (isEmoji(emoji)) {
                         Text(text = emoji, fontSize = 20.sp)
                     } else {
-                        AsyncImage(
+                        SubcomposeAsyncImage(
                             model = ImageRequest.Builder(context)
                                 .data(emoji)
                                 .crossfade(true)
                                 .build(),
                             contentDescription = feeling.displayName,
+                            loading = {
+                                Box(
+                                    modifier = Modifier.size(28.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(14.dp),
+                                        strokeWidth = 2.dp
+                                    )
+                                }
+                            },
+                            error = {
+                                Text(text = feeling.emoji, fontSize = 20.sp)
+                            },
                             modifier = Modifier
                                 .size(28.dp)
                                 .clip(CircleShape),

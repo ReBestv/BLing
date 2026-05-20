@@ -23,6 +23,9 @@ ui/
 ├── settings/          # Pairing + unlink
 │   ├── SettingsScreen.kt     # Generate/join code
 │   └── SettingsViewModel.kt
+├── checkin/           # Daily check-in with notes
+│   ├── CheckinScreen.kt      # Check-in form + history
+│   └── CheckinViewModel.kt
 ├── celebration/       # Date-based overlay
 │   ├── CelebrationConfig.kt  # 3 dates (birthday, xmas, valentine)
 │   ├── CelebrationDay.kt     # Data class
@@ -31,13 +34,16 @@ ui/
 │   ├── StatusCard.kt         # Gradient card for status display
 │   ├── FeelingPicker.kt      # Horizontal scroll mood selector
 │   ├── DoingPicker.kt        # Chips + custom text input
-│   └── AvatarWithGlow.kt     # Breathing glow animation
+│   ├── AvatarWithGlow.kt     # Breathing glow animation
+│   └── AppHeader.kt          # Title bar with back button
 └── theme/             # Design system
     ├── Color.kt              # Coral palette + dark mode
     ├── Theme.kt              # Light/dark color schemes
     ├── Type.kt               # Typography scale
     ├── EmotionColors.kt      # Mood→Color mapping function (16 feelings)
-    └── EmojiTheme.kt         # Emoji set switching (default/cat)
+    ├── EmojiTheme.kt         # Emoji set switching (default/cat)
+    ├── NavIcons.kt           # Bottom nav icon composables
+    └── StandByUsTokens.kt    # Design token constants
 ```
 
 ## WHERE TO LOOK

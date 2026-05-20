@@ -12,7 +12,7 @@ No custom Gradle tasks. Open in Android Studio and run on device/emulator (minSd
 
 ## Architecture
 
-Single `:app` module. 4 Compose navigation destinations: `home`, `post_status`, `history`, `settings`.
+Single `:app` module. 6 Compose navigation destinations: `home`, `album`, `checkin`, `post_status`, `history`, `settings`.
 
 **Entrypoints:**
 - `StandByApplication` (`app/.../StandByApplication.kt`) — `@HiltAndroidApp`, eagerly initializes `SupabaseService`
@@ -31,7 +31,7 @@ Single `:app` module. 4 Compose navigation destinations: `home`, `post_status`, 
 - **No real-time subscriptions.** Status updates use polling every 6 seconds via `callbackFlow`.
 
 ### Room
-- `AppDatabase` with single `status_cache` table.
+- `AppDatabase` with two tables: `status_cache` and `checkin_records`.
 - `fallbackToDestructiveMigration()` — schema changes wipe data.
 
 ### Widget cache
@@ -40,8 +40,8 @@ Single `:app` module. 4 Compose navigation destinations: `home`, `post_status`, 
 ## Key conventions
 
 - UI language: **Simplified Chinese** throughout (Feeling/Doing enum display names, all screen text).
-- `Feeling` enum: 9 values (开心/难过/疲惫/生病/悠闲/想你了/睡觉/奋斗/思考).
-- `Doing` enum: 12 values (搬砖/加班/学习/睡觉/干饭/运动/通勤/看电影/玩游戏/发呆/桌游/自定义). Custom doing capped at 20 chars.
+- `Feeling` enum: 16 values (开心/难过/疲惫/生病/悠闲/想你了/睡觉/奋斗/思考/亲亲/生气/焦虑/看剧/委屈/爱心/无聊).
+- `Doing` enum: 12 values (搬砖/加班/学习/睡觉/干饭/运动/通勤/看电影/玩游戏/发呆/桌游/自定义). Custom doing capped at 30 chars.
 - Celebration overlay: date-based (MM/dd), shown once per day via `celebration` SharedPreferences. Configured in `CelebrationConfig`.
 
 ## Testing

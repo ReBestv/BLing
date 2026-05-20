@@ -137,6 +137,8 @@ dimen notification_subtext_size
 dimen notification_top_pad
 dimen notification_top_pad_large_text
 drawable abc_vector_test
+drawable album
+drawable checkin
 drawable glance_abc_btn_check_material_anim_enabled
 drawable glance_btn_checkbox_checked_mtrl
 drawable glance_btn_checkbox_checked_to_unchecked_mtrl_animation
@@ -166,6 +168,8 @@ drawable glance_switch_thumb_off_to_on
 drawable glance_switch_thumb_on
 drawable glance_switch_thumb_on_to_off
 drawable glance_switch_track
+drawable history
+drawable home
 drawable ic_call_answer
 drawable ic_call_answer_low
 drawable ic_call_answer_video

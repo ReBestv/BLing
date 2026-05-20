@@ -6,9 +6,11 @@ Room persistence layer — write-through cache for status data.
 
 ```
 local/
-├── AppDatabase.kt       # Room database (single table)
-├── StatusDao.kt         # get/upsert/clearAll
-└── StatusEntity.kt      # Room entity + ↔ UserStatus converters
+├── AppDatabase.kt          # Room database (status_cache + checkin_records)
+├── StatusDao.kt            # get/upsert/clearAll
+├── StatusEntity.kt         # Room entity + ↔ UserStatus converters
+├── CheckinDao.kt           # Check-in CRUD operations
+└── CheckinRecordEntity.kt  # Check-in Room entity
 ```
 
 ## NOTES

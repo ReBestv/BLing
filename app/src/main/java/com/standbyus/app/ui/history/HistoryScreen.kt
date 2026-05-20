@@ -25,6 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.standbyus.app.data.model.Feeling
 import com.standbyus.app.data.model.UserStatus
 import com.standbyus.app.ui.components.AppHeader
+import com.standbyus.app.ui.components.StatusEmojiImage
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -51,6 +52,7 @@ fun HistoryScreen(
     val history by viewModel.statusHistory.collectAsState()
     val loading by viewModel.loading.collectAsState()
     val myId by viewModel.myId.collectAsState()
+    val partnerName by viewModel.partnerName.collectAsState()
 
     val groupedHistory = remember(history) {
         history.groupBy { status ->
@@ -117,7 +119,11 @@ fun HistoryScreen(
                 groupedHistory.forEach { (dateKey, statuses) ->
                     item { DateHeader(dateKey) }
                     items(statuses) { status ->
-                        TimelineEntry(status = status, isMe = status.userId == myId)
+                        TimelineEntry(
+                            status = status,
+                            isMe = status.userId == myId,
+                            partnerName = partnerName
+                        )
                     }
                 }
             }
@@ -161,10 +167,13 @@ private fun DateHeader(dateKey: String) {
 // Timeline Entry — dot + line + content card
 // ================================================================
 @Composable
-private fun TimelineEntry(status: UserStatus, isMe: Boolean) {
+private fun TimelineEntry(
+    status: UserStatus,
+    isMe: Boolean,
+    partnerName: String
+) {
     val feeling = Feeling.fromDisplayName(status.feeling)
     val feelingColor = feeling?.color ?: Color(0xFFFFD180)
-    val emoji = feeling?.emoji ?: status.feelingEmoji
     val moodName = feeling?.displayName ?: status.feeling
     val activityText = status.customDoing.ifEmpty { status.doing }.ifEmpty { status.feeling }
     val formattedTime = SimpleDateFormat("HH:mm", Locale.getDefault())
@@ -178,7 +187,7 @@ private fun TimelineEntry(status: UserStatus, isMe: Boolean) {
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 6.dp)
             .graphicsLayer { rotationZ = rotationDeg },
-        horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start
+        horizontalArrangement = HistoryEntryLayout.horizontalArrangement(isMe)
     ) {
         if (!isMe) {
             // ——— Other person's dot (Left) ———
@@ -197,7 +206,13 @@ private fun TimelineEntry(status: UserStatus, isMe: Boolean) {
                     .background(feelingColor, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = emoji, fontSize = 24.sp)
+                StatusEmojiImage(
+                    value = status.feelingEmoji,
+                    feelingName = status.feeling,
+                    size = 28.dp,
+                    textSize = 24.sp,
+                    tintColor = feelingColor
+                )
             }
         }
 
@@ -226,7 +241,13 @@ private fun TimelineEntry(status: UserStatus, isMe: Boolean) {
                             .padding(horizontal = 8.dp, vertical = 2.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(text = emoji, fontSize = 16.sp)
+                            StatusEmojiImage(
+                                value = status.feelingEmoji,
+                                feelingName = status.feeling,
+                                size = 20.dp,
+                                textSize = 16.sp,
+                                tintColor = feelingColor
+                            )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = moodName,
@@ -238,7 +259,10 @@ private fun TimelineEntry(status: UserStatus, isMe: Boolean) {
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = if (isMe) "我" else "她",
+                        text = HistoryDisplayName.resolveEntryDisplayName(
+                            isMe = isMe,
+                            partnerDisplayName = partnerName
+                        ),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         color = FgColor
@@ -291,7 +315,13 @@ private fun TimelineEntry(status: UserStatus, isMe: Boolean) {
                     .background(feelingColor, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = emoji, fontSize = 24.sp)
+                StatusEmojiImage(
+                    value = status.feelingEmoji,
+                    feelingName = status.feeling,
+                    size = 28.dp,
+                    textSize = 24.sp,
+                    tintColor = feelingColor
+                )
             }
         }
     }

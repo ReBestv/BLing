@@ -39,6 +39,8 @@ enum class Feeling(
         Color(0xFFDCEDC8), Color(0xFFDCEDC8), Color(0xFFC5E1A5)),
     BORED("无聊", "😑",
         Color(0xFFF0F4C3), Color(0xFFF0F4C3), Color(0xFFE6EE9C)),
+    CRYING("哭哭", "😭",
+        Color(0xFFBBDEFB), Color(0xFFBBDEFB), Color(0xFF90CAF9)),
     SLEEPING("睡觉", "😴",
         Color(0xFFE8EAF6), Color(0xFFE8EAF6), Color(0xFFC5CAE9));
 

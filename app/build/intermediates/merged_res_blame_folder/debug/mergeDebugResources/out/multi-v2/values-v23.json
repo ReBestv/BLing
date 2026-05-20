@@ -4,7 +4,7 @@
             "outputFile": "com.standbyus.app-mergeDebugResources-70:/values-v23/values-v23.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\7434168c2985c699f5679e1975dfc357\\transformed\\work-runtime-2.7.1\\res\\values-v23\\values-v23.xml",
+                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\54f64724c4d340104d15f497f2ae3e10\\transformed\\work-runtime-2.7.1\\res\\values-v23\\values-v23.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",
@@ -14,7 +14,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\88c2493d37b676e483ee3e37bf701cf5\\transformed\\glance-appwidget-1.1.1\\res\\values-v23\\values-v23.xml",
+                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\fe3454d8ba4c5eb9789d64463a18070c\\transformed\\glance-appwidget-1.1.1\\res\\values-v23\\values-v23.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

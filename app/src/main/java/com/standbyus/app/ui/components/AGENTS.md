@@ -9,7 +9,8 @@ components/
 ├── StatusCard.kt         # Gradient card for partner status display
 ├── FeelingPicker.kt      # Mood selector grid (emoji + name)
 ├── DoingPicker.kt        # Free-text activity input
-└── AvatarWithGlow.kt     # Breathing glow animation on avatar
+├── AvatarWithGlow.kt     # Breathing glow animation on avatar
+└── AppHeader.kt          # Title bar with back button
 ```
 
 ## WHERE TO LOOK
@@ -19,3 +20,4 @@ components/
 | Change mood picker UI | `FeelingPicker.kt` |
 | Modify status card design | `StatusCard.kt` |
 | Adjust doing input | `DoingPicker.kt` |
+| Change header style | `AppHeader.kt` |

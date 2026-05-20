@@ -56,7 +56,13 @@ fun StatusCard(
         contentAlignment = Alignment.Center
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = status?.feelingEmoji ?: feeling.emoji, fontSize = 96.sp)
+            StatusEmojiImage(
+                value = status?.feelingEmoji,
+                feelingName = status?.feeling,
+                size = 132.dp,
+                textSize = 96.sp,
+                tintColor = feeling.color
+            )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = status?.let { it.customDoing.ifEmpty { it.doing }.ifEmpty { it.feeling } } ?: "—",

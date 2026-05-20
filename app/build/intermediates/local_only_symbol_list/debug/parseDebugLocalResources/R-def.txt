@@ -1,5 +1,9 @@
 R_DEF: Internal format may change without notice
 local
+drawable album
+drawable checkin
+drawable history
+drawable home
 drawable ic_launcher_background
 drawable ic_launcher_foreground
 layout widget_loading

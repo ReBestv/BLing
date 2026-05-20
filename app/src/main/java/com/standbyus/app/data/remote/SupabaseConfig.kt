@@ -15,4 +15,7 @@ object SupabaseConfig {
     // =============================================
 
     const val REST_URL = "$SUPABASE_URL/rest/v1/"
+
+    // Supabase Storage 公开 URL — 用于加载公开 bucket 中的文件
+    const val STORAGE_URL = "$SUPABASE_URL/storage/v1/object/public/"
 }

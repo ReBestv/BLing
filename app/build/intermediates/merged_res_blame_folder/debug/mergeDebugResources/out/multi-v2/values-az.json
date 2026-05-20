@@ -4,24 +4,24 @@
             "outputFile": "com.standbyus.app-mergeDebugResources-70:/values-az/values-az.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\b70573c490d3bf650b6a4203393797ee\\transformed\\core-1.13.1\\res\\values-az\\values-az.xml",
+                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\fe3454d8ba4c5eb9789d64463a18070c\\transformed\\glance-appwidget-1.1.1\\res\\values-az\\values-az.xml",
                     "from": {
-                        "startLines": "2,3,4,5,6,7,8,9",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "55,156,258,361,465,566,671,782",
-                        "endColumns": "100,101,102,103,100,104,110,100",
-                        "endOffsets": "151,253,356,460,561,666,777,878"
+                        "startLines": "2,3,4",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,252,363",
+                        "endColumns": "196,110,119",
+                        "endOffsets": "247,358,478"
                     },
                     "to": {
-                        "startLines": "2,3,4,5,6,7,8,84",
-                        "startColumns": "4,4,4,4,4,4,4,4",
-                        "startOffsets": "105,206,308,411,515,616,721,8803",
-                        "endColumns": "100,101,102,103,100,104,110,100",
-                        "endOffsets": "201,303,406,510,611,716,827,8899"
+                        "startLines": "14,15,16",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "1309,1506,1617",
+                        "endColumns": "196,110,119",
+                        "endOffsets": "1501,1612,1732"
                     }
                 },
                 {
-                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\93c3b283a96d0ce15af41babc6f96ddf\\transformed\\ui-release\\res\\values-az\\values-az.xml",
+                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\98098217206533b54750f55ccffc599b\\transformed\\ui-release\\res\\values-az\\values-az.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -38,7 +38,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\112127342afbff043559484dd6de4cbf\\transformed\\material3-release\\res\\values-az\\values-az.xml",
+                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\e6cb6826df19af7b3e77899d262c651b\\transformed\\material3-release\\res\\values-az\\values-az.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -55,7 +55,24 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\c249f2684b97532a05222f82a8102174\\transformed\\foundation-release\\res\\values-az\\values-az.xml",
+                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\95f3c8fc25d75cb896faf2e9175c05fb\\transformed\\core-1.13.1\\res\\values-az\\values-az.xml",
+                    "from": {
+                        "startLines": "2,3,4,5,6,7,8,9",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "55,156,258,361,465,566,671,782",
+                        "endColumns": "100,101,102,103,100,104,110,100",
+                        "endOffsets": "151,253,356,460,561,666,777,878"
+                    },
+                    "to": {
+                        "startLines": "2,3,4,5,6,7,8,84",
+                        "startColumns": "4,4,4,4,4,4,4,4",
+                        "startOffsets": "105,206,308,411,515,616,721,8803",
+                        "endColumns": "100,101,102,103,100,104,110,100",
+                        "endOffsets": "201,303,406,510,611,716,827,8899"
+                    }
+                },
+                {
+                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\6bfa6dc7a9fd13f70729968a3a8d8617\\transformed\\foundation-release\\res\\values-az\\values-az.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",
@@ -69,23 +86,6 @@
                         "startOffsets": "9168,9257",
                         "endColumns": "88,93",
                         "endOffsets": "9252,9346"
-                    }
-                },
-                {
-                    "source": "C:\\Users\\BestV\\.gradle\\caches\\9.0.0\\transforms\\88c2493d37b676e483ee3e37bf701cf5\\transformed\\glance-appwidget-1.1.1\\res\\values-az\\values-az.xml",
-                    "from": {
-                        "startLines": "2,3,4",
-                        "startColumns": "4,4,4",
-                        "startOffsets": "55,252,363",
-                        "endColumns": "196,110,119",
-                        "endOffsets": "247,358,478"
-                    },
-                    "to": {
-                        "startLines": "14,15,16",
-                        "startColumns": "4,4,4",
-                        "startOffsets": "1309,1506,1617",
-                        "endColumns": "196,110,119",
-                        "endOffsets": "1501,1612,1732"
                     }
                 }
             ]

@@ -16,7 +16,7 @@ app/
 └── widget/                 # Glance AppWidget
 ```
 
-- 9 -&gt; 16 feelings (added 亲亲, 生气, 焦虑, 看剧, 委屈, 爱心, 无聊)
+- 16 feelings (开心/难过/疲惫/生病/悠闲/想你了/睡觉/奋斗/思考/亲亲/生气/焦虑/看剧/委屈/爱心/无聊)
 
 ## CONVENTIONS
 

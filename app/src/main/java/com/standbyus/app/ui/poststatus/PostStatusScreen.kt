@@ -21,10 +21,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
@@ -35,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.standbyus.app.data.model.Feeling
 import com.standbyus.app.ui.theme.EmojiThemeManager
@@ -54,6 +57,7 @@ fun PostStatusScreen(
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+    val themeVersion by EmojiThemeManager.themeVersion.collectAsState()
 
     // Animated background tint based on selected feeling
     val bgTint by animateColorAsState(
@@ -143,18 +147,37 @@ fun PostStatusScreen(
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
-                                val emoji = EmojiThemeManager.getEmoji(context, feeling.displayName)
+                                val emoji = remember(themeVersion, feeling.displayName) {
+                                    EmojiThemeManager.getEmoji(context, feeling.displayName)
+                                }
                                 if (isEmoji(emoji)) {
                                     Text(text = emoji, fontSize = 32.sp)
                                 } else {
-                                    // Fallback for URL-based emoji themes
-                                    AsyncImage(
+                                    SubcomposeAsyncImage(
                                         model = ImageRequest.Builder(context)
                                             .data(emoji)
                                             .crossfade(true)
                                             .build(),
                                         contentDescription = feeling.displayName,
-                                        modifier = Modifier.size(36.dp)
+                                        loading = {
+                                            Box(
+                                                modifier = Modifier.size(58.dp),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                CircularProgressIndicator(
+                                                    modifier = Modifier.size(18.dp),
+                                                    strokeWidth = 2.dp,
+                                                    color = feeling.color
+                                                )
+                                            }
+                                        },
+                                        error = {
+                                            Text(text = feeling.emoji, fontSize = 28.sp)
+                                        },
+                                        modifier = Modifier
+                                            .size(58.dp)
+                                            .clip(CircleShape),
+                                        contentScale = ContentScale.Crop
                                     )
                                 }
                             }

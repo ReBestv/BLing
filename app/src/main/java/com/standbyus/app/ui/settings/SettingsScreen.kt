@@ -26,10 +26,15 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.standbyus.app.ui.celebration.CelebrationDay
 import com.standbyus.app.ui.celebration.CelebrationOverlay
 import com.standbyus.app.ui.components.AppHeader
+import com.standbyus.app.ui.theme.EmojiThemeSet
+import com.standbyus.app.ui.theme.EmojiThemeManager
 
 // ===== Design Tokens =====
 private val Primary = Color(0xFFFFB4A2)
@@ -53,12 +58,15 @@ fun SettingsScreen(
     val justPaired by viewModel.justPaired.collectAsState()
     val loading by viewModel.loading.collectAsState()
     val currentTheme by viewModel.currentTheme.collectAsState()
+    val nameInput by viewModel.nameInput.collectAsState()
+    val nickname by viewModel.nicknameInput.collectAsState()
+    val partnerDisplayName by viewModel.partnerDisplayName.collectAsState()
 
     // Dark mode local state (visual only)
     var isDarkMode by remember { mutableStateOf(false) }
 
-    // Emoji theme toggle: is cats theme active
-    val isCatsTheme = currentTheme.id == "cats"
+    // 动态主题列表
+    val themes by viewModel.availableThemes.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize().background(Background)) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -97,10 +105,30 @@ fun SettingsScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = "已与 ${currentTheme.icon} 已绑定",
+                                    text = "已与 $partnerDisplayName 已绑定",
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = TextPrimary
+                                )
+                                Spacer(modifier = Modifier.height(12.dp))
+                                Text(
+                                    text = "对方昵称",
+                                    fontSize = 13.sp,
+                                    color = TextSecondary
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                OutlinedTextField(
+                                    value = nickname,
+                                    onValueChange = { viewModel.updateNickname(it) },
+                                    placeholder = { Text("输入对方昵称", color = TextSecondary.copy(alpha = 0.5f)) },
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(16.dp),
+                                    colors = OutlinedTextFieldDefaults.colors(
+                                        focusedBorderColor = Primary,
+                                        unfocusedBorderColor = Border,
+                                        cursorColor = Primary
+                                    ),
+                                    modifier = Modifier.fillMaxWidth()
                                 )
                                 Spacer(modifier = Modifier.height(20.dp))
                                 OutlinedButton(
@@ -128,8 +156,24 @@ fun SettingsScreen(
                                 color = TextSecondary
                             )
                             Spacer(modifier = Modifier.height(12.dp))
+                            // 名字输入
+                            OutlinedTextField(
+                                value = nameInput,
+                                onValueChange = { viewModel.updateNameInput(it) },
+                                placeholder = { Text("输入你的昵称", color = TextSecondary.copy(alpha = 0.5f)) },
+                                singleLine = true,
+                                shape = RoundedCornerShape(16.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Primary,
+                                    unfocusedBorderColor = Border,
+                                    cursorColor = Primary
+                                ),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
                             Button(
                                 onClick = { viewModel.createCode() },
+                                enabled = nameInput.isNotBlank(),
                                 shape = RoundedCornerShape(24.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = Primary),
                                 modifier = Modifier.fillMaxWidth()
@@ -160,6 +204,26 @@ fun SettingsScreen(
 
                             // 加入配对
                             Text(
+                                text = "输入你的昵称",
+                                fontSize = 13.sp,
+                                color = TextSecondary
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            OutlinedTextField(
+                                value = nameInput,
+                                onValueChange = { viewModel.updateNameInput(it) },
+                                placeholder = { Text("输入你的昵称", color = TextSecondary.copy(alpha = 0.5f)) },
+                                singleLine = true,
+                                shape = RoundedCornerShape(16.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Primary,
+                                    unfocusedBorderColor = Border,
+                                    cursorColor = Primary
+                                ),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
                                 text = "输入对方的配对码",
                                 fontSize = 13.sp,
                                 color = TextSecondary
@@ -184,7 +248,7 @@ fun SettingsScreen(
                             Spacer(modifier = Modifier.height(12.dp))
                             Button(
                                 onClick = { viewModel.joinPair() },
-                                enabled = joinCodeInput.length == 6,
+                                enabled = joinCodeInput.length == 6 && nameInput.isNotBlank(),
                                 shape = RoundedCornerShape(24.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = Primary,
@@ -225,15 +289,16 @@ fun SettingsScreen(
                             showDivider = true
                         )
 
-                        // 猫咪主题 toggle
-                        ToggleRow(
-                            label = "😺 猫咪主题",
-                            isActive = isCatsTheme,
-                            onToggle = {
-                                viewModel.selectTheme(if (isCatsTheme) "default" else "cats")
-                            },
-                            showDivider = false
-                        )
+                        // 动态主题列表
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            themes.forEach { theme ->
+                                ThemeRow(
+                                    theme = theme,
+                                    isSelected = currentTheme.id == theme.id,
+                                    onClick = { viewModel.selectTheme(theme.id) }
+                                )
+                            }
+                        }
                     }
 
                     // ===== Section 3: 关于 =====
@@ -393,5 +458,67 @@ private fun CustomToggle(
                 .shadow(2.dp, CircleShape)
                 .background(Color.White, CircleShape)
         )
+    }
+}
+
+// ===== Theme Row =====
+@Composable
+private fun ThemeRow(
+    theme: EmojiThemeSet,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { onClick() }
+                .padding(vertical = 12.dp, horizontal = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            // 主题图标
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color(0xFFF5F0ED)),
+                contentAlignment = Alignment.Center
+            ) {
+                if (theme.icon != null && theme.icon.startsWith("http")) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(theme.icon)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = theme.name,
+                        modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(10.dp))
+                    )
+                } else {
+                    Text(
+                        text = theme.icon ?: "🎨",
+                        fontSize = 20.sp
+                    )
+                }
+            }
+
+            // 主题名
+            Text(
+                text = theme.name,
+                fontSize = 15.sp,
+                color = TextPrimary,
+                modifier = Modifier.weight(1f)
+            )
+
+            // 选中勾
+            if (isSelected) {
+                Text(text = "✓", color = Primary, fontSize = 18.sp)
+            }
+        }
+
+        HorizontalDivider(color = Border, thickness = 0.5.dp)
     }
 }

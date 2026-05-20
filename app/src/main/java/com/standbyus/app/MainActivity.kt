@@ -22,7 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.annotation.DrawableRes
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,7 +55,7 @@ import java.util.Locale
 
 private data class BottomNavItem(
     val route: String,
-    val icon: ImageVector,
+    @DrawableRes val iconResId: Int,
     val label: String
 )
 
@@ -205,7 +206,7 @@ private fun BottomNavBar(
                 verticalArrangement = Arrangement.Center
             ) {
                 Icon(
-                    imageVector = item.icon,
+                    painter = painterResource(id = item.iconResId),
                     contentDescription = item.label,
                     tint = if (selected) Primary else TextSecondary,
                     modifier = Modifier.size(24.dp)

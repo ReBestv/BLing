@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.standbyus.app.data.local.AppDatabase
 import com.standbyus.app.data.local.CheckinDao
 import com.standbyus.app.data.local.StatusDao
+import com.standbyus.app.data.remote.ThemeRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,4 +29,8 @@ object AppModule {
 
     @Provides
     fun provideCheckinDao(database: AppDatabase): CheckinDao = database.checkinDao()
+
+    @Provides
+    @Singleton
+    fun provideThemeRepository(): ThemeRepository = ThemeRepository()
 }

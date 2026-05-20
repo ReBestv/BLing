@@ -37,6 +37,9 @@ class HomeViewModel @Inject constructor(
         if (id.isEmpty()) flowOf(null) else statusRepository.observeStatus(id)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
+    private val _partnerDisplayName = MutableStateFlow("对方")
+    val partnerDisplayName: StateFlow<String> = _partnerDisplayName.asStateFlow()
+
     init {
         try {
             val uid = supabaseService.getCachedDeviceId()
@@ -48,6 +51,13 @@ class HomeViewModel @Inject constructor(
             if (!cachedPartnerId.isNullOrEmpty()) {
                 Log.d(TAG, "partner from cache: $cachedPartnerId")
                 _partnerUserId.value = cachedPartnerId
+                val cachedNickname = prefs.getString("partner_nickname", null)
+                val cachedPartnerName = prefs.getString("partner_name", null)
+                _partnerDisplayName.value = when {
+                    !cachedNickname.isNullOrEmpty() -> cachedNickname
+                    !cachedPartnerName.isNullOrEmpty() -> cachedPartnerName
+                    else -> "对方"
+                }
             } else {
                 // 无缓存时联网查询
                 viewModelScope.launch {
@@ -64,6 +74,17 @@ class HomeViewModel @Inject constructor(
                             if (partnerId.isNotEmpty()) {
                                 prefs.edit().putString("partner_id", partnerId).apply()
                                 _partnerUserId.value = partnerId
+                            }
+                            val partnerName = when {
+                                pair.user1Id == uid -> pair.user2Name
+                                pair.user2Id == uid -> pair.user1Name
+                                else -> ""
+                            }
+                            val cachedNickname = prefs.getString("partner_nickname", null)
+                            _partnerDisplayName.value = when {
+                                !cachedNickname.isNullOrEmpty() -> cachedNickname
+                                !partnerName.isNullOrEmpty() -> partnerName
+                                else -> "对方"
                             }
                         }
                     } catch (e: Exception) {

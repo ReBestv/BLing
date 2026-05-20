@@ -10,7 +10,9 @@ model/
 ├── PairingInfo.kt         # Pair link data class
 ├── Feeling.kt             # 16 moods (displayName, emoji, colors)
 ├── Doing.kt               # 12 activities enum
-└── AlbumPhoto.kt          # Photo metadata
+├── AlbumPhoto.kt          # Photo metadata
+├── CheckinData.kt         # Check-in record data class
+└── ThemePack.kt           # Emoji theme pack model
 ```
 
 ## KEY TYPES
