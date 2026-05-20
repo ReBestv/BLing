@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "themes": [
+    {
+      "id": "xiaoxin",
+      "name": "小新",
+      "bucket": "xiaoxin",
+      "icon": "happy.png",
+      "feelings": [
+        "开心", "难过", "疲惫", "生病", "悠闲", "想你", "睡觉",
+        "奋斗", "思考", "爱你", "亲亲", "焦虑", "生气", "哭哭",
+        "无聊", "追剧"
+      ],
+      "fileNameMap": {
+        "开心": "happy",
+        "难过": "sad",
+        "疲惫": "tired",
+        "生病": "sick",
+        "悠闲": "relaxed",
+        "想你": "missyou",
+        "睡觉": "sleep",
+        "奋斗": "hustle",
+        "思考": "think",
+        "爱你": "love",
+        "亲亲": "kiss",
+        "焦虑": "anxious",
+        "生气": "angry",
+        "哭哭": "crying",
+        "无聊": "bored",
+        "追剧": "drama"
+      }
+    }
+  ]
+}

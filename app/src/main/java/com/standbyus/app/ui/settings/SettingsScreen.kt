@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -15,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
+import androidx.compose.ui.window.Dialog
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +35,8 @@ import coil.request.ImageRequest
 import com.standbyus.app.ui.celebration.CelebrationDay
 import com.standbyus.app.ui.celebration.CelebrationOverlay
 import com.standbyus.app.ui.components.AppHeader
+import com.standbyus.app.ui.components.AvatarPicker
+import com.standbyus.app.ui.components.allAvatarEmojis
 import com.standbyus.app.ui.theme.EmojiThemeSet
 import com.standbyus.app.ui.theme.EmojiThemeManager
 
@@ -61,9 +65,14 @@ fun SettingsScreen(
     val nameInput by viewModel.nameInput.collectAsState()
     val nickname by viewModel.nicknameInput.collectAsState()
     val partnerDisplayName by viewModel.partnerDisplayName.collectAsState()
+    val avatarEmoji by viewModel.avatarEmoji.collectAsState()
+    val myName by viewModel.myName.collectAsState()
 
     // Dark mode local state (visual only)
     var isDarkMode by remember { mutableStateOf(false) }
+
+    // Avatar picker dialog state
+    var showAvatarPicker by remember { mutableStateOf(false) }
 
     // 动态主题列表
     val themes by viewModel.availableThemes.collectAsState()
@@ -95,6 +104,44 @@ fun SettingsScreen(
                         CircularProgressIndicator(color = Primary)
                     }
                 } else {
+                    // ===== Section 0: 个人头像 =====
+                    SectionCard {
+                        SectionTitle(text = "个人头像")
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { showAvatarPicker = true },
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            // Avatar circle
+                            Box(
+                                modifier = Modifier
+                                    .size(64.dp)
+                                    .shadow(12.dp, CircleShape, ambientColor = Primary.copy(alpha = 0.3f))
+                                    .clip(CircleShape)
+                                    .background(Color(0xFFF5F0ED)),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(text = avatarEmoji, fontSize = 32.sp)
+                            }
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = if (myName.isNotEmpty()) myName else "我",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = TextPrimary
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = "点击更换头像",
+                                    fontSize = 12.sp,
+                                    color = TextSecondary
+                                )
+                            }
+                        }
+                    }
+
                     // ===== Section 1: 配对状态 =====
                     SectionCard {
                         SectionTitle(text = "配对状态")
@@ -171,6 +218,18 @@ fun SettingsScreen(
                                 modifier = Modifier.fillMaxWidth()
                             )
                             Spacer(modifier = Modifier.height(12.dp))
+                            // 选择头像
+                            Text(
+                                text = "选择你的头像",
+                                fontSize = 13.sp,
+                                color = TextSecondary
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            InlineAvatarPicker(
+                                selectedEmoji = avatarEmoji,
+                                onSelected = { viewModel.selectAvatar(it) }
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
                             Button(
                                 onClick = { viewModel.createCode() },
                                 enabled = nameInput.isNotBlank(),
@@ -244,6 +303,18 @@ fun SettingsScreen(
                                     cursorColor = Primary
                                 ),
                                 modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                            // 选择头像
+                            Text(
+                                text = "选择你的头像",
+                                fontSize = 13.sp,
+                                color = TextSecondary
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            InlineAvatarPicker(
+                                selectedEmoji = avatarEmoji,
+                                onSelected = { viewModel.selectAvatar(it) }
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                             Button(
@@ -335,6 +406,43 @@ fun SettingsScreen(
                             fontSize = 12.sp,
                             color = TextSecondary.copy(alpha = 0.7f)
                         )
+                    }
+                }
+            }
+        }
+
+        // ===== 头像选择弹窗 =====
+        if (showAvatarPicker) {
+            Dialog(onDismissRequest = { showAvatarPicker = false }) {
+                Surface(
+                    shape = RoundedCornerShape(20.dp),
+                    color = Surface,
+                    modifier = Modifier.fillMaxWidth(0.92f)
+                ) {
+                    Column {
+                        // Header
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color(0xFFFFF8F5), RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                                .padding(horizontal = 16.dp, vertical = 14.dp)
+                        ) {
+                            Text(
+                                text = "选择头像",
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = TextPrimary
+                            )
+                        }
+                        AvatarPicker(
+                            selectedEmoji = avatarEmoji,
+                            onAvatarSelected = {
+                                viewModel.selectAvatar(it)
+                                showAvatarPicker = false
+                            },
+                            modifier = Modifier.heightIn(max = 400.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }
@@ -520,5 +628,40 @@ private fun ThemeRow(
         }
 
         HorizontalDivider(color = Border, thickness = 0.5.dp)
+    }
+}
+
+// ===== Inline Avatar Picker =====
+@Composable
+private fun InlineAvatarPicker(
+    selectedEmoji: String,
+    onSelected: (String) -> Unit
+) {
+    val emojis = allAvatarEmojis.chunked(7)
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        emojis.forEach { row ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                row.forEach { emoji ->
+                    val isSelected = emoji == selectedEmoji
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(if (isSelected) Primary.copy(alpha = 0.2f) else Color(0xFFF5F0ED))
+                            .border(
+                                width = if (isSelected) 2.dp else 0.dp,
+                                color = if (isSelected) Primary else Color.Transparent,
+                                shape = CircleShape
+                            )
+                            .clickable { onSelected(emoji) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = emoji, fontSize = 20.sp)
+                    }
+                }
+            }
+        }
     }
 }

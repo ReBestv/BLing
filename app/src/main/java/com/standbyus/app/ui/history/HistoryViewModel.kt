@@ -37,6 +37,11 @@ class HistoryViewModel @Inject constructor(
     private val _myId = MutableStateFlow("")
     val myId: StateFlow<String> = _myId.asStateFlow()
 
+    private val _myAvatar = MutableStateFlow(
+        prefs.getString("avatar_emoji", "🐱") ?: "🐱"
+    )
+    val myAvatar: StateFlow<String> = _myAvatar.asStateFlow()
+
     init {
         loadHistory()
     }

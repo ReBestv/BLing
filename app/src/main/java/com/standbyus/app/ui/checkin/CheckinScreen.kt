@@ -10,6 +10,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,12 +19,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -74,42 +75,26 @@ fun CheckinScreen(
                 showDivider = false // Usually matching home/other pages?
             )
 
-            // ── Scrollable content (takes remaining space) ──
-            Column(
+            // ── Fixed information area (scales to available screen space) ──
+            BoxWithConstraints(
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
             ) {
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // ── PK Section (top) ──
-                if (state.isPaired && state.pkStats != null) {
-                    PKCard(stats = state.pkStats!!)
-                } else {
-                    EmptyPKCard()
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // ── Today Stats Card ──
-                ThreeColCard(
-                    col1 = { StatCell("💩", "${state.todayCount} 次", "已记录", PrimaryColor.copy(alpha = 0.15f)) },
-                    col2 = { StatCell("⏰", state.lastInterval, "间隔", Color(0xFFE3F2FD)) },
-                    col3 = { StatCell(state.riskLevel.emoji, state.riskLevel.label, "便秘风险", Color(0xFFFFF8E1)) }
+                val scale = CheckinLayout.infoScale(
+                    availableWidthDp = maxWidth.value,
+                    availableHeightDp = maxHeight.value
                 )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // ── This Week Stats Card ──
-                ThreeColCard(
-                    col1 = { StatCell("📊", "${state.weeklyTotal} 次", "总共", Color(0xFFE3F2FD)) },
-                    col2 = { StatCell("📈", "${state.weeklyAverage}/天", "平均", Color(0xFFE8F5E9)) },
-                    col3 = { StatCell("🔥", "${state.streak} 天", "连续打卡", Color(0xFFFFF3E0)) }
+                CheckinInfoPanel(
+                    state = state,
+                    modifier = Modifier
+                        .requiredSize(
+                            width = CheckinLayout.NATURAL_INFO_WIDTH_DP.dp,
+                            height = CheckinLayout.NATURAL_INFO_HEIGHT_DP.dp
+                        )
+                        .scale(scale)
                 )
-
-                Spacer(modifier = Modifier.height(32.dp))
             }
 
             // ── Big Checkin Button (fixed, not scrollable) ──
@@ -128,6 +113,43 @@ fun CheckinScreen(
             // Space for bottom nav
             Spacer(modifier = Modifier.height(8.dp))
         }
+    }
+}
+
+@Composable
+private fun CheckinInfoPanel(
+    state: CheckinUiState,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // ── PK Section (top) ──
+        if (state.isPaired && state.pkStats != null) {
+            PKCard(stats = state.pkStats)
+        } else {
+            EmptyPKCard()
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // ── Today Stats Card ──
+        ThreeColCard(
+            col1 = { StatCell("💩", "${state.todayCount} 次", "已记录", PrimaryColor.copy(alpha = 0.15f)) },
+            col2 = { StatCell("⏰", state.lastInterval, "间隔", Color(0xFFE3F2FD)) },
+            col3 = { StatCell(state.riskLevel.emoji, state.riskLevel.label, "便秘风险", Color(0xFFFFF8E1)) }
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // ── This Week Stats Card ──
+        ThreeColCard(
+            col1 = { StatCell("📊", "${state.weeklyTotal} 次", "总共", Color(0xFFE3F2FD)) },
+            col2 = { StatCell("📈", "${state.weeklyAverage}/天", "平均", Color(0xFFE8F5E9)) },
+            col3 = { StatCell("🔥", "${state.streak} 天", "连续打卡", Color(0xFFFFF3E0)) }
+        )
     }
 }
 

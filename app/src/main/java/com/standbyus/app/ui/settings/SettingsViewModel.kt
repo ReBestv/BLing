@@ -63,13 +63,26 @@ class SettingsViewModel @Inject constructor(
     private val _partnerDisplayName = MutableStateFlow("对方")
     val partnerDisplayName: StateFlow<String> = _partnerDisplayName.asStateFlow()
 
+    private val _avatarEmoji = MutableStateFlow("🐱")
+    val avatarEmoji: StateFlow<String> = _avatarEmoji.asStateFlow()
+
+    private val _myName = MutableStateFlow("")
+    val myName: StateFlow<String> = _myName.asStateFlow()
+
     private val prefs = context.getSharedPreferences("pairing", Context.MODE_PRIVATE)
 
     init {
+        _avatarEmoji.value = prefs.getString("avatar_emoji", "🐱") ?: "🐱"
+        _myName.value = prefs.getString("self_name", "") ?: ""
         checkExistingPair()
         _nicknameInput.value = prefs.getString("partner_nickname", "") ?: ""
         updatePartnerDisplayName()
         loadThemes()
+    }
+
+    fun selectAvatar(emoji: String) {
+        _avatarEmoji.value = emoji
+        prefs.edit().putString("avatar_emoji", emoji).apply()
     }
 
     private fun loadThemes() {
@@ -132,6 +145,7 @@ class SettingsViewModel @Inject constructor(
                 _pairingCode.value = code
                 _status.value = "配对码: $code，等待对方连接…"
                 prefs.edit().putString("self_name", myName).apply()
+                _myName.value = myName
                 pollPairingComplete(code)
             } catch (e: Exception) {
                 _status.value = "❌ 生成失败：${e.localizedMessage}"
@@ -161,6 +175,7 @@ class SettingsViewModel @Inject constructor(
                         else -> ""
                     }
                     prefs.edit().putString("partner_name", partnerName).apply()
+                    prefs.edit().putString("avatar_emoji", _avatarEmoji.value).apply()
                     updatePartnerDisplayName(partnerName = partnerName)
                     return
                 }
@@ -195,6 +210,7 @@ class SettingsViewModel @Inject constructor(
                         putString("partner_name", partnerName)
                         apply()
                     }
+                    _myName.value = myName
                     updatePartnerDisplayName(partnerName = partnerName)
                 } else {
                     _status.value = "❌ 配对失败，请检查配对码"
@@ -212,6 +228,7 @@ class SettingsViewModel @Inject constructor(
                 pairingRepository.unpair(uid)
             } catch (_: Exception) { }
             prefs.edit().clear().apply()
+            _avatarEmoji.value = "🐱"
             _isPaired.value = false
             _justPaired.value = false
             _pairingCode.value = ""

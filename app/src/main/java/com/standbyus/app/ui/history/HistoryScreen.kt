@@ -61,6 +61,8 @@ fun HistoryScreen(
         }.entries.sortedByDescending { it.key }
     }
 
+    val myAvatar by viewModel.myAvatar.collectAsState()
+
     Column(modifier = Modifier.fillMaxSize().background(BgColor)) {
         // ——— Custom App Bar ———
         AppHeader(
@@ -122,7 +124,8 @@ fun HistoryScreen(
                         TimelineEntry(
                             status = status,
                             isMe = status.userId == myId,
-                            partnerName = partnerName
+                            partnerName = partnerName,
+                            myAvatar = myAvatar
                         )
                     }
                 }
@@ -170,7 +173,8 @@ private fun DateHeader(dateKey: String) {
 private fun TimelineEntry(
     status: UserStatus,
     isMe: Boolean,
-    partnerName: String
+    partnerName: String,
+    myAvatar: String
 ) {
     val feeling = Feeling.fromDisplayName(status.feeling)
     val feelingColor = feeling?.color ?: Color(0xFFFFD180)
@@ -178,6 +182,12 @@ private fun TimelineEntry(
     val activityText = status.customDoing.ifEmpty { status.doing }.ifEmpty { status.feeling }
     val formattedTime = SimpleDateFormat("HH:mm", Locale.getDefault())
         .format(Date(status.updatedAt))
+    val bubbleModifier = when (val width = HistoryEntryLayout.bubbleWidth(isMe)) {
+        is HistoryBubbleWidth.Fixed -> Modifier.width(width.width)
+        HistoryBubbleWidth.Wrap -> Modifier
+            .widthIn(max = 260.dp)
+            .wrapContentWidth()
+    }
 
     // Use parity of timestamp for hand-diary style rotation (+1 or -1)
     val rotationDeg = if ((status.updatedAt % 2).toInt() == 0) 1f else -1f
@@ -218,8 +228,7 @@ private fun TimelineEntry(
 
         // ——— Content card ———
         Card(
-            modifier = Modifier
-                .width(260.dp) // Constrain width based on content, acting like a message bubble
+            modifier = bubbleModifier
                 .shadow(
                     elevation = 16.dp,
                     shape = RoundedCornerShape(16.dp),
@@ -231,7 +240,8 @@ private fun TimelineEntry(
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Column(
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 16.dp)
+                modifier = Modifier.padding(horizontal = 14.dp, vertical = 16.dp),
+                horizontalAlignment = HistoryEntryLayout.bubbleContentAlignment(isMe)
             ) {
                 // Header row: emoji + mood name + time
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -299,10 +309,10 @@ private fun TimelineEntry(
         }
 
         if (isMe) {
-            // ——— My dot (Right) ———
+            // ——— My dot (Right) — with avatar emoji ———
             Box(
                 modifier = Modifier
-                    .padding(top = 4.dp, start = 12.dp)
+                    .padding(top = 4.dp, start = HistoryEntryLayout.avatarGap(isMe))
                     .size(DotSize) // 40.dp
                     .shadow(
                         6.dp,
@@ -312,15 +322,12 @@ private fun TimelineEntry(
                     )
                     .border(2.dp, TimelineDotBorder, CircleShape)
                     .padding(2.dp)
-                    .background(feelingColor, CircleShape),
+                    .background(Color(0xFFF5F0ED), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                StatusEmojiImage(
-                    value = status.feelingEmoji,
-                    feelingName = status.feeling,
-                    size = 28.dp,
-                    textSize = 24.sp,
-                    tintColor = feelingColor
+                Text(
+                    text = myAvatar,
+                    fontSize = 24.sp
                 )
             }
         }
