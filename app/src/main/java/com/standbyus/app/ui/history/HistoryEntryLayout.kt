@@ -20,10 +20,22 @@ object HistoryEntryLayout {
     }
 
     fun bubbleWidth(isMe: Boolean): HistoryBubbleWidth {
-        return if (isMe) HistoryBubbleWidth.Wrap else HistoryBubbleWidth.Fixed(260.dp)
+        return HistoryBubbleWidth.Fixed(260.dp)
     }
 
     fun bubbleContentAlignment(isMe: Boolean): Alignment.Horizontal {
         return if (isMe) Alignment.End else Alignment.Start
     }
+
+    fun cardContentArrangement(isMe: Boolean): Arrangement.Horizontal {
+        return if (isMe) Arrangement.End else Arrangement.Start
+    }
+
+    fun cardMinHeight(): Dp = 72.dp
+
+    fun cardHorizontalPadding(): Dp = 12.dp
+
+    fun moodBadgeSize(): Dp = 44.dp
+
+    fun moodToTextGap(): Dp = 14.dp
 }

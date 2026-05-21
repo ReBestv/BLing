@@ -5,6 +5,7 @@ import com.standbyus.app.data.model.Feeling
 import com.standbyus.app.data.model.StatusFeelingSnapshot
 import com.standbyus.app.data.model.ThemeFeeling
 import com.standbyus.app.data.model.ThemePack
+import com.standbyus.app.data.model.ThemeSticker
 import com.standbyus.app.data.model.toHex
 import com.standbyus.app.data.remote.SupabaseConfig
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +17,7 @@ data class EmojiThemeSet(
     val bucket: String = "themes",
     val icon: String?,
     val feelings: List<ThemeFeeling>,
+    val stickers: List<ThemeSticker> = emptyList(),
     val isDefault: Boolean = false
 ) {
     val resolvedIcon: String?
@@ -23,9 +25,17 @@ data class EmojiThemeSet(
 
     fun feelingByKey(key: String): ThemeFeeling? = feelings.find { it.key == key }
 
+    fun stickerById(id: String): ThemeSticker? = stickers.find { it.id == id }
+
     fun stickerUrl(feelingKey: String): String? {
         if (isDefault) return null
         val asset = feelingByKey(feelingKey)?.asset ?: return null
+        return themeAssetUrl(bucket, asset)
+    }
+
+    fun themeStickerUrl(stickerId: String): String? {
+        if (isDefault) return null
+        val asset = stickerById(stickerId)?.asset ?: return null
         return themeAssetUrl(bucket, asset)
     }
 }
@@ -56,7 +66,8 @@ object EmojiThemeManager {
                 name = pack.name,
                 bucket = pack.bucket,
                 icon = pack.icon,
-                feelings = pack.feelings
+                feelings = pack.feelings,
+                stickers = pack.stickers
             )
         }
         _themeVersion.value += 1
@@ -82,10 +93,23 @@ object EmojiThemeManager {
         return createSnapshot(getCurrentTheme(context), feelingKey).feelingLabel
     }
 
-    fun createSnapshot(theme: EmojiThemeSet, feelingKey: String): StatusFeelingSnapshot {
+    fun createSnapshot(
+        theme: EmojiThemeSet,
+        feelingKey: String,
+        stickerId: String? = null
+    ): StatusFeelingSnapshot {
         val definition = Feeling.fromKey(feelingKey) ?: Feeling.HAPPY
         val themeFeeling = theme.feelingByKey(definition.key)
+        val selectedSticker = stickerId?.let { theme.stickerById(it) }
+        val selectedStickerAsset = selectedSticker?.let { sticker ->
+            when {
+                sticker.asset.startsWith("http://") -> sticker.asset
+                sticker.asset.startsWith("https://") -> sticker.asset
+                else -> themeAssetUrl(theme.bucket, sticker.asset)
+            }
+        }
         val asset = when {
+            selectedStickerAsset != null -> selectedStickerAsset
             theme.isDefault -> definition.emoji
             themeFeeling?.asset?.startsWith("http://") == true -> themeFeeling.asset
             themeFeeling?.asset?.startsWith("https://") == true -> themeFeeling.asset
@@ -100,7 +124,10 @@ object EmojiThemeManager {
             feelingLabel = themeFeeling?.label ?: definition.displayName,
             feelingAsset = asset,
             feelingFallbackEmoji = definition.emoji,
-            feelingColor = definition.color.toHex()
+            feelingColor = definition.color.toHex(),
+            stickerId = selectedSticker?.id,
+            stickerLabel = selectedSticker?.label,
+            stickerAsset = selectedStickerAsset
         )
     }
 }

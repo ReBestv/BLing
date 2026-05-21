@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.glance.appwidget.updateAll
 import com.standbyus.app.data.remote.SupabaseService
 import com.standbyus.app.data.remote.ThemeRepository
+import com.standbyus.app.notification.PartnerEventNotifier
 import com.standbyus.app.ui.theme.EmojiThemeManager
 import com.standbyus.app.widget.StandByWidget
 import dagger.hilt.android.HiltAndroidApp
@@ -27,11 +28,15 @@ class StandByApplication : Application() {
     @Inject
     lateinit var themeRepository: ThemeRepository
 
+    @Inject
+    lateinit var partnerEventNotifier: PartnerEventNotifier
+
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     override fun onCreate() {
         super.onCreate()
         supabaseService.getDeviceId(this)
+        partnerEventNotifier.start()
 
         appScope.launch {
             try {

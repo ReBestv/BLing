@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -32,17 +31,11 @@ import java.util.*
 import androidx.compose.ui.graphics.graphicsLayer
 
 // ——— Design tokens ———
-private val TimelineOutline = Color(0xFFF0EAE6)
 private val TimelineDotBorder = Color(0xFFFFFFFF)
 private val TextSecondary = Color(0xFF9E8E86)
 private val FgColor = Color(0xFF5A4A42)
 private val BgColor = Color(0xFFFFF8F5)
 private val CardBg = Color(0xFFFFFFFF)
-
-private val TimelineColumnWidth = 56.dp
-private val LineX = 39.dp
-private val DotSize = 40.dp
-private val LineWidth = 2.dp
 
 @Composable
 fun HistoryScreen(
@@ -253,75 +246,75 @@ private fun TimelineEntry(
             colors = CardDefaults.cardColors(containerColor = CardBg),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(
-                    horizontal = 14.dp,
-                    vertical = layoutMetrics.bubbleVerticalPaddingDp.dp
-                ),
-                horizontalAlignment = HistoryEntryLayout.bubbleContentAlignment(isMe)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = HistoryEntryLayout.cardMinHeight())
+                    .padding(
+                        horizontal = HistoryEntryLayout.cardHorizontalPadding(),
+                        vertical = layoutMetrics.bubbleVerticalPaddingDp.dp
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = HistoryEntryLayout.cardContentArrangement(isMe)
             ) {
-                // Header row: emoji + mood name + time
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .background(feelingColor.copy(alpha = 0.2f), shape = RoundedCornerShape(8.dp))
-                            .padding(horizontal = 8.dp, vertical = 2.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            StatusEmojiImage(
-                                value = status.feelingAsset,
-                                feelingKey = status.feelingKey,
-                                feelingLabel = status.feelingLabel,
-                                size = 20.dp,
-                                textSize = 16.sp,
-                                tintColor = feelingColor,
-                                fallbackEmoji = status.feelingFallbackEmoji
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = moodName,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = feelingColor
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = HistoryDisplayName.resolveEntryDisplayName(
-                            isMe = isMe,
-                            partnerDisplayName = partnerName
-                        ),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = FgColor
+                if (!isMe) {
+                    MoodBadge(
+                        status = status,
+                        feelingColor = feelingColor,
+                        moodName = moodName
                     )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        text = formattedTime,
-                        fontSize = 12.sp,
-                        color = TextSecondary
-                    )
+                    Spacer(modifier = Modifier.width(HistoryEntryLayout.moodToTextGap()))
                 }
 
-                // Activity text
-                if (activityText.isNotEmpty()) {
+                Column(
+                    modifier = if (isMe) Modifier.wrapContentWidth() else Modifier.weight(1f),
+                    horizontalAlignment = HistoryEntryLayout.bubbleContentAlignment(isMe)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start
+                    ) {
+                        Text(
+                            text = HistoryDisplayName.resolveEntryDisplayName(
+                                isMe = isMe,
+                                partnerDisplayName = partnerName
+                            ),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = FgColor
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = formattedTime,
+                            fontSize = 12.sp,
+                            color = TextSecondary
+                        )
+                    }
+
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = activityText,
                         fontSize = 14.sp,
                         color = TextSecondary
                     )
+
+                    if (status.note.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = status.note,
+                            fontSize = 13.sp,
+                            color = TextSecondary.copy(alpha = 0.8f),
+                            fontStyle = FontStyle.Italic
+                        )
+                    }
                 }
 
-                // Optional note
-                if (status.note.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = status.note,
-                        fontSize = 13.sp,
-                        color = TextSecondary.copy(alpha = 0.8f),
-                        fontStyle = FontStyle.Italic
+                if (isMe) {
+                    Spacer(modifier = Modifier.width(HistoryEntryLayout.moodToTextGap()))
+                    MoodBadge(
+                        status = status,
+                        feelingColor = feelingColor,
+                        moodName = moodName
                     )
                 }
             }
@@ -349,6 +342,39 @@ private fun TimelineEntry(
                     fontSize = (layoutMetrics.dotSizeDp * 0.6f).sp
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun MoodBadge(
+    status: UserStatus,
+    feelingColor: Color,
+    moodName: String
+) {
+    Box(
+        modifier = Modifier
+            .size(HistoryEntryLayout.moodBadgeSize())
+            .background(feelingColor.copy(alpha = 0.14f), CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            StatusEmojiImage(
+                value = status.feelingAsset,
+                feelingKey = status.feelingKey,
+                feelingLabel = status.feelingLabel,
+                size = 24.dp,
+                textSize = 20.sp,
+                tintColor = feelingColor,
+                fallbackEmoji = status.feelingFallbackEmoji
+            )
+            Text(
+                text = moodName,
+                fontSize = 9.sp,
+                fontWeight = FontWeight.Bold,
+                color = feelingColor,
+                maxLines = 1
+            )
         }
     }
 }

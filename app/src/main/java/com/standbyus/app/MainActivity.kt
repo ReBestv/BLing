@@ -1,10 +1,15 @@
 package com.standbyus.app
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.core.content.ContextCompat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -61,9 +66,16 @@ private data class BottomNavItem(
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        // No-op: notification delivery gracefully skips when permission is denied.
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        requestNotificationPermissionIfNeeded()
 
         val celebration = checkCelebrationDay()
 
@@ -169,6 +181,26 @@ class MainActivity : ComponentActivity() {
         prefs.edit().putBoolean(todayKey, true).apply()
 
         return match
+    }
+
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        val prefs = getSharedPreferences(NOTIFICATION_PREFS_NAME, Context.MODE_PRIVATE)
+        if (prefs.getBoolean(KEY_NOTIFICATION_PERMISSION_ASKED, false)) return
+
+        val granted = ContextCompat.checkSelfPermission(
+            this,
+            Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+        if (!granted) {
+            prefs.edit().putBoolean(KEY_NOTIFICATION_PERMISSION_ASKED, true).apply()
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    companion object {
+        private const val NOTIFICATION_PREFS_NAME = "notification_permission"
+        private const val KEY_NOTIFICATION_PERMISSION_ASKED = "asked_once"
     }
 }
 

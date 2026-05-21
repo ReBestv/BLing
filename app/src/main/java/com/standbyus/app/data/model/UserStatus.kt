@@ -7,7 +7,10 @@ data class StatusFeelingSnapshot(
     val feelingLabel: String = Feeling.HAPPY.displayName,
     val feelingAsset: String = Feeling.HAPPY.emoji,
     val feelingFallbackEmoji: String = Feeling.HAPPY.emoji,
-    val feelingColor: String = Feeling.HAPPY.color.toHex()
+    val feelingColor: String = Feeling.HAPPY.color.toHex(),
+    val stickerId: String? = null,
+    val stickerLabel: String? = null,
+    val stickerAsset: String? = null
 )
 
 data class UserStatus(
@@ -21,25 +24,31 @@ data class UserStatus(
     val feelingAsset: String = Feeling.HAPPY.emoji,
     val feelingFallbackEmoji: String = Feeling.HAPPY.emoji,
     val feelingColor: String = Feeling.HAPPY.color.toHex(),
+    val stickerId: String? = null,
+    val stickerLabel: String? = null,
+    val stickerAsset: String? = null,
     val note: String = "",
     val updatedAt: Long = System.currentTimeMillis(),
     val source: String = "manual"
 ) {
-    fun toMap(): Map<String, Any> = mapOf(
-        "userId" to userId,
-        "doing" to doing,
-        "customDoing" to customDoing,
-        "themeId" to themeId,
-        "themeName" to themeName,
-        "feelingKey" to feelingKey,
-        "feelingLabel" to feelingLabel,
-        "feelingAsset" to feelingAsset,
-        "feelingFallbackEmoji" to feelingFallbackEmoji,
-        "feelingColor" to feelingColor,
-        "note" to note,
-        "updatedAt" to updatedAt,
-        "source" to source
-    )
+    fun toMap(): Map<String, Any> = buildMap {
+        put("userId", userId)
+        put("doing", doing)
+        put("customDoing", customDoing)
+        put("themeId", themeId)
+        put("themeName", themeName)
+        put("feelingKey", feelingKey)
+        put("feelingLabel", feelingLabel)
+        put("feelingAsset", feelingAsset)
+        put("feelingFallbackEmoji", feelingFallbackEmoji)
+        put("feelingColor", feelingColor)
+        stickerId?.let { put("stickerId", it) }
+        stickerLabel?.let { put("stickerLabel", it) }
+        stickerAsset?.let { put("stickerAsset", it) }
+        put("note", note)
+        put("updatedAt", updatedAt)
+        put("source", source)
+    }
 
     companion object {
         fun fromMap(map: Map<String, Any>): UserStatus {
@@ -63,6 +72,9 @@ data class UserStatus(
                 feelingAsset = map["feelingAsset"] as? String ?: map["feelingEmoji"] as? String ?: fallbackEmoji,
                 feelingFallbackEmoji = fallbackEmoji,
                 feelingColor = map["feelingColor"] as? String ?: feeling.color.toHex(),
+                stickerId = map["stickerId"] as? String,
+                stickerLabel = map["stickerLabel"] as? String,
+                stickerAsset = map["stickerAsset"] as? String,
                 note = map["note"] as? String ?: "",
                 updatedAt = (map["updatedAt"] as? Number)?.toLong() ?: System.currentTimeMillis(),
                 source = map["source"] as? String ?: "manual"

@@ -32,9 +32,9 @@ class HistoryEntryLayoutTest {
     }
 
     @Test
-    fun `wraps my message bubble while keeping partner bubble fixed`() {
+    fun `keeps my and partner message bubbles the same width`() {
         assertEquals(
-            HistoryBubbleWidth.Wrap,
+            HistoryBubbleWidth.Fixed(260.dp),
             HistoryEntryLayout.bubbleWidth(isMe = true)
         )
         assertEquals(
@@ -47,5 +47,19 @@ class HistoryEntryLayoutTest {
     fun `aligns my bubble content to the end`() {
         assertSame(Alignment.End, HistoryEntryLayout.bubbleContentAlignment(isMe = true))
         assertSame(Alignment.Start, HistoryEntryLayout.bubbleContentAlignment(isMe = false))
+    }
+
+    @Test
+    fun `aligns my card row content to the right`() {
+        assertSame(Arrangement.End, HistoryEntryLayout.cardContentArrangement(isMe = true))
+        assertSame(Arrangement.Start, HistoryEntryLayout.cardContentArrangement(isMe = false))
+    }
+
+    @Test
+    fun `sets horizontal card rhythm for avatar emoji and text layout`() {
+        assertEquals(72.dp, HistoryEntryLayout.cardMinHeight())
+        assertEquals(12.dp, HistoryEntryLayout.cardHorizontalPadding())
+        assertEquals(44.dp, HistoryEntryLayout.moodBadgeSize())
+        assertEquals(14.dp, HistoryEntryLayout.moodToTextGap())
     }
 }

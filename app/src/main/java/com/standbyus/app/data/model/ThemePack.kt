@@ -30,6 +30,13 @@ data class ThemeFeeling(
     val asset: String? = null
 )
 
+data class ThemeSticker(
+    val id: String,
+    val label: String,
+    val asset: String,
+    val tags: List<String> = emptyList()
+)
+
 /**
  * 单个主题包定义。
  * @param id          主题唯一标识
@@ -37,28 +44,34 @@ data class ThemeFeeling(
  * @param bucket      Supabase Storage bucket 名称（主题图片所在 bucket）
  * @param icon        主题图标文件名（相对于 bucket 根），null 表示无图标
  * @param feelings    该主题覆盖的心情 key/label/asset 列表
+ * @param stickers    该主题提供的自由贴纸列表
  */
 data class ThemePack(
     val id: String,
     val name: String,
     val bucket: String,
     val icon: String?,
-    val feelings: List<ThemeFeeling>
+    val feelings: List<ThemeFeeling>,
+    val stickers: List<ThemeSticker> = emptyList()
 ) {
     fun feelingByKey(key: String): ThemeFeeling? = feelings.find { it.key == key }
+
+    fun stickerById(id: String): ThemeSticker? = stickers.find { it.id == id }
 
     fun fileName(feelingKey: String): String = feelingByKey(feelingKey)?.asset ?: "$feelingKey.png"
 
     companion object {
         fun fromJson(obj: JSONObject): ThemePack {
-            val feelingsArray = obj.getJSONArray("feelings")
+            val feelingsArray = obj.optJSONArray("feelings") ?: JSONArray()
             val feelings = parseFeelings(feelingsArray, obj.optJSONObject("fileNameMap"))
+            val stickers = parseStickers(obj.optJSONArray("stickers"))
             return ThemePack(
                 id = obj.getString("id"),
                 name = obj.getString("name"),
                 bucket = obj.optString("bucket", "themes"),
                 icon = obj.optString("icon", "").takeIf { it.isNotEmpty() },
-                feelings = feelings
+                feelings = feelings,
+                stickers = stickers
             )
         }
 
@@ -84,6 +97,25 @@ data class ThemePack(
                         asset = mappedName.takeIf { it.isNotEmpty() }?.let { "$it.png" } ?: "${feeling.key}.png"
                     )
                 }
+            }
+        }
+
+        private fun parseStickers(stickersArray: JSONArray?): List<ThemeSticker> {
+            if (stickersArray == null) return emptyList()
+            return (0 until stickersArray.length()).map { index ->
+                val raw = stickersArray.getJSONObject(index)
+                val tagsArray = raw.optJSONArray("tags")
+                val tags = if (tagsArray == null) {
+                    emptyList()
+                } else {
+                    (0 until tagsArray.length()).map { tagIndex -> tagsArray.getString(tagIndex) }
+                }
+                ThemeSticker(
+                    id = raw.getString("id"),
+                    label = raw.getString("label"),
+                    asset = raw.getString("asset"),
+                    tags = tags
+                )
             }
         }
     }

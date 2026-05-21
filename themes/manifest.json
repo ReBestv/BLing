@@ -1,11 +1,29 @@
 {
-  "version": 2,
+  "version": 3,
   "themes": [
     {
       "id": "xiaoxin",
       "name": "小新",
       "bucket": "xiaoxin",
       "icon": "happy.png",
+      "stickers": [
+        { "id": "happy", "label": "开心", "asset": "happy.png", "tags": ["happy"] },
+        { "id": "missing", "label": "想你", "asset": "missyou.png", "tags": ["missing", "love"] },
+        { "id": "kiss", "label": "亲亲", "asset": "kiss.png", "tags": ["kiss", "love"] },
+        { "id": "love", "label": "爱你", "asset": "love.png", "tags": ["love"] },
+        { "id": "relaxed", "label": "悠闲", "asset": "relaxed.png", "tags": ["relaxed"] },
+        { "id": "hustling", "label": "奋斗", "asset": "hustle.png", "tags": ["hustling", "doing"] },
+        { "id": "thinking", "label": "思考", "asset": "think.png", "tags": ["thinking"] },
+        { "id": "watching", "label": "追剧", "asset": "drama.png", "tags": ["watching", "doing"] },
+        { "id": "sad", "label": "难过", "asset": "sad.png", "tags": ["sad"] },
+        { "id": "upset", "label": "沮丧", "asset": "crying.png", "tags": ["upset", "sad"] },
+        { "id": "angry", "label": "生气", "asset": "angry.png", "tags": ["angry"] },
+        { "id": "anxious", "label": "焦虑", "asset": "anxious.png", "tags": ["anxious"] },
+        { "id": "tired", "label": "疲惫", "asset": "tired.png", "tags": ["tired"] },
+        { "id": "sick", "label": "生病", "asset": "sick.png", "tags": ["sick"] },
+        { "id": "bored", "label": "无聊", "asset": "bored.png", "tags": ["bored"] },
+        { "id": "sleeping", "label": "睡觉", "asset": "sleep.png", "tags": ["sleeping", "tired"] }
+      ],
       "feelings": [
         { "key": "happy", "label": "开心", "asset": "happy.png" },
         { "key": "missing", "label": "想你", "asset": "missyou.png" },
@@ -24,6 +42,31 @@
         { "key": "bored", "label": "无聊", "asset": "bored.png" },
         { "key": "sleeping", "label": "睡觉", "asset": "sleep.png" }
       ]
+    },
+    {
+      "id": "vv",
+      "name": "VV",
+      "bucket": "VV",
+      "icon": "love_you.webp",
+      "stickers": [
+        { "id": "unhappy", "label": "不开心", "asset": "unhappy.webp", "tags": ["sad", "upset"] },
+        { "id": "eating", "label": "吃饭", "asset": "eating.webp", "tags": ["doing"] },
+        { "id": "coffee", "label": "喝咖啡", "asset": "coffee.webp", "tags": ["relaxed", "doing"] },
+        { "id": "sleepy", "label": "困了", "asset": "sleepy.webp", "tags": ["tired", "sleeping"] },
+        { "id": "whats_up", "label": "在干嘛", "asset": "whats_up.webp", "tags": ["thinking"] },
+        { "id": "studying", "label": "学习", "asset": "studying.webp", "tags": ["hustling", "doing"] },
+        { "id": "surprised", "label": "惊讶", "asset": "surprised.webp", "tags": ["anxious"] },
+        { "id": "missing_you", "label": "想你", "asset": "missing_you.webp", "tags": ["missing", "love"] },
+        { "id": "hug", "label": "抱抱", "asset": "hug.webp", "tags": ["happy", "love"] },
+        { "id": "bored", "label": "无聊", "asset": "bored.webp", "tags": ["bored"] },
+        { "id": "love_you", "label": "爱你", "asset": "love_you.webp", "tags": ["love", "kiss"] },
+        { "id": "gaming", "label": "玩游戏", "asset": "gaming.webp", "tags": ["watching", "doing"] },
+        { "id": "angry", "label": "生气", "asset": "angry.webp", "tags": ["angry"] },
+        { "id": "sick", "label": "生病", "asset": "sick.webp", "tags": ["sick"] },
+        { "id": "workout", "label": "锻炼", "asset": "workout.webp", "tags": ["hustling", "doing"] },
+        { "id": "cycling", "label": "骑车", "asset": "cycling.webp", "tags": ["hustling", "doing"] }
+      ],
+      "feelings": []
     }
   ]
 }

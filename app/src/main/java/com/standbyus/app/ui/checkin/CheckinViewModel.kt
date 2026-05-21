@@ -4,8 +4,10 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.standbyus.app.data.model.InteractionType
 import com.standbyus.app.data.remote.SupabaseService
 import com.standbyus.app.data.repository.CheckinRepository
+import com.standbyus.app.data.repository.InteractionRepository
 import com.standbyus.app.data.repository.PairingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -81,6 +83,7 @@ data class PKStats(
 class CheckinViewModel @Inject constructor(
     private val checkinRepository: CheckinRepository,
     private val pairingRepository: PairingRepository,
+    private val interactionRepository: InteractionRepository,
     private val supabaseService: SupabaseService,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -232,12 +235,32 @@ class CheckinViewModel @Inject constructor(
         _isCheckingIn.value = true
         viewModelScope.launch {
             try {
-                checkinRepository.submitCheckIn()
+                val checkedIn = checkinRepository.submitCheckIn()
+                if (checkedIn) {
+                    sendPoopCheckinInteraction()
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "checkIn failed", e)
             } finally {
                 _isCheckingIn.value = false
             }
+        }
+    }
+
+    private suspend fun sendPoopCheckinInteraction() {
+        val fromUserId = _myUserId.value
+        val toUserId = _partnerUserId.value
+        if (fromUserId.isEmpty() || toUserId.isEmpty()) return
+
+        try {
+            interactionRepository.sendInteraction(
+                fromUserId = fromUserId,
+                toUserId = toUserId,
+                type = InteractionType.POOP_CHECKIN,
+                targetStatusTime = System.currentTimeMillis()
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "poop checkin interaction failed", e)
         }
     }
 

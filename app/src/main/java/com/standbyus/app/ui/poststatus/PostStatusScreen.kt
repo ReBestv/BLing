@@ -43,6 +43,7 @@ import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.standbyus.app.data.model.Feeling
+import com.standbyus.app.data.model.ThemeSticker
 import com.standbyus.app.ui.theme.EmojiThemeManager
 import com.standbyus.app.ui.components.AppHeader
 
@@ -61,6 +62,7 @@ fun PostStatusScreen(
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val themeVersion by EmojiThemeManager.themeVersion.collectAsState()
+    val currentTheme = remember(themeVersion) { EmojiThemeManager.getCurrentTheme(context) }
 
     // Animated background tint based on selected feeling
     val bgTint by animateColorAsState(
@@ -111,102 +113,53 @@ fun PostStatusScreen(
                 ) {
                 Spacer(modifier = Modifier.height(layoutMetrics.topSpacerDp.dp))
 
-                // ── 4-column mood grid (16 feelings) ──
-                val allFeelings = Feeling.entries
+                val hasThemeStickers = currentTheme.stickers.isNotEmpty()
+                if (hasThemeStickers) {
+                    StickerGridPicker(
+                        stickers = currentTheme.stickers,
+                        bucket = currentTheme.bucket,
+                        selectedStickerId = viewModel.selectedStickerId,
+                        onStickerClick = viewModel::selectSticker,
+                        imageSizeDp = layoutMetrics.stickerImageSizeDp,
+                        gridHeightDp = layoutMetrics.stickerGridHeightDp,
+                        gridVerticalGapDp = layoutMetrics.stickerGridVerticalGapDp,
+                        labelLineHeightSp = layoutMetrics.stickerLabelLineHeightSp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
 
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(4),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(layoutMetrics.moodGridHeightDp.dp),
-                    horizontalArrangement = Arrangement.spacedBy(layoutMetrics.gridHorizontalGapDp.dp),
-                    verticalArrangement = Arrangement.spacedBy(layoutMetrics.gridVerticalGapDp.dp),
-                    userScrollEnabled = false
-                ) {
-                    items(allFeelings) { feeling ->
-                        val isSelected = feeling == viewModel.selectedFeeling
+                    Spacer(modifier = Modifier.height(layoutMetrics.sectionGapDp.dp))
+                }
 
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
-                                .clickable { viewModel.selectFeeling(feeling) }
-                                .padding(vertical = 4.dp)
-                        ) {
-                            // Mood circle
-                            Box(
-                                modifier = Modifier
-                                    .size(layoutMetrics.moodCircleSizeDp.dp)
-                                    .scale(if (isSelected) 1.12f else 1f)
-                                    .shadow(
-                                        elevation = if (isSelected) 12.dp else 0.dp,
-                                        shape = CircleShape,
-                                        ambientColor = feeling.color.copy(alpha = 0.3f),
-                                        spotColor = feeling.color.copy(alpha = 0.3f)
-                                    )
-                                    .background(
-                                        color = if (isSelected) feeling.color.copy(alpha = 0.25f)
-                                        else Color(0xFFFFF2EF),
-                                        shape = CircleShape
-                                    )
-                                    .then(
-                                        if (isSelected) {
-                                            Modifier
-                                                .border(3.dp, Color.White, CircleShape)
-                                                .border(2.dp, feeling.color, CircleShape)
-                                        } else {
-                                            Modifier.border(1.dp, DesignBorder, CircleShape)
-                                        }
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                val emoji = remember(themeVersion, feeling.key) {
-                                    EmojiThemeManager.getEmoji(context, feeling.key)
-                                }
-                                if (isEmoji(emoji)) {
-                                    Text(text = emoji, fontSize = layoutMetrics.moodEmojiTextSizeSp.sp)
-                                } else {
-                                    SubcomposeAsyncImage(
-                                        model = ImageRequest.Builder(context)
-                                            .data(emoji)
-                                            .crossfade(true)
-                                            .build(),
-                                        contentDescription = feeling.displayName,
-                                        loading = {
-                                            Box(
-                                                modifier = Modifier.size(layoutMetrics.moodImageSizeDp.dp),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                CircularProgressIndicator(
-                                                    modifier = Modifier.size(18.dp),
-                                                    strokeWidth = 2.dp,
-                                                    color = feeling.color
-                                                )
-                                            }
-                                        },
-                                        error = {
-                                            Text(text = feeling.emoji, fontSize = 28.sp)
-                                        },
-                                        modifier = Modifier
-                                            .size(layoutMetrics.moodImageSizeDp.dp)
-                                            .clip(CircleShape),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(layoutMetrics.labelTopGapDp.dp))
-
-                            // Label
-                            Text(
-                                text = feeling.displayName,
-                                fontSize = 12.sp,
-                                color = if (isSelected) Color(0xFF252220)
-                                else Color(0xFF807975),
-                                fontWeight = if (isSelected) FontWeight.Medium
-                                else FontWeight.Normal
-                            )
-                        }
-                    }
+                if (hasThemeStickers) {
+                    MoodRowPicker(
+                        feelings = Feeling.entries,
+                        selectedFeeling = viewModel.selectedFeeling,
+                        onFeelingClick = viewModel::selectFeeling,
+                        themeVersion = themeVersion,
+                        circleSizeDp = layoutMetrics.moodRowCircleSizeDp,
+                        imageSizeDp = layoutMetrics.moodRowImageSizeDp,
+                        itemWidthDp = layoutMetrics.moodRowItemWidthDp,
+                        labelLineHeightSp = layoutMetrics.moodLabelLineHeightSp,
+                        useDefaultEmoji = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    MoodGridPicker(
+                        feelings = Feeling.entries,
+                        selectedFeeling = viewModel.selectedFeeling,
+                        onFeelingClick = viewModel::selectFeeling,
+                        themeVersion = themeVersion,
+                        gridHeightDp = layoutMetrics.moodGridHeightDp,
+                        circleSizeDp = layoutMetrics.moodCircleSizeDp,
+                        imageSizeDp = layoutMetrics.moodImageSizeDp,
+                        emojiTextSizeSp = layoutMetrics.moodEmojiTextSizeSp,
+                        labelTopGapDp = layoutMetrics.labelTopGapDp,
+                        labelLineHeightSp = layoutMetrics.moodLabelLineHeightSp,
+                        gridHorizontalGapDp = layoutMetrics.gridHorizontalGapDp,
+                        gridVerticalGapDp = layoutMetrics.gridVerticalGapDp,
+                        useDefaultEmoji = false,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(layoutMetrics.sectionGapDp.dp))
@@ -316,6 +269,271 @@ fun PostStatusScreen(
         if (viewModel.published) {
             kotlinx.coroutines.delay(1000)
             onBack()
+        }
+    }
+}
+
+@Composable
+private fun MoodGridPicker(
+    feelings: List<Feeling>,
+    selectedFeeling: Feeling,
+    onFeelingClick: (Feeling) -> Unit,
+    themeVersion: Int,
+    gridHeightDp: Float,
+    circleSizeDp: Float,
+    imageSizeDp: Float,
+    emojiTextSizeSp: Float,
+    labelTopGapDp: Float,
+    labelLineHeightSp: Float,
+    gridHorizontalGapDp: Float,
+    gridVerticalGapDp: Float,
+    useDefaultEmoji: Boolean,
+    modifier: Modifier = Modifier
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(4),
+        modifier = modifier.height(gridHeightDp.dp),
+        horizontalArrangement = Arrangement.spacedBy(gridHorizontalGapDp.dp),
+        verticalArrangement = Arrangement.spacedBy(gridVerticalGapDp.dp),
+        userScrollEnabled = false
+    ) {
+        items(feelings) { feeling ->
+            MoodOption(
+                feeling = feeling,
+                isSelected = feeling == selectedFeeling,
+                onClick = { onFeelingClick(feeling) },
+                themeVersion = themeVersion,
+                circleSizeDp = circleSizeDp,
+                imageSizeDp = imageSizeDp,
+                emojiTextSizeSp = emojiTextSizeSp,
+                labelTopGapDp = labelTopGapDp,
+                labelLineHeightSp = labelLineHeightSp,
+                useDefaultEmoji = useDefaultEmoji
+            )
+        }
+    }
+}
+
+@Composable
+private fun MoodRowPicker(
+    feelings: List<Feeling>,
+    selectedFeeling: Feeling,
+    onFeelingClick: (Feeling) -> Unit,
+    themeVersion: Int,
+    circleSizeDp: Float,
+    imageSizeDp: Float,
+    itemWidthDp: Float,
+    labelLineHeightSp: Float,
+    useDefaultEmoji: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Text(
+            text = "心情底色",
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color(0xFF807975)
+        )
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(end = 4.dp)
+        ) {
+            items(feelings) { feeling ->
+                Box(modifier = Modifier.width(itemWidthDp.dp)) {
+                    MoodOption(
+                        feeling = feeling,
+                        isSelected = feeling == selectedFeeling,
+                        onClick = { onFeelingClick(feeling) },
+                        themeVersion = themeVersion,
+                        circleSizeDp = circleSizeDp,
+                        imageSizeDp = imageSizeDp,
+                        emojiTextSizeSp = 24f,
+                        labelTopGapDp = 4f,
+                        labelLineHeightSp = labelLineHeightSp,
+                        useDefaultEmoji = useDefaultEmoji
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MoodOption(
+    feeling: Feeling,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    themeVersion: Int,
+    circleSizeDp: Float,
+    imageSizeDp: Float,
+    emojiTextSizeSp: Float,
+    labelTopGapDp: Float,
+    labelLineHeightSp: Float,
+    useDefaultEmoji: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .clickable { onClick() }
+            .padding(vertical = 4.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(circleSizeDp.dp)
+                .scale(if (isSelected) 1.12f else 1f)
+                .shadow(
+                    elevation = if (isSelected) 12.dp else 0.dp,
+                    shape = CircleShape,
+                    ambientColor = feeling.color.copy(alpha = 0.3f),
+                    spotColor = feeling.color.copy(alpha = 0.3f)
+                )
+                .background(
+                    color = if (isSelected) feeling.color.copy(alpha = 0.25f) else Color(0xFFFFF2EF),
+                    shape = CircleShape
+                )
+                .then(
+                    if (isSelected) {
+                        Modifier
+                            .border(3.dp, Color.White, CircleShape)
+                            .border(2.dp, feeling.color, CircleShape)
+                    } else {
+                        Modifier.border(1.dp, DesignBorder, CircleShape)
+                    }
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            val emoji = remember(themeVersion, feeling.key, useDefaultEmoji) {
+                if (useDefaultEmoji) feeling.emoji else EmojiThemeManager.getEmoji(context, feeling.key)
+            }
+            if (isEmoji(emoji)) {
+                Text(text = emoji, fontSize = emojiTextSizeSp.sp)
+            } else {
+                SubcomposeAsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(emoji)
+                        .crossfade(true)
+                        .build(),
+                    contentDescription = feeling.displayName,
+                    loading = {
+                        Box(
+                            modifier = Modifier.size(imageSizeDp.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size((imageSizeDp * 0.32f).dp),
+                                strokeWidth = 2.dp,
+                                color = feeling.color
+                            )
+                        }
+                    },
+                    error = {
+                        Text(text = feeling.emoji, fontSize = emojiTextSizeSp.sp)
+                    },
+                    modifier = Modifier
+                        .size(imageSizeDp.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(labelTopGapDp.dp))
+
+        Text(
+            text = feeling.displayName,
+            fontSize = 12.sp,
+            lineHeight = labelLineHeightSp.sp,
+            color = if (isSelected) Color(0xFF252220) else Color(0xFF807975),
+            fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
+        )
+    }
+}
+
+@Composable
+private fun StickerGridPicker(
+    stickers: List<ThemeSticker>,
+    bucket: String,
+    selectedStickerId: String?,
+    onStickerClick: (ThemeSticker) -> Unit,
+    imageSizeDp: Float,
+    gridHeightDp: Float,
+    gridVerticalGapDp: Float,
+    labelLineHeightSp: Float,
+    modifier: Modifier = Modifier
+) {
+    if (stickers.isEmpty()) return
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Text(
+            text = "表情贴纸",
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color(0xFF807975)
+        )
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(4),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(gridHeightDp.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalArrangement = Arrangement.spacedBy(gridVerticalGapDp.dp),
+            userScrollEnabled = false
+        ) {
+            items(stickers) { sticker ->
+                val isSelected = sticker.id == selectedStickerId
+                val stickerUrl = remember(bucket, sticker.asset) {
+                    if (sticker.asset.startsWith("http")) {
+                        sticker.asset
+                    } else {
+                        com.standbyus.app.ui.theme.themeAssetUrl(bucket, sticker.asset)
+                    }
+                }
+                Surface(
+                    onClick = { onStickerClick(sticker) },
+                    shape = RoundedCornerShape(18.dp),
+                    color = if (isSelected) DesignPrimary.copy(alpha = 0.16f) else Color.White,
+                    border = BorderStroke(
+                        width = if (isSelected) 2.dp else 1.dp,
+                        color = if (isSelected) DesignPrimary else DesignBorder
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(stickerUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = sticker.label,
+                            modifier = Modifier
+                                .size(imageSizeDp.dp)
+                                .clip(CircleShape),
+                            contentScale = ContentScale.Fit
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        Text(
+                            text = sticker.label,
+                            fontSize = 11.sp,
+                            lineHeight = labelLineHeightSp.sp,
+                            maxLines = 1,
+                            color = if (isSelected) Color(0xFF5A4A42) else Color(0xFF807975),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
         }
     }
 }

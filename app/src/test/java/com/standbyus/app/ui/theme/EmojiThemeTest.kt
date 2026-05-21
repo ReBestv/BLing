@@ -2,6 +2,7 @@ package com.standbyus.app.ui.theme
 
 import com.standbyus.app.data.model.ThemeFeeling
 import com.standbyus.app.data.model.ThemePack
+import com.standbyus.app.data.model.ThemeSticker
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -14,12 +15,30 @@ class EmojiThemeTest {
             name = "小新",
             bucket = "xiaoxin",
             icon = "happy.png",
-            feelings = listOf(ThemeFeeling("happy", "开心", "happy.png"))
+            feelings = listOf(ThemeFeeling("happy", "开心", "happy.png")),
+            stickers = emptyList()
         )
 
         assertEquals(
             "https://dxwnnskelbygqdvjlorj.supabase.co/storage/v1/object/public/themes/xiaoxin/happy.png",
             theme.stickerUrl("happy")
+        )
+    }
+
+    @Test
+    fun `theme sticker url includes themes bucket path`() {
+        val theme = EmojiThemeSet(
+            id = "vv",
+            name = "VV",
+            bucket = "VV",
+            icon = "love_you.webp",
+            feelings = emptyList(),
+            stickers = listOf(ThemeSticker("eating", "吃饭", "eating.webp", listOf("doing")))
+        )
+
+        assertEquals(
+            "https://dxwnnskelbygqdvjlorj.supabase.co/storage/v1/object/public/themes/VV/eating.webp",
+            theme.themeStickerUrl("eating")
         )
     }
 
@@ -32,7 +51,8 @@ class EmojiThemeTest {
                     name = "小新",
                     bucket = "xiaoxin",
                     icon = "happy.png",
-                    feelings = listOf(ThemeFeeling("happy", "开心", "happy.png"))
+                    feelings = listOf(ThemeFeeling("happy", "开心", "happy.png")),
+                    stickers = emptyList()
                 )
             )
         )
