@@ -76,7 +76,12 @@ fun AlbumScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val overlayLayoutMetrics = AlbumLayout.metrics(
+            availableWidthDp = maxWidth.value,
+            availableHeightDp = maxHeight.value
+        )
+
         Scaffold(
             snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
@@ -102,13 +107,25 @@ fun AlbumScreen(
                 )
             }
         ) { padding ->
-            Column(Modifier.fillMaxSize().padding(padding)) {
+            BoxWithConstraints(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+            ) {
+                val layoutMetrics = AlbumLayout.metrics(
+                    availableWidthDp = maxWidth.value,
+                    availableHeightDp = maxHeight.value
+                )
+            Column(Modifier.fillMaxSize()) {
                 // 横向可滚动的筛选标签
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .horizontalScroll(rememberScrollState())
-                        .padding(horizontal = 24.dp, vertical = 8.dp),
+                        .padding(
+                            horizontal = layoutMetrics.horizontalPaddingDp.dp,
+                            vertical = layoutMetrics.filterVerticalPaddingDp.dp
+                        ),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     val filters = listOf(0 to "全部", 7 to "近7天", 30 to "近30天", 90 to "近90天")
@@ -126,7 +143,10 @@ fun AlbumScreen(
                                     ) else Modifier
                                 )
                                 .clickable { viewModel.setFilter(days) }
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .padding(
+                                    horizontal = layoutMetrics.filterHorizontalPaddingDp.dp,
+                                    vertical = layoutMetrics.filterVerticalPaddingDp.dp
+                                )
                         ) {
                             Text(
                                 text = label,
@@ -165,9 +185,11 @@ fun AlbumScreen(
                     // 3列照片网格
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(3),
-                        modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = layoutMetrics.horizontalPaddingDp.dp),
+                        horizontalArrangement = Arrangement.spacedBy(layoutMetrics.gridGapDp.dp),
+                        verticalArrangement = Arrangement.spacedBy(layoutMetrics.gridGapDp.dp),
                         contentPadding = PaddingValues(vertical = 12.dp)
                     ) {
                         items(photos, key = { it.id }) { photo ->
@@ -179,6 +201,7 @@ fun AlbumScreen(
                         }
                     }
                 }
+            }
             }
         }
 
@@ -201,7 +224,7 @@ fun AlbumScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState())
-                        .padding(20.dp),
+                        .padding(overlayLayoutMetrics.sheetPaddingDp.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // 拖拽手柄
@@ -212,7 +235,7 @@ fun AlbumScreen(
                             .clip(RoundedCornerShape(2.dp))
                             .background(StandByUsLightColors.borderLight)
                     )
-                    Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(overlayLayoutMetrics.sheetSpacerDp.dp))
 
                     // 预览图
                     AsyncImage(
@@ -222,11 +245,11 @@ fun AlbumScreen(
                             .build(),
                         contentDescription = null,
                         modifier = Modifier
-                            .size(160.dp)
+                            .size(overlayLayoutMetrics.sheetPreviewSizeDp.dp)
                             .clip(RoundedCornerShape(12.dp)),
                         contentScale = ContentScale.Crop
                     )
-                    Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(overlayLayoutMetrics.sheetSpacerDp.dp))
 
                     // 输入框
                     OutlinedTextField(
@@ -259,7 +282,7 @@ fun AlbumScreen(
                         ),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(48.dp)
+                            .height(overlayLayoutMetrics.sheetButtonHeightDp.dp)
                     ) {
                         if (uploading) {
                             CircularProgressIndicator(

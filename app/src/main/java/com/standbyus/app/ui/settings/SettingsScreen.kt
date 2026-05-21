@@ -32,8 +32,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.standbyus.app.ui.celebration.CelebrationConfig
 import com.standbyus.app.ui.celebration.CelebrationDay
 import com.standbyus.app.ui.celebration.CelebrationOverlay
+import com.standbyus.app.ui.celebration.CelebrationStyle
 import com.standbyus.app.ui.components.AppHeader
 import com.standbyus.app.ui.components.AvatarPicker
 import com.standbyus.app.ui.components.allAvatarEmojis
@@ -73,11 +75,18 @@ fun SettingsScreen(
 
     // Avatar picker dialog state
     var showAvatarPicker by remember { mutableStateOf(false) }
+    var showEffectPreviewOptions by remember { mutableStateOf(false) }
+    var previewCelebration by remember { mutableStateOf<CelebrationDay?>(null) }
 
     // 动态主题列表
     val themes by viewModel.availableThemes.collectAsState()
 
-    Box(modifier = Modifier.fillMaxSize().background(Background)) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(Background)) {
+        val layoutMetrics = SettingsLayout.metrics(
+            availableWidthDp = maxWidth.value,
+            availableHeightDp = maxHeight.value
+        )
+
         Column(modifier = Modifier.fillMaxSize()) {
             // ===== Custom App Bar =====
             AppHeader(
@@ -85,27 +94,28 @@ fun SettingsScreen(
                 onBack = onBack
             )
 
-            // ===== Scrollable Content =====
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 32.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Spacer(modifier = Modifier.height(8.dp))
+            Box(modifier = Modifier.fillMaxSize()) {
+                // ===== Scrollable Content =====
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = layoutMetrics.horizontalPaddingDp.dp)
+                        .padding(bottom = 32.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                if (loading) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth().height(200.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = Primary)
-                    }
-                } else {
+                    if (loading) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().height(200.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = Primary)
+                        }
+                    } else {
                     // ===== Section 0: 个人头像 =====
-                    SectionCard {
+                    SectionCard(contentPadding = layoutMetrics.cardPaddingDp.dp) {
                         SectionTitle(text = "个人头像")
                         Row(
                             modifier = Modifier
@@ -117,7 +127,7 @@ fun SettingsScreen(
                             // Avatar circle
                             Box(
                                 modifier = Modifier
-                                    .size(64.dp)
+                                    .size(layoutMetrics.profileAvatarSizeDp.dp)
                                     .shadow(12.dp, CircleShape, ambientColor = Primary.copy(alpha = 0.3f))
                                     .clip(CircleShape)
                                     .background(Color(0xFFF5F0ED)),
@@ -143,7 +153,7 @@ fun SettingsScreen(
                     }
 
                     // ===== Section 1: 配对状态 =====
-                    SectionCard {
+                    SectionCard(contentPadding = layoutMetrics.cardPaddingDp.dp) {
                         SectionTitle(text = "配对状态")
 
                         if (isPaired) {
@@ -349,7 +359,7 @@ fun SettingsScreen(
                     }
 
                     // ===== Section 2: 外观 =====
-                    SectionCard {
+                    SectionCard(contentPadding = layoutMetrics.cardPaddingDp.dp) {
                         SectionTitle(text = "外观")
 
                         // 深色模式 toggle
@@ -375,23 +385,14 @@ fun SettingsScreen(
                     // ===== Section 3: 关于 =====
                     SectionCard(
                         modifier = Modifier.fillMaxWidth(),
+                        contentPadding = layoutMetrics.cardPaddingDp.dp,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        OutlinedButton(
-                            onClick = { /* Preview celebration */ },
-                            shape = RoundedCornerShape(28.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = Primary
-                            ),
-                            border = BorderStroke(1.dp, Primary)
-                        ) {
-                            Text(
-                                text = "🎉 庆祝效果预览",
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier.padding(vertical = 4.dp)
-                            )
-                        }
+                        CelebrationPreviewSection(
+                            expanded = showEffectPreviewOptions,
+                            onToggle = { showEffectPreviewOptions = !showEffectPreviewOptions },
+                            onPreview = { previewCelebration = it }
+                        )
 
                         Spacer(modifier = Modifier.height(20.dp))
 
@@ -412,6 +413,8 @@ fun SettingsScreen(
         }
 
         // ===== 头像选择弹窗 =====
+    }
+
         if (showAvatarPicker) {
             Dialog(onDismissRequest = { showAvatarPicker = false }) {
                 Surface(
@@ -440,7 +443,7 @@ fun SettingsScreen(
                                 viewModel.selectAvatar(it)
                                 showAvatarPicker = false
                             },
-                            modifier = Modifier.heightIn(max = 400.dp)
+                            modifier = Modifier.heightIn(max = layoutMetrics.avatarPickerMaxHeightDp.dp)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                     }
@@ -452,20 +455,124 @@ fun SettingsScreen(
         if (justPaired) {
             CelebrationOverlay(
                 celebration = CelebrationDay(
-                    month = 0, day = 0,
+                    id = "pair_success",
+                    month = 0,
+                    day = 0,
                     emoji = "💕",
-                    message = "配对成功！"
+                    message = "配对成功！",
+                    style = CelebrationStyle.HEARTS,
+                    priority = 0
                 ),
                 onDismiss = { viewModel.dismissPairCelebration() }
             )
         }
+
+        previewCelebration?.let { celebration ->
+            CelebrationOverlay(
+                celebration = celebration,
+                onDismiss = { previewCelebration = null }
+            )
+        }
     }
+}
+
+@Composable
+private fun CelebrationPreviewSection(
+    expanded: Boolean,
+    onToggle: () -> Unit,
+    onPreview: (CelebrationDay) -> Unit
+) {
+    OutlinedButton(
+        onClick = onToggle,
+        shape = RoundedCornerShape(28.dp),
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = Primary
+        ),
+        border = BorderStroke(1.dp, Primary),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = if (expanded) "收起特效预览" else "特效预览",
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(vertical = 4.dp)
+        )
+    }
+
+    if (expanded) {
+        Spacer(modifier = Modifier.height(12.dp))
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            CelebrationConfig.previewDays.forEach { celebration ->
+                PreviewEffectRow(
+                    celebration = celebration,
+                    onClick = { onPreview(celebration) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun PreviewEffectRow(
+    celebration: CelebrationDay,
+    onClick: () -> Unit
+) {
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(14.dp),
+        color = Color(0xFFFFF8F5),
+        border = BorderStroke(1.dp, Border),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = celebration.emoji,
+                fontSize = 22.sp
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = celebration.style.previewName(),
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = TextPrimary
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = celebration.message,
+                    fontSize = 12.sp,
+                    color = TextSecondary
+                )
+            }
+            Text(
+                text = "播放",
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium,
+                color = Primary
+            )
+        }
+    }
+}
+
+private fun CelebrationStyle.previewName(): String = when (this) {
+    CelebrationStyle.BIRTHDAY -> "生日特效"
+    CelebrationStyle.HEARTS -> "爱心特效"
+    CelebrationStyle.FIREWORKS -> "烟花特效"
+    CelebrationStyle.CHRISTMAS -> "圣诞特效"
+    CelebrationStyle.RED_GOLD -> "红金特效"
 }
 
 // ===== Section Card =====
 @Composable
 private fun SectionCard(
     modifier: Modifier = Modifier,
+    contentPadding: androidx.compose.ui.unit.Dp = 20.dp,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -479,7 +586,7 @@ private fun SectionCard(
                 spotColor = Color(0x1F5A4A42)
             )
             .background(Surface, RoundedCornerShape(16.dp))
-            .padding(20.dp),
+            .padding(contentPadding),
         horizontalAlignment = horizontalAlignment,
         content = content
     )

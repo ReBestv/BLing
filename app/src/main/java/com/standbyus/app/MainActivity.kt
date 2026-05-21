@@ -154,18 +154,16 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun checkCelebrationDay(): CelebrationDay? {
-        val today = SimpleDateFormat("MM/dd", Locale.US)
-            .format(Date())
-            .split("/")
+        val now = Date()
+        val today = SimpleDateFormat("MM/dd", Locale.US).format(now).split("/")
+        val dateKey = SimpleDateFormat("yyyyMMdd", Locale.US).format(now)
         val month = today[0].toInt()
         val day = today[1].toInt()
 
-        val match = CelebrationConfig.days.firstOrNull {
-            it.month == month && it.day == day
-        } ?: return null
+        val match = CelebrationConfig.match(month, day) ?: return null
 
         val prefs = getSharedPreferences("celebration", Context.MODE_PRIVATE)
-        val todayKey = "shown_${month}_$day"
+        val todayKey = CelebrationConfig.displayKey(match.id, dateKey)
         if (prefs.getBoolean(todayKey, false)) return null
 
         prefs.edit().putBoolean(todayKey, true).apply()

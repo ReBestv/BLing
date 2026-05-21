@@ -2,6 +2,7 @@ package com.standbyus.app.ui.poststatus
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,6 +10,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -90,14 +93,23 @@ fun PostStatusScreen(
             )
 
             // ── Content Area ──
-            Column(
+            BoxWithConstraints(
                 modifier = Modifier
                     .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth()
             ) {
-                Spacer(modifier = Modifier.height(16.dp))
+                val layoutMetrics = PostStatusLayout.metrics(
+                    availableWidthDp = maxWidth.value,
+                    availableHeightDp = maxHeight.value
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = layoutMetrics.horizontalPaddingDp.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                Spacer(modifier = Modifier.height(layoutMetrics.topSpacerDp.dp))
 
                 // ── 4-column mood grid (16 feelings) ──
                 val allFeelings = Feeling.entries
@@ -106,9 +118,9 @@ fun PostStatusScreen(
                     columns = GridCells.Fixed(4),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(440.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                        .height(layoutMetrics.moodGridHeightDp.dp),
+                    horizontalArrangement = Arrangement.spacedBy(layoutMetrics.gridHorizontalGapDp.dp),
+                    verticalArrangement = Arrangement.spacedBy(layoutMetrics.gridVerticalGapDp.dp),
                     userScrollEnabled = false
                 ) {
                     items(allFeelings) { feeling ->
@@ -123,7 +135,7 @@ fun PostStatusScreen(
                             // Mood circle
                             Box(
                                 modifier = Modifier
-                                    .size(64.dp)
+                                    .size(layoutMetrics.moodCircleSizeDp.dp)
                                     .scale(if (isSelected) 1.12f else 1f)
                                     .shadow(
                                         elevation = if (isSelected) 12.dp else 0.dp,
@@ -151,7 +163,7 @@ fun PostStatusScreen(
                                     EmojiThemeManager.getEmoji(context, feeling.key)
                                 }
                                 if (isEmoji(emoji)) {
-                                    Text(text = emoji, fontSize = 32.sp)
+                                    Text(text = emoji, fontSize = layoutMetrics.moodEmojiTextSizeSp.sp)
                                 } else {
                                     SubcomposeAsyncImage(
                                         model = ImageRequest.Builder(context)
@@ -161,7 +173,7 @@ fun PostStatusScreen(
                                         contentDescription = feeling.displayName,
                                         loading = {
                                             Box(
-                                                modifier = Modifier.size(58.dp),
+                                                modifier = Modifier.size(layoutMetrics.moodImageSizeDp.dp),
                                                 contentAlignment = Alignment.Center
                                             ) {
                                                 CircularProgressIndicator(
@@ -175,14 +187,14 @@ fun PostStatusScreen(
                                             Text(text = feeling.emoji, fontSize = 28.sp)
                                         },
                                         modifier = Modifier
-                                            .size(58.dp)
+                                            .size(layoutMetrics.moodImageSizeDp.dp)
                                             .clip(CircleShape),
                                         contentScale = ContentScale.Crop
                                     )
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(6.dp))
+                            Spacer(modifier = Modifier.height(layoutMetrics.labelTopGapDp.dp))
 
                             // Label
                             Text(
@@ -197,7 +209,15 @@ fun PostStatusScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(layoutMetrics.sectionGapDp.dp))
+
+                PhraseSuggestionChips(
+                    selectedFeeling = viewModel.selectedFeeling,
+                    onPhraseClick = viewModel::updateCustomDoing,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height((layoutMetrics.sectionGapDp * 0.6f).dp))
 
                 // ── Note input (replaces DoingPicker) ──
                 OutlinedTextField(
@@ -214,7 +234,7 @@ fun PostStatusScreen(
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(120.dp),
+                        .height(layoutMetrics.noteHeightDp.dp),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -226,7 +246,7 @@ fun PostStatusScreen(
                     )
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height((layoutMetrics.sectionGapDp * 0.7f).dp))
 
                 // ── Error message ──
                 if (viewModel.error.isNotEmpty()) {
@@ -240,7 +260,8 @@ fun PostStatusScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height((layoutMetrics.sectionGapDp * 0.7f).dp))
+                }
             }
 
             // ── Publish button pinned to bottom ──
@@ -295,6 +316,57 @@ fun PostStatusScreen(
         if (viewModel.published) {
             kotlinx.coroutines.delay(1000)
             onBack()
+        }
+    }
+}
+
+@Composable
+private fun PhraseSuggestionChips(
+    selectedFeeling: Feeling,
+    onPhraseClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val phrases = remember(selectedFeeling) {
+        StatusPhraseSuggestions.forFeeling(selectedFeeling)
+    }
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Text(
+            text = "常用短句",
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color(0xFF807975)
+        )
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(end = 4.dp)
+        ) {
+            items(phrases) { phrase ->
+                Surface(
+                    onClick = { onPhraseClick(phrase) },
+                    shape = RoundedCornerShape(18.dp),
+                    color = Color.White,
+                    border = BorderStroke(
+                        width = 1.dp,
+                        brush = Brush.horizontalGradient(
+                            listOf(
+                                selectedFeeling.color.copy(alpha = 0.4f),
+                                DesignBorder
+                            )
+                        )
+                    )
+                ) {
+                    Text(
+                        text = phrase,
+                        fontSize = 14.sp,
+                        color = Color(0xFF5A4A42),
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 9.dp)
+                    )
+                }
+            }
         }
     }
 }

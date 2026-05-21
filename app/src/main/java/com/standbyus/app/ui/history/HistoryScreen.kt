@@ -104,29 +104,37 @@ fun HistoryScreen(
                 }
             }
         } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 24.dp)
-            ) {
-                if (loading && history.isNotEmpty()) {
-                    item {
-                        LinearProgressIndicator(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp)
-                        )
-                    }
-                }
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                val layoutMetrics = HistoryLayout.metrics(
+                    availableWidthDp = maxWidth.value,
+                    availableHeightDp = maxHeight.value
+                )
 
-                groupedHistory.forEach { (dateKey, statuses) ->
-                    item { DateHeader(dateKey) }
-                    items(statuses) { status ->
-                        TimelineEntry(
-                            status = status,
-                            isMe = status.userId == myId,
-                            partnerName = partnerName,
-                            myAvatar = myAvatar
-                        )
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = 24.dp)
+                ) {
+                    if (loading && history.isNotEmpty()) {
+                        item {
+                            LinearProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = layoutMetrics.horizontalPaddingDp.dp)
+                            )
+                        }
+                    }
+
+                    groupedHistory.forEach { (dateKey, statuses) ->
+                        item { DateHeader(dateKey) }
+                        items(statuses) { status ->
+                            TimelineEntry(
+                                status = status,
+                                isMe = status.userId == myId,
+                                partnerName = partnerName,
+                                myAvatar = myAvatar,
+                                layoutMetrics = layoutMetrics
+                            )
+                        }
                     }
                 }
             }
@@ -174,7 +182,8 @@ private fun TimelineEntry(
     status: UserStatus,
     isMe: Boolean,
     partnerName: String,
-    myAvatar: String
+    myAvatar: String,
+    layoutMetrics: HistoryLayoutMetrics
 ) {
     val feeling = Feeling.fromKey(status.feelingKey)
     val feelingColor = feeling?.color ?: Color(0xFFFFD180)
@@ -183,11 +192,14 @@ private fun TimelineEntry(
     val formattedTime = SimpleDateFormat("HH:mm", Locale.getDefault())
         .format(Date(status.updatedAt))
     val bubbleModifier = when (val width = HistoryEntryLayout.bubbleWidth(isMe)) {
-        is HistoryBubbleWidth.Fixed -> Modifier.width(width.width)
+        is HistoryBubbleWidth.Fixed -> Modifier.width(
+            minOf(width.width.value, layoutMetrics.partnerBubbleMaxWidthDp).dp
+        )
         HistoryBubbleWidth.Wrap -> Modifier
-            .widthIn(max = 260.dp)
+            .widthIn(max = layoutMetrics.partnerBubbleMaxWidthDp.dp)
             .wrapContentWidth()
     }
+    val dotSize = layoutMetrics.dotSizeDp.dp
 
     // Use parity of timestamp for hand-diary style rotation (+1 or -1)
     val rotationDeg = if ((status.updatedAt % 2).toInt() == 0) 1f else -1f
@@ -195,7 +207,7 @@ private fun TimelineEntry(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .padding(horizontal = layoutMetrics.horizontalPaddingDp.dp, vertical = 6.dp)
             .graphicsLayer { rotationZ = rotationDeg },
         horizontalArrangement = HistoryEntryLayout.horizontalArrangement(isMe)
     ) {
@@ -204,7 +216,7 @@ private fun TimelineEntry(
             Box(
                 modifier = Modifier
                     .padding(top = 4.dp, end = 12.dp)
-                    .size(DotSize) // 40.dp
+                    .size(dotSize)
                     .shadow(
                         6.dp,
                         CircleShape,
@@ -220,8 +232,8 @@ private fun TimelineEntry(
                     value = status.feelingAsset,
                     feelingKey = status.feelingKey,
                     feelingLabel = status.feelingLabel,
-                    size = 28.dp,
-                    textSize = 24.sp,
+                    size = (layoutMetrics.dotSizeDp * 0.7f).dp,
+                    textSize = (layoutMetrics.dotSizeDp * 0.6f).sp,
                     tintColor = feelingColor,
                     fallbackEmoji = status.feelingFallbackEmoji
                 )
@@ -242,7 +254,10 @@ private fun TimelineEntry(
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Column(
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 16.dp),
+                modifier = Modifier.padding(
+                    horizontal = 14.dp,
+                    vertical = layoutMetrics.bubbleVerticalPaddingDp.dp
+                ),
                 horizontalAlignment = HistoryEntryLayout.bubbleContentAlignment(isMe)
             ) {
                 // Header row: emoji + mood name + time
@@ -317,7 +332,7 @@ private fun TimelineEntry(
             Box(
                 modifier = Modifier
                     .padding(top = 4.dp, start = HistoryEntryLayout.avatarGap(isMe))
-                    .size(DotSize) // 40.dp
+                    .size(dotSize)
                     .shadow(
                         6.dp,
                         CircleShape,
@@ -331,7 +346,7 @@ private fun TimelineEntry(
             ) {
                 Text(
                     text = myAvatar,
-                    fontSize = 24.sp
+                    fontSize = (layoutMetrics.dotSizeDp * 0.6f).sp
                 )
             }
         }

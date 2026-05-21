@@ -11,6 +11,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,11 +25,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -50,6 +53,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.foundation.layout.statusBarsPadding
 import com.standbyus.app.data.model.Feeling
+import com.standbyus.app.data.model.Interaction
+import com.standbyus.app.data.model.InteractionType
 import com.standbyus.app.data.model.UserStatus
 import com.standbyus.app.ui.components.AppHeader
 import com.standbyus.app.ui.components.StatusEmojiImage
@@ -77,6 +82,13 @@ fun HomeScreen(
     val partnerStatus by viewModel.partnerStatus.collectAsState()
     val myStatus by viewModel.myStatus.collectAsState()
     val partnerDisplayName by viewModel.partnerDisplayName.collectAsState()
+    val latestInteraction by viewModel.latestInteraction.collectAsState()
+    val sendingInteractionType by viewModel.sendingInteractionType.collectAsState()
+    val interactionError by viewModel.interactionError.collectAsState()
+
+    LaunchedEffect(latestInteraction?.id) {
+        viewModel.markLatestInteractionRead()
+    }
 
     Column(
         modifier = Modifier
@@ -100,31 +112,67 @@ fun HomeScreen(
 
         // ── Content area (fills remaining space) ──
         if (partnerStatus != null) {
-            Column(
+            @Suppress("UnusedBoxWithConstraintsScope")
+            BoxWithConstraints(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Spacer(modifier = Modifier.height(8.dp))
+                val layoutMetrics = HomeLayout.metrics(
+                    availableWidthDp = maxWidth.value,
+                    availableHeightDp = maxHeight.value
+                )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = layoutMetrics.horizontalPaddingDp.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(layoutMetrics.contentGapDp.dp)
+            ) {
+                Spacer(modifier = Modifier.height(layoutMetrics.topSpacerDp.dp))
 
                 PartnerStatusCard(
                     status = partnerStatus!!,
                     userName = partnerDisplayName,
+                    layoutMetrics = layoutMetrics,
                     modifier = Modifier
-                        .weight(1f)
                         .fillMaxWidth()
+                        .height(layoutMetrics.partnerCardHeightDp.dp)
                 )
 
-                MyStatusStrip(
-                    status = myStatus,
-                    onClick = onNavigateToPost,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                HomeStatusInteractionOrder.sections(
+                    hasInteractionError = interactionError.isNotEmpty()
+                ).forEach { section ->
+                    when (section) {
+                        HomeStatusInteractionSection.LATEST_INTERACTION -> LatestInteractionNotice(
+                            interaction = latestInteraction,
+                            modifier = Modifier.fillMaxWidth()
+                        )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                        HomeStatusInteractionSection.MY_STATUS -> MyStatusStrip(
+                            status = myStatus,
+                            onClick = onNavigateToPost,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        HomeStatusInteractionSection.INTERACTION_ACTIONS -> InteractionActionsGrid(
+                            sendingType = sendingInteractionType,
+                            onActionClick = viewModel::sendInteraction,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+
+                        HomeStatusInteractionSection.INTERACTION_ERROR -> Text(
+                            text = interactionError,
+                            fontSize = 12.sp,
+                            color = Color(0xFFE45A45),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(layoutMetrics.bottomSpacerDp.dp))
+            }
             }
         } else {
             Box(
@@ -149,12 +197,128 @@ fun HomeScreen(
     }
 }
 
+@Composable
+private fun LatestInteractionNotice(
+    interaction: Interaction?,
+    modifier: Modifier = Modifier
+) {
+    if (interaction == null) return
+
+    Surface(
+        shape = RoundedCornerShape(18.dp),
+        color = Color.White.copy(alpha = 0.92f),
+        shadowElevation = 0.dp,
+        modifier = modifier
+            .border(1.dp, BorderColor, RoundedCornerShape(18.dp))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Text(text = "💌", fontSize = 18.sp)
+            Text(
+                text = interaction.displayText(),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = TextPrimary,
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun InteractionActionsGrid(
+    sendingType: String?,
+    onActionClick: (InteractionType) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val rows = InteractionType.entries.chunked(2)
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        rows.forEachIndexed { rowIndex, rowTypes ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                rowTypes.forEachIndexed { columnIndex, type ->
+                    InteractionActionButton(
+                        type = type,
+                        actionIndex = rowIndex * 2 + columnIndex,
+                        isSending = sendingType == type.key,
+                        onClick = { onActionClick(type) },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                if (rowTypes.size == 1) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun InteractionActionButton(
+    type: InteractionType,
+    actionIndex: Int,
+    isSending: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val buttonShape = RoundedCornerShape(HomeInteractionActionButtonStyle.cornerRadiusDp.dp)
+
+    Surface(
+        onClick = onClick,
+        enabled = !isSending,
+        shape = buttonShape,
+        color = HomeInteractionActionButtonStyle.containerColorForIndex(actionIndex),
+        shadowElevation = 0.dp,
+        modifier = modifier
+            .height(HomeInteractionActionButtonStyle.heightDp.dp)
+            .border(
+                width = 1.dp,
+                color = HomeInteractionActionButtonStyle.borderColor,
+                shape = buttonShape
+            )
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isSending) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    strokeWidth = 2.dp,
+                    color = PrimaryColor
+                )
+            } else {
+                Text(
+                    text = type.sendText,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = TextPrimary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+            }
+        }
+    }
+}
+
 // ── Partner status card (gradient, emoji float, mood, note) ─
 
 @Composable
 private fun PartnerStatusCard(
     status: UserStatus,
     userName: String,
+    layoutMetrics: HomeLayoutMetrics,
     modifier: Modifier = Modifier
 ) {
     val feeling = Feeling.fromKey(status.feelingKey) ?: Feeling.HAPPY
@@ -203,23 +367,23 @@ private fun PartnerStatusCard(
                 )
             }
             .border(1.dp, HomePartnerStatusCardSurfaceStyle.borderColor, cardShape)
-            .padding(vertical = 56.dp, horizontal = 24.dp),
+            .padding(vertical = layoutMetrics.partnerCardVerticalPaddingDp.dp, horizontal = 24.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            verticalArrangement = Arrangement.spacedBy(layoutMetrics.partnerContentGapDp.dp)
         ) {
             // Large emoji with float animation
             StatusEmojiImage(
                 value = status.feelingAsset,
                 feelingKey = status.feelingKey,
                 feelingLabel = status.feelingLabel,
-                size = HomePartnerStatusCardStyle.emojiSizeDp.dp,
-                textSize = HomePartnerStatusCardStyle.emojiTextSizeSp.sp,
+                size = layoutMetrics.partnerEmojiSizeDp.dp,
+                textSize = layoutMetrics.partnerEmojiTextSizeSp.sp,
                 tintColor = feeling.color,
                 fallbackEmoji = status.feelingFallbackEmoji,
-                modifier = Modifier.offset(y = floatOffset.dp)
+                modifier = Modifier.offset(y = (floatOffset + layoutMetrics.partnerEmojiLiftDp).dp)
             )
 
             // Mood text (28sp bold, white, with text-shadow)
@@ -260,23 +424,6 @@ private fun PartnerStatusCard(
                 )
             }
 
-            // Relative time with clock icon
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = "${userName}刚刚更新了这个心情 · ${formatRelativeTime(status.updatedAt)}",
-                    fontSize = 12.sp,
-                    color = Color.White.copy(alpha = 0.7f)
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "需要我哄哄${userName}吗？",
-                fontSize = 13.sp,
-                color = Color.White.copy(alpha = 0.8f)
-            )
         }
     }
 }

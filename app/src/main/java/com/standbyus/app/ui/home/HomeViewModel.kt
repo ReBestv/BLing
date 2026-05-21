@@ -4,8 +4,11 @@ import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.standbyus.app.data.model.Interaction
+import com.standbyus.app.data.model.InteractionType
 import com.standbyus.app.data.model.UserStatus
 import com.standbyus.app.data.remote.SupabaseService
+import com.standbyus.app.data.repository.InteractionRepository
 import com.standbyus.app.data.repository.PairingRepository
 import com.standbyus.app.data.repository.StatusRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +23,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val statusRepository: StatusRepository,
     private val pairingRepository: PairingRepository,
+    private val interactionRepository: InteractionRepository,
     private val supabaseService: SupabaseService,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -43,6 +47,16 @@ class HomeViewModel @Inject constructor(
 
     private val _partnerDisplayName = MutableStateFlow("对方")
     val partnerDisplayName: StateFlow<String> = _partnerDisplayName.asStateFlow()
+
+    val latestInteraction: StateFlow<Interaction?> = _myUserId.flatMapLatest { id ->
+        if (id.isEmpty()) flowOf(null) else interactionRepository.observeLatestReceivedInteraction(id)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    private val _sendingInteractionType = MutableStateFlow<String?>(null)
+    val sendingInteractionType: StateFlow<String?> = _sendingInteractionType.asStateFlow()
+
+    private val _interactionError = MutableStateFlow("")
+    val interactionError: StateFlow<String> = _interactionError.asStateFlow()
 
     init {
         try {
@@ -104,6 +118,42 @@ class HomeViewModel @Inject constructor(
 
     fun setPartnerId(partnerId: String) {
         _partnerUserId.value = partnerId
+    }
+
+    fun sendInteraction(type: InteractionType) {
+        val fromUserId = _myUserId.value
+        val toUserId = _partnerUserId.value
+        if (fromUserId.isEmpty() || toUserId.isEmpty()) return
+
+        viewModelScope.launch {
+            _sendingInteractionType.value = type.key
+            _interactionError.value = ""
+            try {
+                interactionRepository.sendInteraction(
+                    fromUserId = fromUserId,
+                    toUserId = toUserId,
+                    type = type,
+                    targetStatusTime = partnerStatus.value?.updatedAt ?: 0L
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "send interaction failed", e)
+                _interactionError.value = "刚刚没送达，等下再试试"
+            } finally {
+                _sendingInteractionType.value = null
+            }
+        }
+    }
+
+    fun markLatestInteractionRead() {
+        val interaction = latestInteraction.value ?: return
+        if (interaction.readAt != null) return
+        viewModelScope.launch {
+            try {
+                interactionRepository.markRead(interaction.id)
+            } catch (e: Exception) {
+                Log.e(TAG, "mark interaction read failed", e)
+            }
+        }
     }
 
     companion object {
