@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>生日礼盒爆开预览</title>
+  <style>
+    :root {
+      --phone-w: 390px;
+      --phone-h: 780px;
+      --ink: #3b1d28;
+      --cream: #fff7da;
+      --pink: #ff6f9f;
+      --coral: #ff8a53;
+      --gold: #ffe36f;
+      --blue: #79d7ff;
+      --mint: #8df0ca;
+      --purple: #d7b1ff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(390px, 470px) minmax(320px, 1fr);
+      gap: 36px;
+      align-items: center;
+      padding: 32px;
+      color: var(--ink);
+      font-family: Inter, "Microsoft YaHei", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255, 227, 111, .36), transparent 28%),
+        radial-gradient(circle at 82% 20%, rgba(121, 215, 255, .36), transparent 26%),
+        linear-gradient(135deg, #fff2df, #ffe2ef 48%, #e6f6ff);
+    }
+
+    .phone {
+      justify-self: center;
+      width: var(--phone-w);
+      height: var(--phone-h);
+      position: relative;
+      overflow: hidden;
+      border: 9px solid #111;
+      border-radius: 42px;
+      background: #fff;
+      box-shadow: 0 34px 96px rgba(51, 22, 34, .28);
+    }
+
+    .camera {
+      position: absolute;
+      left: 50%;
+      top: 7px;
+      width: 38px;
+      height: 24px;
+      transform: translateX(-50%);
+      border-radius: 0 0 18px 18px;
+      background: #111;
+      z-index: 50;
+    }
+
+    .status {
+      height: 46px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: rgba(59, 29, 40, .68);
+      background: #fff9f8;
+    }
+
+    .screen {
+      position: relative;
+      height: calc(100% - 46px);
+      overflow: hidden;
+      cursor: pointer;
+      background:
+        radial-gradient(circle at 50% 68%, rgba(255, 255, 255, .42), transparent 36%),
+        linear-gradient(180deg, #ff7fa4 0%, #ffa867 42%, #8dcdfa 100%);
+      isolation: isolate;
+    }
+
+    .hint {
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      bottom: 20px;
+      z-index: 40;
+      text-align: center;
+      color: rgba(255, 255, 255, .86);
+      font-size: 13px;
+      text-shadow: 0 2px 8px rgba(82, 38, 52, .35);
+      transition: opacity .25s ease;
+    }
+
+    .screen.opened .hint { opacity: 0; }
+
+    .image-card {
+      position: absolute;
+      left: 40px;
+      right: 40px;
+      top: 132px;
+      z-index: 20;
+      aspect-ratio: 1;
+      padding: 8px;
+      border-radius: 14px;
+      background: rgba(255, 247, 218, .96);
+      box-shadow:
+        0 22px 54px rgba(60, 26, 38, .34),
+        0 0 0 1px rgba(255, 255, 255, .7) inset;
+      transform-origin: 50% 100%;
+      opacity: 0;
+      transform: translateY(330px) scale(.18) rotate(-8deg);
+    }
+
+    .image-card img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .crown {
+      position: absolute;
+      left: 50%;
+      top: 26px;
+      z-index: 24;
+      width: 166px;
+      height: 82px;
+      transform: translateX(-50%) translateY(24px) rotate(-8deg) scale(.72);
+      opacity: 0;
+      filter:
+        drop-shadow(0 9px 13px rgba(92, 50, 16, .25))
+        drop-shadow(0 0 13px rgba(255, 229, 122, .56));
+      pointer-events: none;
+    }
+
+    .crown::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      bottom: 4px;
+      height: 52px;
+      border-radius: 0 0 12px 12px;
+      background: linear-gradient(135deg, #ffb72f, #ffe97d 54%, #ff9f2e);
+      clip-path: polygon(0 100%, 0 45%, 17% 70%, 31% 0, 50% 66%, 69% 0, 83% 70%, 100% 45%, 100% 100%);
+    }
+
+    .crown::after {
+      content: "";
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 0;
+      height: 16px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #fff3a3, #ffbb3e);
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.62);
+    }
+
+    .gift {
+      position: absolute;
+      left: 50%;
+      bottom: 72px;
+      z-index: 30;
+      width: 178px;
+      height: 128px;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    .gift::before {
+      content: "";
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: -10px;
+      height: 22px;
+      border-radius: 999px;
+      background: rgba(72, 32, 46, .25);
+      filter: blur(8px);
+    }
+
+    .box-base,
+    .box-lid {
+      position: absolute;
+      border-radius: 12px;
+      border: 2px solid rgba(255, 246, 199, .76);
+      overflow: hidden;
+      background:
+        linear-gradient(90deg, transparent 41%, #ffe07a 41% 59%, transparent 59%),
+        radial-gradient(circle at 18% 24%, rgba(255,255,255,.46) 0 6px, transparent 7px),
+        radial-gradient(circle at 82% 64%, rgba(255,255,255,.28) 0 5px, transparent 6px),
+        linear-gradient(135deg, #ff5272, #ff8a53 56%, #ffb35f);
+      box-shadow:
+        inset 0 2px 0 rgba(255, 255, 255, .4),
+        inset 0 -10px 18px rgba(151, 49, 64, .18),
+        0 16px 36px rgba(103, 42, 50, .25);
+    }
+
+    .box-base {
+      left: 14px;
+      right: 14px;
+      bottom: 0;
+      height: 82px;
+    }
+
+    .box-lid {
+      left: 0;
+      top: 18px;
+      width: 100%;
+      height: 40px;
+      transform-origin: 14% 100%;
+      background:
+        linear-gradient(90deg, transparent 41%, #ffe07a 41% 59%, transparent 59%),
+        linear-gradient(180deg, rgba(255,255,255,.38), transparent 44%),
+        linear-gradient(135deg, #ff6f89, #ff9b5f 62%, #ffc06d);
+    }
+
+    .bow {
+      position: absolute;
+      left: 50%;
+      top: -12px;
+      z-index: 2;
+      width: 98px;
+      height: 56px;
+      transform: translateX(-50%);
+    }
+
+    .bow::before,
+    .bow::after {
+      content: "";
+      position: absolute;
+      top: 10px;
+      width: 44px;
+      height: 36px;
+      border: 9px solid #ffe36f;
+      border-radius: 60% 46% 60% 46%;
+      background: rgba(255, 255, 255, .18);
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.46), 0 5px 10px rgba(103,42,50,.16);
+    }
+
+    .bow::before { left: 0; transform: rotate(-18deg); }
+    .bow::after { right: 0; transform: rotate(18deg) scaleX(-1); }
+
+    .burst-ribbon,
+    .spark,
+    .fall-star,
+    .fall-heart,
+    .petal {
+      position: absolute;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .burst-ribbon {
+      left: 50%;
+      bottom: 146px;
+      z-index: 14;
+      width: var(--w, 144px);
+      height: var(--h, 34px);
+      border: var(--b, 8px) solid var(--c, #fff5a8);
+      border-left: 0;
+      border-bottom: 0;
+      border-radius: 60% 44% 60% 44%;
+      filter:
+        drop-shadow(0 8px 9px rgba(100, 47, 54, .2))
+        drop-shadow(0 0 9px rgba(255, 255, 255, .46));
+      transform-origin: 0 50%;
+    }
+
+    .spark {
+      left: 50%;
+      bottom: 162px;
+      z-index: 16;
+      width: var(--s, 14px);
+      height: var(--s, 14px);
+      background: var(--c, #fff7a8);
+      clip-path: polygon(50% 0, 62% 35%, 100% 50%, 62% 65%, 50% 100%, 38% 65%, 0 50%, 38% 35%);
+      filter: drop-shadow(0 0 8px var(--g, rgba(255, 247, 168, .75)));
+    }
+
+    .petal {
+      left: 50%;
+      bottom: 154px;
+      z-index: 13;
+      width: 10px;
+      height: 18px;
+      border-radius: 999px 999px 999px 0;
+      background: var(--c, #ff9fd0);
+      transform-origin: 50% 100%;
+    }
+
+    .fall-star {
+      z-index: 8;
+      top: -34px;
+      width: calc(var(--s, 22px) * 1.55);
+      height: calc(var(--s, 22px) * 1.55);
+      left: var(--x, 40px);
+      background: var(--c, #fff7a8);
+      clip-path: polygon(50% 0, 62% 35%, 100% 50%, 62% 65%, 50% 100%, 38% 65%, 0 50%, 38% 35%);
+      filter:
+        drop-shadow(0 4px 8px rgba(122, 70, 0, .2))
+        drop-shadow(0 0 12px var(--g, rgba(255, 247, 168, .72)));
+    }
+
+    .fall-heart {
+      z-index: 9;
+      top: -42px;
+      width: calc(var(--s, 20px) * 1.55);
+      height: calc(var(--s, 20px) * 1.55);
+      left: var(--x, 60px);
+      transform: rotate(-45deg);
+      background: var(--c, #ff78a8);
+      filter:
+        drop-shadow(0 4px 8px rgba(120, 34, 80, .2))
+        drop-shadow(0 0 11px rgba(255, 152, 190, .55));
+    }
+
+    .fall-heart::before,
+    .fall-heart::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 999px;
+      background: inherit;
+    }
+
+    .fall-heart::before { top: -50%; left: 0; }
+    .fall-heart::after { top: 0; left: 50%; }
+
+    .controls {
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 18px;
+      max-width: 620px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 50px);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .copy {
+      margin: 0;
+      max-width: 540px;
+      color: rgba(59, 29, 40, .72);
+      font-size: 16px;
+      line-height: 1.72;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      min-height: 48px;
+      border: 0;
+      border-radius: 8px;
+      padding: 0 16px;
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+      background: linear-gradient(135deg, #ff5f86, #ff8a53);
+      box-shadow: 0 13px 28px rgba(255, 106, 123, .28);
+      transition: transform .18s ease, filter .18s ease;
+    }
+
+    button:hover,
+    button:focus-visible {
+      transform: translateY(-1px);
+      filter: brightness(1.04);
+      outline: none;
+    }
+
+    .note {
+      color: rgba(59, 29, 40, .6);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .screen.opened .gift {
+      animation: giftThump 1.18s cubic-bezier(.18, 1.25, .24, 1) both;
+    }
+
+    .screen.opened .box-lid {
+      animation: lidBlast 1.2s cubic-bezier(.17, 1.12, .18, 1) both;
+    }
+
+    .screen.opened .bow {
+      animation: bowBlast 1.2s cubic-bezier(.17, 1.08, .2, 1) both;
+    }
+
+    .screen.opened .burst-ribbon {
+      animation: ribbonBlast 2.25s cubic-bezier(.13, .92, .18, 1) both;
+      animation-delay: var(--d, 0ms);
+    }
+
+    .screen.opened .spark {
+      animation: sparkBlast 1.8s cubic-bezier(.15, .92, .22, 1) both;
+      animation-delay: var(--d, 0ms);
+    }
+
+    .screen.opened .petal {
+      animation: petalBlast 2.25s cubic-bezier(.15, .94, .2, 1) both;
+      animation-delay: var(--d, 0ms);
+    }
+
+    .screen.opened .image-card {
+      animation: imageArrive 1.35s cubic-bezier(.16, 1.22, .24, 1) .72s both;
+    }
+
+    .screen.opened .crown {
+      animation: crownArrive 1.1s cubic-bezier(.2, 1.18, .25, 1) 1s both;
+    }
+
+    .screen.opened .fall-star {
+      animation: starRain var(--dur, 5.6s) linear infinite;
+      animation-delay: var(--d, 0s);
+    }
+
+    .screen.opened .fall-heart {
+      animation: heartRain var(--dur, 6.6s) ease-in-out infinite;
+      animation-delay: var(--d, 0s);
+    }
+
+    @keyframes giftThump {
+      0% { transform: translateX(-50%) scale(1); }
+      18% { transform: translateX(-50%) translateY(8px) scale(1.18, .82); }
+      32% { transform: translateX(-50%) translateY(-20px) scale(.92, 1.15); }
+      50% { transform: translateX(-50%) translateY(0) scale(1.04); }
+      100% { transform: translateX(-50%) scale(1); }
+    }
+
+    @keyframes lidBlast {
+      0% { transform: translate(0, 0) rotate(0); }
+      38% { transform: translate(-42px, -86px) rotate(-34deg); }
+      100% { transform: translate(-46px, -76px) rotate(-24deg); }
+    }
+
+    @keyframes bowBlast {
+      0% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1) rotate(0); }
+      40% { opacity: 1; transform: translateX(-50%) translate(-6px, -94px) scale(1.22) rotate(-22deg); }
+      100% { opacity: .76; transform: translateX(-50%) translate(12px, -76px) scale(.86) rotate(16deg); }
+    }
+
+    @keyframes ribbonBlast {
+      0% {
+        opacity: 0;
+        transform: translate(-50%, 18px) scale(.24) rotate(var(--r0, 0deg));
+        clip-path: inset(0 100% 0 0);
+      }
+      22% {
+        opacity: 1;
+        clip-path: inset(0 0 0 0);
+      }
+      58% {
+        opacity: .98;
+      }
+      100% {
+        opacity: .06;
+        transform:
+          translate(calc(-50% + var(--tx, 0px)), var(--ty, -260px))
+          scale(var(--sc, 1.1))
+          rotate(var(--r1, 18deg));
+      }
+    }
+
+    @keyframes sparkBlast {
+      0% { opacity: 0; transform: translate(-50%, 12px) scale(.3) rotate(0deg); }
+      22% { opacity: 1; }
+      72% { opacity: .9; }
+      100% {
+        opacity: 0;
+        transform:
+          translate(calc(-50% + var(--tx, 0px)), var(--ty, -260px))
+          scale(var(--sc, 1.35))
+          rotate(210deg);
+      }
+    }
+
+    @keyframes petalBlast {
+      0% { opacity: 0; transform: translate(-50%, 12px) scale(.3) rotate(var(--r0, 0deg)); }
+      25% { opacity: .95; }
+      100% {
+        opacity: 0;
+        transform:
+          translate(calc(-50% + var(--tx, 0px)), var(--ty, -250px))
+          scale(var(--sc, 1))
+          rotate(var(--r1, 120deg));
+      }
+    }
+
+    @keyframes imageArrive {
+      0% { opacity: 0; transform: translateY(330px) scale(.18) rotate(-8deg); filter: blur(2px); }
+      46% { opacity: 1; transform: translateY(-22px) scale(1.08) rotate(3deg); filter: blur(0); }
+      66% { transform: translateY(7px) scale(.98) rotate(-1deg); }
+      100% { opacity: 1; transform: translateY(0) scale(1) rotate(0); filter: blur(0); }
+    }
+
+    @keyframes crownArrive {
+      0% { opacity: 0; transform: translateX(-50%) translateY(36px) rotate(-10deg) scale(.7); }
+      55% { opacity: 1; transform: translateX(-50%) translateY(-8px) rotate(5deg) scale(1.1); }
+      100% { opacity: 1; transform: translateX(-50%) translateY(0) rotate(-4deg) scale(1); }
+    }
+
+    @keyframes starRain {
+      0% { opacity: 0; translate: 0 -34px; rotate: 0deg; }
+      12% { opacity: .96; }
+      78% { opacity: .9; }
+      100% { opacity: 0; translate: var(--drift, 18px) 790px; rotate: 220deg; }
+    }
+
+    @keyframes heartRain {
+      0% { opacity: 0; translate: 0 -42px; rotate: -45deg; }
+      13% { opacity: .9; }
+      46% { opacity: .78; translate: var(--mid, -16px) 280px; }
+      100% { opacity: 0; translate: var(--drift, 16px) 820px; rotate: -45deg; }
+    }
+
+    @media (max-width: 920px) {
+      body {
+        grid-template-columns: 1fr;
+        padding: 18px;
+      }
+
+      .phone {
+        width: min(var(--phone-w), calc(100vw - 36px));
+        height: min(var(--phone-h), calc((100vw - 36px) * 2));
+      }
+
+      .controls {
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="phone" aria-label="生日礼盒开屏动效预览">
+    <div class="camera" aria-hidden="true"></div>
+    <div class="status"><span>10:12</span><span>5G  ▰</span></div>
+    <section class="screen" id="screen" role="button" tabindex="0" aria-label="点击打开礼盒">
+      <div class="rain" aria-hidden="true">
+        <i class="fall-star" style="--x:14px;--s:24px;--c:#fff7a8;--g:rgba(255,247,168,.74);--d:.8s;--dur:5.2s;--drift:24px"></i>
+        <i class="fall-star" style="--x:48px;--s:17px;--c:#ff9fd0;--g:rgba(255,159,208,.7);--d:1.3s;--dur:6.2s;--drift:-18px"></i>
+        <i class="fall-star" style="--x:82px;--s:28px;--c:#82dfff;--g:rgba(130,223,255,.72);--d:.3s;--dur:5.7s;--drift:28px"></i>
+        <i class="fall-star" style="--x:122px;--s:19px;--c:#b8ffce;--g:rgba(184,255,206,.66);--d:1.7s;--dur:6.5s;--drift:-20px"></i>
+        <i class="fall-star" style="--x:158px;--s:25px;--c:#ffc36f;--g:rgba(255,195,111,.68);--d:.6s;--dur:5.4s;--drift:16px"></i>
+        <i class="fall-star" style="--x:196px;--s:18px;--c:#d5b0ff;--g:rgba(213,176,255,.72);--d:2.1s;--dur:6.6s;--drift:-26px"></i>
+        <i class="fall-star" style="--x:232px;--s:27px;--c:#fff7a8;--g:rgba(255,247,168,.74);--d:1s;--dur:5.9s;--drift:20px"></i>
+        <i class="fall-star" style="--x:270px;--s:18px;--c:#ff9fd0;--g:rgba(255,159,208,.7);--d:2.4s;--dur:6.1s;--drift:-14px"></i>
+        <i class="fall-star" style="--x:306px;--s:23px;--c:#82dfff;--g:rgba(130,223,255,.72);--d:1.5s;--dur:5.5s;--drift:18px"></i>
+        <i class="fall-star" style="--x:344px;--s:20px;--c:#b8ffce;--g:rgba(184,255,206,.66);--d:.1s;--dur:6.4s;--drift:-22px"></i>
+        <i class="fall-heart" style="--x:30px;--s:19px;--c:#ff7fb1;--d:1.2s;--dur:6.4s;--mid:-18px;--drift:22px"></i>
+        <i class="fall-heart" style="--x:96px;--s:24px;--c:#ffbfd6;--d:2.1s;--dur:7s;--mid:20px;--drift:-14px"></i>
+        <i class="fall-heart" style="--x:176px;--s:20px;--c:#ff6f91;--d:.7s;--dur:6.7s;--mid:-24px;--drift:18px"></i>
+        <i class="fall-heart" style="--x:250px;--s:22px;--c:#ff9dc7;--d:1.8s;--dur:7.3s;--mid:16px;--drift:-28px"></i>
+        <i class="fall-heart" style="--x:326px;--s:18px;--c:#ffd1e1;--d:2.6s;--dur:6.8s;--mid:-14px;--drift:24px"></i>
+      </div>
+
+      <div class="burst" aria-hidden="true">
+        <i class="burst-ribbon" style="--c:#fff5a8;--w:178px;--h:42px;--b:10px;--tx:-150px;--ty:-300px;--r0:-18deg;--r1:-48deg;--sc:1.22;--d:0ms"></i>
+        <i class="burst-ribbon" style="--c:#ff9ecc;--w:168px;--h:38px;--b:9px;--tx:145px;--ty:-286px;--r0:16deg;--r1:42deg;--sc:1.16;--d:35ms"></i>
+        <i class="burst-ribbon" style="--c:#82e0c5;--w:146px;--h:36px;--b:8px;--tx:-90px;--ty:-360px;--r0:8deg;--r1:18deg;--sc:1.12;--d:80ms"></i>
+        <i class="burst-ribbon" style="--c:#78d2ff;--w:158px;--h:36px;--b:8px;--tx:78px;--ty:-354px;--r0:-10deg;--r1:-22deg;--sc:1.18;--d:120ms"></i>
+        <i class="burst-ribbon" style="--c:#ff8b63;--w:188px;--h:44px;--b:10px;--tx:-178px;--ty:-214px;--r0:-36deg;--r1:-78deg;--sc:1.05;--d:160ms"></i>
+        <i class="burst-ribbon" style="--c:#d5b0ff;--w:176px;--h:40px;--b:9px;--tx:174px;--ty:-226px;--r0:34deg;--r1:72deg;--sc:1.1;--d:200ms"></i>
+        <i class="burst-ribbon" style="--c:#fff5a8;--w:138px;--h:30px;--b:7px;--tx:-28px;--ty:-402px;--r0:-4deg;--r1:5deg;--sc:1.28;--d:245ms"></i>
+        <i class="burst-ribbon" style="--c:#ff9ecc;--w:152px;--h:32px;--b:7px;--tx:24px;--ty:-418px;--r0:6deg;--r1:-4deg;--sc:1.18;--d:275ms"></i>
+
+        <i class="spark" style="--c:#fff7a8;--s:22px;--tx:-118px;--ty:-330px;--sc:1.7;--d:40ms"></i>
+        <i class="spark" style="--c:#ff9fd0;--s:18px;--tx:122px;--ty:-316px;--sc:1.45;--d:95ms"></i>
+        <i class="spark" style="--c:#82dfff;--s:24px;--tx:-42px;--ty:-384px;--sc:1.65;--d:130ms"></i>
+        <i class="spark" style="--c:#b8ffce;--s:17px;--tx:54px;--ty:-374px;--sc:1.55;--d:185ms"></i>
+        <i class="spark" style="--c:#ffc36f;--s:20px;--tx:-184px;--ty:-238px;--sc:1.3;--d:220ms"></i>
+        <i class="spark" style="--c:#d5b0ff;--s:21px;--tx:188px;--ty:-246px;--sc:1.34;--d:260ms"></i>
+
+        <i class="petal" style="--c:#ffbfd6;--tx:-146px;--ty:-246px;--r0:-20deg;--r1:-210deg;--sc:1.3;--d:50ms"></i>
+        <i class="petal" style="--c:#fff5a8;--tx:148px;--ty:-260px;--r0:24deg;--r1:180deg;--sc:1.1;--d:110ms"></i>
+        <i class="petal" style="--c:#82e0c5;--tx:-78px;--ty:-326px;--r0:0deg;--r1:160deg;--sc:1.22;--d:170ms"></i>
+        <i class="petal" style="--c:#78d2ff;--tx:80px;--ty:-342px;--r0:8deg;--r1:-170deg;--sc:1.18;--d:210ms"></i>
+        <i class="petal" style="--c:#ff8b63;--tx:-16px;--ty:-390px;--r0:-12deg;--r1:220deg;--sc:1.36;--d:250ms"></i>
+      </div>
+
+      <figure class="image-card">
+        <img src="../../app/src/main/res/drawable-nodpi/birthday_splash.webp" alt="生日快乐图片" />
+      </figure>
+      <div class="crown" aria-hidden="true"></div>
+
+      <div class="gift" aria-hidden="true">
+        <div class="bow"></div>
+        <div class="box-lid"></div>
+        <div class="box-base"></div>
+      </div>
+      <div class="hint">点击礼盒预览打开动效</div>
+    </section>
+  </main>
+
+  <aside class="controls">
+    <h1>夸张礼盒爆开方案</h1>
+    <p class="copy">
+      节奏改成三段：先只有礼盒；点击后礼盒用弹簧感“砰”一下打开，大型丝带、闪光和彩片先喷出来；大约半秒后图片从礼盒里弹出并戴上皇冠；顶部星星和爱心再持续落下。
+    </p>
+    <div class="button-row">
+      <button type="button" id="play">播放 / 重播</button>
+      <button type="button" id="reset">回到只有礼盒</button>
+    </div>
+    <p class="note">
+      这个页面只是浏览器预览，确认喜欢后我再把同样的节奏迁移到 Compose 代码里。
+    </p>
+  </aside>
+
+  <script>
+    const screen = document.getElementById("screen");
+    const play = document.getElementById("play");
+    const reset = document.getElementById("reset");
+
+    function replay() {
+      screen.classList.remove("opened");
+      void screen.offsetWidth;
+      screen.classList.add("opened");
+    }
+
+    function closePreview() {
+      screen.classList.remove("opened");
+    }
+
+    screen.addEventListener("click", replay);
+    screen.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        replay();
+      }
+    });
+    play.addEventListener("click", replay);
+    reset.addEventListener("click", closePreview);
+  </script>
+</body>
+</html>
