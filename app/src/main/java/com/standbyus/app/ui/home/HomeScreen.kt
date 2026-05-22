@@ -71,6 +71,13 @@ private val HomeBackgroundGradient = Brush.verticalGradient(
     colors = HomeBackgroundStyle.gradientColors
 )
 
+private fun UserStatus.primaryPartnerActionText(): String {
+    return stickerLabel.orEmpty()
+        .ifEmpty { customDoing.ifEmpty { doing } }
+}
+
+private fun UserStatus.partnerMoodText(): String = feelingLabel
+
 // Main screen
 
 @Composable
@@ -375,8 +382,12 @@ private fun PartnerStatusCard(
     layoutMetrics: HomeLayoutMetrics,
     modifier: Modifier = Modifier
 ) {
-    val feeling = Feeling.fromKey(status.feelingKey) ?: Feeling.HAPPY
+    val feeling = Feeling.fromKey(status.feelingKey)
+    val displayFeeling = feeling ?: Feeling.RELAXED
     val cardGradient = HomePartnerStatusCardSurfaceStyle.gradientColorsFor(feeling)
+    val primaryActionText = status.primaryPartnerActionText()
+    val moodText = status.partnerMoodText()
+    val detailText = status.note
 
     // Float animation for emoji: 3s ease-in-out, -8px
     val infiniteTransition = rememberInfiniteTransition(label = "emojiFloat")
@@ -435,41 +446,39 @@ private fun PartnerStatusCard(
                 feelingLabel = status.feelingLabel,
                 size = layoutMetrics.partnerEmojiSizeDp.dp,
                 textSize = layoutMetrics.partnerEmojiTextSizeSp.sp,
-                tintColor = feeling.color,
+                tintColor = displayFeeling.color,
                 fallbackEmoji = status.feelingFallbackEmoji,
                 modifier = Modifier.offset(y = (floatOffset + layoutMetrics.partnerEmojiLiftDp).dp)
             )
 
-            // Mood text (28sp bold, white, with text-shadow)
-            Text(
-                text = status.feelingLabel.ifEmpty { feeling.displayName },
-                fontSize = HomePartnerStatusCardStyle.moodTextSizeSp.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                style = TextStyle(
-                    shadow = Shadow(
-                        color = Color.Black.copy(alpha = 0.2f),
-                        offset = Offset(0f, 2f),
-                        blurRadius = 8f
+            if (primaryActionText.isNotEmpty()) {
+                Text(
+                    text = primaryActionText,
+                    fontSize = HomePartnerStatusCardStyle.moodTextSizeSp.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    style = TextStyle(
+                        shadow = Shadow(
+                            color = Color.Black.copy(alpha = 0.2f),
+                            offset = Offset(0f, 2f),
+                            blurRadius = 8f
+                        )
                     )
                 )
-            )
+            }
 
-            // Activity text (16sp, white 90%)
-            val doing = status.customDoing.ifEmpty { status.doing }
-            if (doing.isNotEmpty()) {
+            if (moodText.isNotEmpty()) {
                 Text(
-                    text = doing,
+                    text = moodText,
                     fontSize = HomePartnerStatusCardStyle.doingTextSizeSp.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.White.copy(alpha = 0.9f)
                 )
             }
 
-            // Optional note (italic, white 80%)
-            if (status.note.isNotEmpty()) {
+            if (detailText.isNotEmpty()) {
                 Text(
-                    text = status.note,
+                    text = detailText,
                     fontSize = HomePartnerStatusCardStyle.noteTextSizeSp.sp,
                     fontStyle = FontStyle.Italic,
                     color = Color.White.copy(alpha = 0.8f),
@@ -515,9 +524,9 @@ private fun MyStatusStrip(
             )
 
             // Text
-            val doing = status?.customDoing
-                ?.ifEmpty { status.doing }
-                ?.ifEmpty { status.feelingLabel }
+            val doing = status?.note
+                ?.ifEmpty { status.primaryPartnerActionText() }
+                ?.ifEmpty { status.partnerMoodText() }
                 ?: "点击发布我的状态"
             Text(
                 text = doing,

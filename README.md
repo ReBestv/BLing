@@ -47,14 +47,14 @@ app/
 │   │   └── UserStatus.kt        # 用户状态实体
 │   ├── remote/                  # 网络层
 │   │   ├── SupabaseConfig.kt    # Supabase 配置
-│   │   └── SupabaseService.kt   # Supabase REST API 客户端
+│   │   ├── SupabaseService.kt   # Supabase REST API 客户端
+│   │   ├── ThemeRepository.kt   # 主题包清单获取
+│   │   └── StickerManager.kt    # 贴纸缓存
 │   └── repository/              # 数据仓库
 │       ├── PairingRepository.kt # 配对业务逻辑
 │       └── StatusRepository.kt  # 状态业务逻辑
 ├── di/
-│   ├── AppModule.kt             # Room 数据库提供
-│   └── SupabaseModule.kt        # Supabase 服务提供
-├── fcm/                         # [已删除] Firebase Cloud Messaging
+│   └── AppModule.kt             # Room 数据库与主题仓库提供
 ├── navigation/
 │   └── Routes.kt                # 导航路由定义
 ├── ui/
@@ -95,7 +95,7 @@ app/
 
 ### 状态共享
 - **Doing（正在做）**：12 种活动预设 + 自定义输入
-- **Feeling（心情）**：9 种心情，每种配有 emoji + 颜色 + 渐变
+- **Feeling（心情）**：16 种心情，每种配有 emoji + 颜色 + 渐变
 - **备注**：可选的补充文字
 - **实时更新**：通过轮询（6 秒间隔）获取对方状态
 

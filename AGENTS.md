@@ -54,4 +54,4 @@ No tests found in the repo.
 
 ## Firebase
 
-`FIREBASE_SETUP.md` exists but **no Firebase SDK is declared** in `build.gradle.kts`. The app uses Supabase, not Firebase.
+No Firebase SDK is declared in `build.gradle.kts`. The app uses Supabase, not Firebase.

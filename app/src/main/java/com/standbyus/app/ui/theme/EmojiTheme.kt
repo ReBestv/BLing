@@ -85,21 +85,21 @@ object EmojiThemeManager {
         _themeVersion.value += 1
     }
 
-    fun getEmoji(context: Context, feelingKey: String): String {
+    fun getEmoji(context: Context, feelingKey: String?): String {
         return createSnapshot(getCurrentTheme(context), feelingKey).feelingAsset
     }
 
-    fun labelFor(context: Context, feelingKey: String): String {
+    fun labelFor(context: Context, feelingKey: String?): String {
         return createSnapshot(getCurrentTheme(context), feelingKey).feelingLabel
     }
 
     fun createSnapshot(
         theme: EmojiThemeSet,
-        feelingKey: String,
+        feelingKey: String?,
         stickerId: String? = null
     ): StatusFeelingSnapshot {
-        val definition = Feeling.fromKey(feelingKey) ?: Feeling.HAPPY
-        val themeFeeling = theme.feelingByKey(definition.key)
+        val definition = feelingKey?.let { Feeling.fromKey(it) }
+        val themeFeeling = definition?.let { theme.feelingByKey(it.key) }
         val selectedSticker = stickerId?.let { theme.stickerById(it) }
         val selectedStickerAsset = selectedSticker?.let { sticker ->
             when {
@@ -110,6 +110,7 @@ object EmojiThemeManager {
         }
         val asset = when {
             selectedStickerAsset != null -> selectedStickerAsset
+            definition == null -> ""
             theme.isDefault -> definition.emoji
             themeFeeling?.asset?.startsWith("http://") == true -> themeFeeling.asset
             themeFeeling?.asset?.startsWith("https://") == true -> themeFeeling.asset
@@ -120,11 +121,11 @@ object EmojiThemeManager {
         return StatusFeelingSnapshot(
             themeId = theme.id,
             themeName = theme.name,
-            feelingKey = definition.key,
-            feelingLabel = themeFeeling?.label ?: definition.displayName,
+            feelingKey = definition?.key.orEmpty(),
+            feelingLabel = definition?.let { themeFeeling?.label ?: it.displayName }.orEmpty(),
             feelingAsset = asset,
-            feelingFallbackEmoji = definition.emoji,
-            feelingColor = definition.color.toHex(),
+            feelingFallbackEmoji = definition?.emoji.orEmpty(),
+            feelingColor = definition?.color?.toHex().orEmpty(),
             stickerId = selectedSticker?.id,
             stickerLabel = selectedSticker?.label,
             stickerAsset = selectedStickerAsset

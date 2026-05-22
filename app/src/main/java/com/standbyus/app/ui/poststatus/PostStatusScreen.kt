@@ -66,7 +66,7 @@ fun PostStatusScreen(
 
     // Animated background tint based on selected feeling
     val bgTint by animateColorAsState(
-        targetValue = viewModel.selectedFeeling.color.copy(alpha = 0.08f),
+        targetValue = (viewModel.selectedFeeling?.color ?: PostStatusViewModel.NeutralFeelingColor).copy(alpha = 0.08f),
         animationSpec = tween(400)
     )
 
@@ -122,6 +122,9 @@ fun PostStatusScreen(
                         onStickerClick = viewModel::selectSticker,
                         imageSizeDp = layoutMetrics.stickerImageSizeDp,
                         gridHeightDp = layoutMetrics.stickerGridHeightDp,
+                        cardHorizontalPaddingDp = layoutMetrics.stickerCardHorizontalPaddingDp,
+                        cardVerticalPaddingDp = layoutMetrics.stickerCardVerticalPaddingDp,
+                        gridHorizontalGapDp = layoutMetrics.stickerGridHorizontalGapDp,
                         gridVerticalGapDp = layoutMetrics.stickerGridVerticalGapDp,
                         labelLineHeightSp = layoutMetrics.stickerLabelLineHeightSp,
                         modifier = Modifier.fillMaxWidth()
@@ -276,7 +279,7 @@ fun PostStatusScreen(
 @Composable
 private fun MoodGridPicker(
     feelings: List<Feeling>,
-    selectedFeeling: Feeling,
+    selectedFeeling: Feeling?,
     onFeelingClick: (Feeling) -> Unit,
     themeVersion: Int,
     gridHeightDp: Float,
@@ -317,7 +320,7 @@ private fun MoodGridPicker(
 @Composable
 private fun MoodRowPicker(
     feelings: List<Feeling>,
-    selectedFeeling: Feeling,
+    selectedFeeling: Feeling?,
     onFeelingClick: (Feeling) -> Unit,
     themeVersion: Int,
     circleSizeDp: Float,
@@ -462,6 +465,9 @@ private fun StickerGridPicker(
     onStickerClick: (ThemeSticker) -> Unit,
     imageSizeDp: Float,
     gridHeightDp: Float,
+    cardHorizontalPaddingDp: Float,
+    cardVerticalPaddingDp: Float,
+    gridHorizontalGapDp: Float,
     gridVerticalGapDp: Float,
     labelLineHeightSp: Float,
     modifier: Modifier = Modifier
@@ -483,7 +489,7 @@ private fun StickerGridPicker(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(gridHeightDp.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(gridHorizontalGapDp.dp),
             verticalArrangement = Arrangement.spacedBy(gridVerticalGapDp.dp),
             userScrollEnabled = false
         ) {
@@ -508,7 +514,10 @@ private fun StickerGridPicker(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 8.dp, vertical = 8.dp),
+                            .padding(
+                                horizontal = cardHorizontalPaddingDp.dp,
+                                vertical = cardVerticalPaddingDp.dp
+                            ),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         AsyncImage(
@@ -522,7 +531,7 @@ private fun StickerGridPicker(
                                 .clip(CircleShape),
                             contentScale = ContentScale.Fit
                         )
-                        Spacer(modifier = Modifier.height(5.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = sticker.label,
                             fontSize = 11.sp,
@@ -540,13 +549,15 @@ private fun StickerGridPicker(
 
 @Composable
 private fun PhraseSuggestionChips(
-    selectedFeeling: Feeling,
+    selectedFeeling: Feeling?,
     onPhraseClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val phrases = remember(selectedFeeling) {
-        StatusPhraseSuggestions.forFeeling(selectedFeeling)
+        selectedFeeling?.let { StatusPhraseSuggestions.forFeeling(it) }
+            ?: StatusPhraseSuggestions.fallbackPhrases()
     }
+    val accentColor = selectedFeeling?.color ?: PostStatusViewModel.NeutralFeelingColor
 
     Column(
         modifier = modifier,
@@ -571,7 +582,7 @@ private fun PhraseSuggestionChips(
                         width = 1.dp,
                         brush = Brush.horizontalGradient(
                             listOf(
-                                selectedFeeling.color.copy(alpha = 0.4f),
+                                accentColor.copy(alpha = 0.4f),
                                 DesignBorder
                             )
                         )

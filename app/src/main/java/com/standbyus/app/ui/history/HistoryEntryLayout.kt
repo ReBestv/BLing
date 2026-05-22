@@ -35,7 +35,11 @@ object HistoryEntryLayout {
 
     fun cardHorizontalPadding(): Dp = 12.dp
 
-    fun moodBadgeSize(): Dp = 44.dp
+    fun cardVerticalPadding(): Dp = 8.dp
+
+    fun moodBadgeSize(): Dp = 56.dp
+
+    fun moodImageSize(): Dp = 40.dp
 
     fun moodToTextGap(): Dp = 14.dp
 }

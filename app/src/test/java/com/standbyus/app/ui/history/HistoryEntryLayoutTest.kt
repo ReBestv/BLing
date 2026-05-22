@@ -59,7 +59,9 @@ class HistoryEntryLayoutTest {
     fun `sets horizontal card rhythm for avatar emoji and text layout`() {
         assertEquals(72.dp, HistoryEntryLayout.cardMinHeight())
         assertEquals(12.dp, HistoryEntryLayout.cardHorizontalPadding())
-        assertEquals(44.dp, HistoryEntryLayout.moodBadgeSize())
+        assertEquals(8.dp, HistoryEntryLayout.cardVerticalPadding())
+        assertEquals(56.dp, HistoryEntryLayout.moodBadgeSize())
+        assertEquals(40.dp, HistoryEntryLayout.moodImageSize())
         assertEquals(14.dp, HistoryEntryLayout.moodToTextGap())
     }
 }

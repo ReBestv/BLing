@@ -16,6 +16,9 @@ data class StatusEntity(
     val feelingAsset: String,
     val feelingFallbackEmoji: String,
     val feelingColor: String,
+    val stickerId: String?,
+    val stickerLabel: String?,
+    val stickerAsset: String?,
     val note: String,
     val updatedAt: Long,
     val source: String
@@ -32,6 +35,9 @@ fun UserStatus.toEntity() = StatusEntity(
     feelingAsset = feelingAsset,
     feelingFallbackEmoji = feelingFallbackEmoji,
     feelingColor = feelingColor,
+    stickerId = stickerId,
+    stickerLabel = stickerLabel,
+    stickerAsset = stickerAsset,
     note = note,
     updatedAt = updatedAt,
     source = source
@@ -48,6 +54,9 @@ fun StatusEntity.toUserStatus() = UserStatus(
     feelingAsset = feelingAsset,
     feelingFallbackEmoji = feelingFallbackEmoji,
     feelingColor = feelingColor,
+    stickerId = stickerId,
+    stickerLabel = stickerLabel,
+    stickerAsset = stickerAsset,
     note = note,
     updatedAt = updatedAt,
     source = source

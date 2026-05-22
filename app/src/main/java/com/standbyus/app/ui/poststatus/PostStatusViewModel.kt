@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.standbyus.app.data.model.Feeling
 import com.standbyus.app.data.model.ThemeSticker
 import com.standbyus.app.data.model.UserStatus
+import com.standbyus.app.data.model.toHex
+import androidx.compose.ui.graphics.Color
 import com.standbyus.app.data.remote.SupabaseService
 import com.standbyus.app.data.repository.StatusRepository
 import com.standbyus.app.ui.theme.EmojiThemeManager
@@ -24,7 +26,7 @@ class PostStatusViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    var selectedFeeling by mutableStateOf(Feeling.HAPPY)
+    var selectedFeeling by mutableStateOf<Feeling?>(null)
         private set
     var customDoing by mutableStateOf("")
         private set
@@ -37,7 +39,9 @@ class PostStatusViewModel @Inject constructor(
     var error by mutableStateOf("")
         private set
 
-    fun selectFeeling(feeling: Feeling) { selectedFeeling = feeling }
+    fun selectFeeling(feeling: Feeling) {
+        selectedFeeling = if (selectedFeeling == feeling) null else feeling
+    }
     fun selectSticker(sticker: ThemeSticker) {
         selectedStickerId = if (selectedStickerId == sticker.id) null else sticker.id
     }
@@ -51,25 +55,28 @@ class PostStatusViewModel @Inject constructor(
             val userId = supabaseService.getCachedDeviceId()
             val snapshot = EmojiThemeManager.createSnapshot(
                 theme = EmojiThemeManager.getCurrentTheme(context),
-                feelingKey = selectedFeeling.key,
+                feelingKey = selectedFeeling?.key,
                 stickerId = selectedStickerId
             )
+            val stickerBehavior = snapshot.stickerLabel.orEmpty()
+            val moodLabel = snapshot.feelingLabel.orEmpty()
+            val detailText = customDoing.trim()
 
             val status = UserStatus(
                 userId = userId,
-                doing = customDoing.ifEmpty { snapshot.feelingLabel },
-                customDoing = customDoing,
+                doing = stickerBehavior,
+                customDoing = "",
                 themeId = snapshot.themeId,
                 themeName = snapshot.themeName,
                 feelingKey = snapshot.feelingKey,
-                feelingLabel = snapshot.feelingLabel,
+                feelingLabel = moodLabel,
                 feelingAsset = snapshot.feelingAsset,
                 feelingFallbackEmoji = snapshot.feelingFallbackEmoji,
                 feelingColor = snapshot.feelingColor,
                 stickerId = snapshot.stickerId,
                 stickerLabel = snapshot.stickerLabel,
                 stickerAsset = snapshot.stickerAsset,
-                note = ""
+                note = detailText
             )
             try {
                 statusRepository.updateStatus(status)
@@ -80,5 +87,10 @@ class PostStatusViewModel @Inject constructor(
                 isPublishing = false
             }
         }
+    }
+
+    companion object {
+        val NeutralFeelingColor: Color = Color(0xFFFFE5DC)
+        val NeutralFeelingColorHex: String = NeutralFeelingColor.toHex()
     }
 }

@@ -8,7 +8,10 @@ object HomePartnerStatusCardSurfaceStyle {
     val topGlowColor = Color(0x40FFFFFF)
     val warmGlowColor = Color(0x26FFD6C8)
 
-    fun gradientColorsFor(feeling: Feeling): List<Color> = when (feeling) {
+    fun gradientColorsFor(feeling: Feeling?): List<Color> = when (feeling) {
+        null ->
+            listOf(Color(0xFFFFF6F1), Color(0xFFFFE1D6), Color(0xFFFFF0E8))
+
         Feeling.HAPPY, Feeling.LOVE, Feeling.KISS, Feeling.MISSING ->
             listOf(Color(0xFFFFEFF4), Color(0xFFFFB9CA), Color(0xFFFFD9C8))
 

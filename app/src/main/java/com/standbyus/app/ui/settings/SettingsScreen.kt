@@ -407,6 +407,20 @@ fun SettingsScreen(
                             fontSize = 12.sp,
                             color = TextSecondary.copy(alpha = 0.7f)
                         )
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text(
+                            text = "字体：标题使用得意黑，正文使用 MiSans",
+                            fontSize = 11.sp,
+                            color = TextSecondary.copy(alpha = 0.75f),
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "本应用已使用 MiSans Fonts",
+                            fontSize = 11.sp,
+                            color = TextSecondary.copy(alpha = 0.65f),
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }
@@ -429,7 +443,8 @@ fun SettingsScreen(
                                 .fillMaxWidth()
                                 .background(Color(0xFFFFF8F5), RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
                                 .padding(horizontal = 16.dp, vertical = 14.dp)
-                        ) {
+                        )
+ {
                             Text(
                                 text = "选择头像",
                                 fontSize = 17.sp,

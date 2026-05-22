@@ -252,7 +252,7 @@ private fun TimelineEntry(
                     .heightIn(min = HistoryEntryLayout.cardMinHeight())
                     .padding(
                         horizontal = HistoryEntryLayout.cardHorizontalPadding(),
-                        vertical = layoutMetrics.bubbleVerticalPaddingDp.dp
+                        vertical = HistoryEntryLayout.cardVerticalPadding()
                     ),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = HistoryEntryLayout.cardContentArrangement(isMe)
@@ -363,8 +363,8 @@ private fun MoodBadge(
                 value = status.feelingAsset,
                 feelingKey = status.feelingKey,
                 feelingLabel = status.feelingLabel,
-                size = 24.dp,
-                textSize = 20.sp,
+                size = HistoryEntryLayout.moodImageSize(),
+                textSize = 32.sp,
                 tintColor = feelingColor,
                 fallbackEmoji = status.feelingFallbackEmoji
             )

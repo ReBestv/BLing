@@ -72,7 +72,8 @@ class StandByWidget : GlanceAppWidget() {
                         )
                     )
 
-                    val doingText = status.customDoing.ifEmpty { status.doing }
+                    val doingText = status.stickerLabel.orEmpty()
+                        .ifEmpty { status.customDoing.ifEmpty { status.doing } }
                     if (doingText.isNotEmpty()) {
                         Spacer(modifier = GlanceModifier.height(2.dp))
                         Text(
@@ -138,6 +139,9 @@ class StandByWidget : GlanceAppWidget() {
             feelingAsset = prefs.getString("feelingAsset", "😊") ?: "😊",
             feelingFallbackEmoji = prefs.getString("feelingFallbackEmoji", "😊") ?: "😊",
             feelingColor = prefs.getString("feelingColor", "#FFFFD180") ?: "#FFFFD180",
+            stickerId = prefs.getString("stickerId", null),
+            stickerLabel = prefs.getString("stickerLabel", null),
+            stickerAsset = prefs.getString("stickerAsset", null),
             note = prefs.getString("note", "") ?: "",
             updatedAt = prefs.getLong("updatedAt", System.currentTimeMillis())
         )

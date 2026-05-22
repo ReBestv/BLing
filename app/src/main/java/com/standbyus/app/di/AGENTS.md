@@ -6,8 +6,7 @@ Hilt modules providing app-wide dependencies.
 
 ```
 di/
-├── AppModule.kt        # Room database provider
-└── SupabaseModule.kt   # OkHttpClient + SupabaseConfig provider
+└── AppModule.kt        # Room database and ThemeRepository provider
 ```
 
 ## WHERE TO LOOK
@@ -15,7 +14,7 @@ di/
 | Task | File |
 |------|------|
 | Add a Room dependency | `AppModule.kt` |
-| Configure HTTP client | `SupabaseModule.kt` |
+| Add an app-wide provider | `AppModule.kt` |
 
 ## CONVENTIONS
 
