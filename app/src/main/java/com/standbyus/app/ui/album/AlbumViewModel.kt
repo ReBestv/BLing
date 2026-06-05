@@ -11,11 +11,11 @@ import com.standbyus.app.data.repository.AlbumRepository
 import com.standbyus.app.data.repository.PairingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class AlbumViewModel @Inject constructor(
@@ -48,10 +48,16 @@ class AlbumViewModel @Inject constructor(
     private val _error = MutableStateFlow("")
     val error: StateFlow<String> = _error.asStateFlow()
 
-    private val _filterDays = MutableStateFlow(0) // 0=全部, 7=最近7天, 30=最近30天
+    private val _filterDays = MutableStateFlow(0)
     val filterDays: StateFlow<Int> = _filterDays.asStateFlow()
 
-    init { loadPhotos() }
+    init {
+        loadPhotos()
+    }
+
+    fun refresh() {
+        loadPhotos()
+    }
 
     fun setFilter(days: Int) {
         _filterDays.value = days
@@ -64,24 +70,47 @@ class AlbumViewModel @Inject constructor(
             try {
                 val myId = supabaseService.getCachedDeviceId()
                 Log.d(TAG, "loadPhotos myId=$myId")
-                if (myId.isEmpty()) { Log.w(TAG, "myId empty"); _loading.value = false; return@launch }
-
-                // 优先使用缓存的 partner_id
-                val cachedPartnerId = prefs.getString("partner_id", null)
-                val partnerId = if (!cachedPartnerId.isNullOrEmpty()) {
-                    cachedPartnerId
-                } else {
-                    val pair = pairingRepository.findPairByUserId(myId)
-                    Log.d(TAG, "pair=$pair")
-                    when {
-                        pair?.user1Id == myId && pair.user2Id.isNotEmpty() -> pair.user2Id
-                        pair?.user2Id == myId && pair.user1Id.isNotEmpty() -> pair.user1Id
-                        else -> ""
-                    }
+                if (myId.isEmpty()) {
+                    _photos.value = emptyList()
+                    _loading.value = false
+                    return@launch
                 }
-                Log.d(TAG, "partnerId=$partnerId")
 
-                val since = if (_filterDays.value > 0) System.currentTimeMillis() - _filterDays.value * 86400000L else 0L
+                val cachedPartnerId = prefs.getString(KEY_PARTNER_ID, null)
+                val pair = runCatching { pairingRepository.findPairByUserId(myId) }
+                    .onFailure { Log.e(TAG, "pair lookup failed", it) }
+                    .getOrNull()
+                val partnerId = when {
+                    !cachedPartnerId.isNullOrEmpty() -> cachedPartnerId
+                    pair?.user1Id == myId && pair.user2Id.isNotEmpty() -> pair.user2Id
+                    pair?.user2Id == myId && pair.user1Id.isNotEmpty() -> pair.user1Id
+                    else -> ""
+                }
+
+                if (partnerId.isEmpty()) {
+                    prefs.edit().apply {
+                        remove(KEY_PARTNER_ID)
+                        remove(KEY_PAIR_ID)
+                        remove(KEY_IS_PAIRED)
+                        apply()
+                    }
+                    _photos.value = emptyList()
+                    _loading.value = false
+                    return@launch
+                }
+
+                prefs.edit().apply {
+                    putBoolean(KEY_IS_PAIRED, true)
+                    putString(KEY_PARTNER_ID, partnerId)
+                    putString(KEY_PAIR_ID, pair?.pairId)
+                    apply()
+                }
+
+                val since = if (_filterDays.value > 0) {
+                    System.currentTimeMillis() - _filterDays.value * 86400000L
+                } else {
+                    0L
+                }
                 _photos.value = albumRepository.getPhotos(myId, partnerId, sinceTimestamp = since)
                 Log.d(TAG, "photos count=${_photos.value.size}")
             } catch (e: Exception) {
@@ -118,7 +147,7 @@ class AlbumViewModel @Inject constructor(
                 dismissSheet()
                 loadPhotos()
             } catch (e: Exception) {
-                _error.value = "上传失败：${e.localizedMessage}"
+                _error.value = "上传失败：${e.localizedMessage ?: "请稍后再试"}"
                 Log.e(TAG, "upload failed", e)
             }
             _uploading.value = false
@@ -140,5 +169,8 @@ class AlbumViewModel @Inject constructor(
 
     companion object {
         private const val TAG = "StandByAlbumVM"
+        private const val KEY_IS_PAIRED = "is_paired"
+        private const val KEY_PARTNER_ID = "partner_id"
+        private const val KEY_PAIR_ID = "pair_id"
     }
 }

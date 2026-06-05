@@ -8,6 +8,9 @@ import com.standbyus.app.data.local.toEntity
 import com.standbyus.app.data.model.CheckinData
 import com.standbyus.app.data.remote.SupabaseService
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.Calendar
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -17,9 +20,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Singleton
-import java.util.Calendar
 
 @Singleton
 class CheckinRepository @Inject constructor(
@@ -35,7 +35,6 @@ class CheckinRepository @Inject constructor(
 
     private val widgetScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    /** 提交一条打卡记录 */
     suspend fun submitCheckIn(note: String = ""): Boolean {
         val userId = supabaseService.getCachedDeviceId()
         if (userId.isEmpty()) {
@@ -45,12 +44,8 @@ class CheckinRepository @Inject constructor(
         val now = System.currentTimeMillis()
         val data = CheckinData(userId = userId, timestamp = now, note = note)
         return try {
-            // ① 写入 Supabase
             supabaseService.create(TABLE, data.toMap())
-            Log.d(TAG, "Supabase create success")
-            // ② Room 缓存
             checkinDao.insert(data.toEntity())
-            Log.d(TAG, "Room insert success")
             true
         } catch (e: Exception) {
             Log.e(TAG, "submitCheckIn failed: ${e.message}", e)
@@ -58,36 +53,26 @@ class CheckinRepository @Inject constructor(
         }
     }
 
-    /** 获取今日打卡次数 */
     suspend fun getTodayCount(userId: String): Int {
-        val startOfDay = getStartOfDay()
-        return checkinDao.getTodayCount(userId, startOfDay)
+        return checkinDao.getTodayCount(userId, getStartOfDay())
     }
 
-    /** 获取今日首次打卡时间 */
     suspend fun getFirstCheckinTime(userId: String): Long? {
-        val startOfDay = getStartOfDay()
-        return checkinDao.getFirstCheckinTime(userId, startOfDay)
+        return checkinDao.getFirstCheckinTime(userId, getStartOfDay())
     }
 
-    /** 获取上次打卡时间 */
     suspend fun getLastCheckinTime(userId: String): Long? {
         return checkinDao.getLastCheckinTime(userId)
     }
 
-    /** 获取本周打卡次数 */
     suspend fun getWeekCount(userId: String): Int {
-        val startOfWeek = getStartOfWeek()
-        return checkinDao.getWeekCount(userId, startOfWeek)
+        return checkinDao.getWeekCount(userId, getStartOfWeek())
     }
 
-    /** 获取本月打卡次数 */
     suspend fun getMonthCount(userId: String): Int {
-        val startOfMonth = getStartOfMonth()
-        return checkinDao.getMonthCount(userId, startOfMonth)
+        return checkinDao.getMonthCount(userId, getStartOfMonth())
     }
 
-    /** 轮询观察某用户的打卡记录 */
     fun observeCheckIns(userId: String, since: Long): Flow<List<CheckinData>> = callbackFlow {
         suspend fun fetchFromRemote() {
             try {
@@ -95,28 +80,22 @@ class CheckinRepository @Inject constructor(
                     TABLE,
                     "userId=eq.$userId&timestamp=gte.$since&order=timestamp.desc"
                 )
-                if (results.isNotEmpty()) {
-                    val records = results.map { CheckinData.fromMap(it) }
-                    // 缓存到 Room
-                    records.forEach { checkinDao.insert(it.toEntity()) }
-                    trySend(records)
-                } else {
-                    // 远程无数据，尝试本地缓存
-                    val cached = checkinDao.getRecordsSince(userId, since)
-                    if (cached.isNotEmpty()) trySend(cached.map { it.toData() })
-                }
+                val records = results.map { CheckinData.fromMap(it) }
+
+                // When remote fetch succeeds, remote is the source of truth.
+                // Clear local rows for this user so old data cannot survive an unpair/re-pair.
+                checkinDao.clearUserRecords(userId)
+                records.forEach { checkinDao.insert(it.toEntity()) }
+                trySend(records)
             } catch (e: Exception) {
                 Log.e(TAG, "observeCheckIns remote failed: ${e.message}")
-                // fallback 到 Room 缓存
                 val cached = checkinDao.getRecordsSince(userId, since)
-                if (cached.isNotEmpty()) trySend(cached.map { it.toData() })
+                trySend(cached.map { it.toData() })
             }
         }
 
-        // 首次立即执行
         fetchFromRemote()
 
-        // 定时轮询
         val job = widgetScope.launch {
             delay(POLL_MS)
             while (isActive) {
@@ -127,10 +106,8 @@ class CheckinRepository @Inject constructor(
         awaitClose { job.cancel() }
     }
 
-    /** 计算连续打卡天数 */
     suspend fun getStreakDays(userId: String): Int {
-        val startOfWeek = getStartOfWeek()
-        val activeDays = checkinDao.getActiveDays(userId, startOfWeek)
+        val activeDays = checkinDao.getActiveDays(userId, getStartOfWeek())
         if (activeDays.isEmpty()) return 0
 
         val todayEpochDay = System.currentTimeMillis() / 86400000
@@ -145,8 +122,6 @@ class CheckinRepository @Inject constructor(
         }
         return streak
     }
-
-    // ── 时间工具 ──
 
     private fun getStartOfDay(): Long {
         val cal = Calendar.getInstance()

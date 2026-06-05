@@ -15,4 +15,7 @@ interface TodoListDao {
 
     @Query("DELETE FROM todo_lists WHERE id = :id")
     suspend fun deleteList(id: Long)
+
+    @Query("DELETE FROM todo_lists")
+    suspend fun clearAll()
 }

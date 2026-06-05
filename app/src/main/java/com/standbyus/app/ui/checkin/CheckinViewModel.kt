@@ -11,20 +11,20 @@ import com.standbyus.app.data.repository.InteractionRepository
 import com.standbyus.app.data.repository.PairingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.Calendar
+import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.util.Calendar
-import javax.inject.Inject
 
 data class CheckinUiState(
     val todayCount: Int = 0,
-    val lastInterval: String = "—",
+    val lastInterval: String = "-",
     val riskLevel: RiskLevel = RiskLevel.NORMAL,
     val weeklyTotal: Int = 0,
     val weeklyAverage: Float = 0f,
@@ -35,9 +35,9 @@ data class CheckinUiState(
 )
 
 enum class RiskLevel(val label: String, val emoji: String) {
-    NORMAL("正常", "😊"),
-    MILD("轻度", "🤔"),
-    ATTENTION("注意", "😰")
+    NORMAL("正常", "🙂"),
+    MILD("轻度", "😵"),
+    ATTENTION("注意", "😳")
 }
 
 data class PKStats(
@@ -88,46 +88,16 @@ class CheckinViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    companion object {
-        private const val TAG = "CheckinVM"
-        private const val PREFS_NAME = "pairing"
-        private const val KEY_PARTNER_ID = "partner_id"
-    }
-
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     private val _myUserId = MutableStateFlow("")
     private val _partnerUserId = MutableStateFlow("")
     private val _isCheckingIn = MutableStateFlow(false)
     private val _refreshTrigger = MutableStateFlow(0L)
 
-    /** 本月起始时间戳 */
     private val monthStart: Long
         get() {
             val cal = Calendar.getInstance()
             cal.set(Calendar.DAY_OF_MONTH, 1)
-            cal.set(Calendar.HOUR_OF_DAY, 0)
-            cal.set(Calendar.MINUTE, 0)
-            cal.set(Calendar.SECOND, 0)
-            cal.set(Calendar.MILLISECOND, 0)
-            return cal.timeInMillis
-        }
-
-    /** 今日起始时间戳 */
-    private val dayStart: Long
-        get() {
-            val cal = Calendar.getInstance()
-            cal.set(Calendar.HOUR_OF_DAY, 0)
-            cal.set(Calendar.MINUTE, 0)
-            cal.set(Calendar.SECOND, 0)
-            cal.set(Calendar.MILLISECOND, 0)
-            return cal.timeInMillis
-        }
-
-    /** 本周起始（周一 00:00） */
-    private val weekStart: Long
-        get() {
-            val cal = Calendar.getInstance()
-            cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
             cal.set(Calendar.HOUR_OF_DAY, 0)
             cal.set(Calendar.MINUTE, 0)
             cal.set(Calendar.SECOND, 0)
@@ -148,22 +118,18 @@ class CheckinViewModel @Inject constructor(
         val weekTotal = checkinRepository.getWeekCount(myId)
         val streak = checkinRepository.getStreakDays(myId)
         val weekAverage = calculateWeekAverage(weekTotal)
-
-        // 距离上次打卡已经过了多久
         val interval = CheckinIntervalFormatter.sinceLastCheckin(
             lastCheckinTime = lastCheckinTime,
             now = System.currentTimeMillis()
         )
-
-        // 计算便秘风险
         val riskLevel = calculateRiskLevel(lastCheckinTime)
-
-        // PK 统计
         val pkStats = if (partnerId.isNotEmpty()) {
             val myMonthCount = checkinRepository.getMonthCount(myId)
             val partnerMonthCount = checkinRepository.getMonthCount(partnerId)
             PKStats(myMonthCount, partnerMonthCount)
-        } else null
+        } else {
+            null
+        }
 
         CheckinUiState(
             todayCount = todayCount,
@@ -182,35 +148,8 @@ class CheckinViewModel @Inject constructor(
         val uid = supabaseService.getCachedDeviceId()
         Log.d(TAG, "deviceId=$uid")
         _myUserId.value = uid
+        refreshPairingState()
 
-        // 从缓存读取 partner ID
-        val cachedPartnerId = prefs.getString(KEY_PARTNER_ID, null)
-        if (!cachedPartnerId.isNullOrEmpty()) {
-            Log.d(TAG, "partner from cache: $cachedPartnerId")
-            _partnerUserId.value = cachedPartnerId
-        } else {
-            // 联网查询
-            viewModelScope.launch {
-                try {
-                    val pair = pairingRepository.findPairByUserId(uid)
-                    if (pair != null) {
-                        val partnerId = when {
-                            pair.user1Id == uid && pair.user2Id.isNotEmpty() -> pair.user2Id
-                            pair.user2Id == uid && pair.user1Id.isNotEmpty() -> pair.user1Id
-                            else -> ""
-                        }
-                        if (partnerId.isNotEmpty()) {
-                            prefs.edit().putString(KEY_PARTNER_ID, partnerId).apply()
-                            _partnerUserId.value = partnerId
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "pair lookup failed", e)
-                }
-            }
-        }
-
-        // 启动轮询（自己 + 伴侣的打卡记录）
         viewModelScope.launch {
             _myUserId.collect { id ->
                 if (id.isNotEmpty()) {
@@ -225,6 +164,48 @@ class CheckinViewModel @Inject constructor(
                 if (id.isNotEmpty()) {
                     checkinRepository.observeCheckIns(id, monthStart)
                         .collect { _refreshTrigger.value = System.currentTimeMillis() }
+                } else {
+                    _refreshTrigger.value = System.currentTimeMillis()
+                }
+            }
+        }
+    }
+
+    fun refreshPairingState() {
+        val uid = _myUserId.value.ifEmpty { supabaseService.getCachedDeviceId() }
+        if (uid.isEmpty()) {
+            clearPartnerState()
+            return
+        }
+
+        val cachedPartnerId = prefs.getString(KEY_PARTNER_ID, null)
+        if (!cachedPartnerId.isNullOrEmpty()) {
+            _partnerUserId.value = cachedPartnerId
+        }
+
+        viewModelScope.launch {
+            try {
+                val pair = pairingRepository.findPairByUserId(uid)
+                val partnerId = when {
+                    pair?.user1Id == uid && pair.user2Id.isNotEmpty() -> pair.user2Id
+                    pair?.user2Id == uid && pair.user1Id.isNotEmpty() -> pair.user1Id
+                    else -> ""
+                }
+                if (partnerId.isEmpty()) {
+                    clearPartnerState()
+                    return@launch
+                }
+                prefs.edit().apply {
+                    putBoolean(KEY_IS_PAIRED, true)
+                    putString(KEY_PARTNER_ID, partnerId)
+                    putString(KEY_PAIR_ID, pair?.pairId)
+                    apply()
+                }
+                _partnerUserId.value = partnerId
+            } catch (e: Exception) {
+                Log.e(TAG, "refreshPairingState failed", e)
+                if (cachedPartnerId.isNullOrEmpty()) {
+                    clearPartnerState()
                 }
             }
         }
@@ -264,6 +245,17 @@ class CheckinViewModel @Inject constructor(
         }
     }
 
+    private fun clearPartnerState() {
+        prefs.edit().apply {
+            remove(KEY_IS_PAIRED)
+            remove(KEY_PARTNER_ID)
+            remove(KEY_PAIR_ID)
+            apply()
+        }
+        _partnerUserId.value = ""
+        _refreshTrigger.value = System.currentTimeMillis()
+    }
+
     private fun calculateRiskLevel(lastCheckinTime: Long?): RiskLevel {
         if (lastCheckinTime == null) return RiskLevel.ATTENTION
         val hoursSince = (System.currentTimeMillis() - lastCheckinTime) / 3_600_000
@@ -288,5 +280,13 @@ class CheckinViewModel @Inject constructor(
         }
         if (daysPassed == 0) return 0f
         return kotlin.math.round(weekTotal.toFloat() / daysPassed * 10) / 10f
+    }
+
+    companion object {
+        private const val TAG = "CheckinVM"
+        private const val PREFS_NAME = "pairing"
+        private const val KEY_IS_PAIRED = "is_paired"
+        private const val KEY_PARTNER_ID = "partner_id"
+        private const val KEY_PAIR_ID = "pair_id"
     }
 }

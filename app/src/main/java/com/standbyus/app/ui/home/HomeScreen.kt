@@ -31,9 +31,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,6 +62,8 @@ import com.standbyus.app.data.model.UserStatus
 import com.standbyus.app.ui.components.AppHeader
 import com.standbyus.app.ui.components.StatusEmojiImage
 import androidx.compose.material.icons.filled.Settings
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 
 // Design tokens (matching preview.html spec)
 private val BgColor       = Color(0xFFFFF8F5)
@@ -87,6 +91,7 @@ fun HomeScreen(
     onNavigateToSettings: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+    val isPaired by viewModel.isPaired.collectAsState()
     val partnerStatus by viewModel.partnerStatus.collectAsState()
     val myStatus by viewModel.myStatus.collectAsState()
     val partnerDisplayName by viewModel.partnerDisplayName.collectAsState()
@@ -96,6 +101,19 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         viewModel.refreshPartner()
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshPartner()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     LaunchedEffect(latestInteraction?.id) {
@@ -123,7 +141,7 @@ fun HomeScreen(
         )
 
         // Content area (fills remaining space)
-        if (partnerStatus != null) {
+        if (isPaired && partnerStatus != null) {
             @Suppress("UnusedBoxWithConstraintsScope")
             BoxWithConstraints(
                 modifier = Modifier
@@ -165,6 +183,18 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(layoutMetrics.bottomSpacerDp.dp))
             }
+            }
+        } else if (isPaired) {
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                WaitingPartnerStatusState(
+                    partnerDisplayName = partnerDisplayName,
+                    onNavigateToPost = onNavigateToPost
+                )
             }
         } else {
             Box(
@@ -670,6 +700,78 @@ private fun EmptyPartnerState(
             ) {
                 Text(
                     text = "去绑定",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun WaitingPartnerStatusState(
+    partnerDisplayName: String,
+    onNavigateToPost: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 60.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(
+                    elevation = 14.dp,
+                    shape = RoundedCornerShape(28.dp),
+                    ambientColor = Color(0x145A4A42),
+                    spotColor = Color(0x145A4A42)
+                )
+                .clip(RoundedCornerShape(28.dp))
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color(0xE6FFFFFF), Color(0x99FFFFFF))
+                    )
+                )
+                .border(1.dp, Color(0x80FFFFFF), RoundedCornerShape(28.dp))
+                .padding(horizontal = 24.dp, vertical = 30.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(text = "💌", fontSize = 58.sp)
+            Text(
+                text = "$partnerDisplayName 还没发布状态",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = TextPrimary
+            )
+            Text(
+                text = "已经绑定成功啦。等 TA 发出第一条状态，这里就会自动出现。",
+                fontSize = 13.sp,
+                color = TextSecondary,
+                textAlign = TextAlign.Center,
+                lineHeight = 20.sp
+            )
+            Box(
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .height(52.dp)
+                    .clip(RoundedCornerShape(26.dp))
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(PrimaryColor, Color(0xFFFFB99F))
+                        )
+                    )
+                    .clickable { onNavigateToPost() }
+                    .padding(horizontal = 32.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "先发一条我的状态",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White

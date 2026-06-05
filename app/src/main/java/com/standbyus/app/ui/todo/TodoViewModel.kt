@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.standbyus.app.data.model.TodoItem
 import com.standbyus.app.data.model.TodoList
+import com.standbyus.app.data.remote.SupabaseService
 import com.standbyus.app.data.repository.TodoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -19,23 +20,36 @@ import javax.inject.Inject
 @HiltViewModel
 class TodoViewModel @Inject constructor(
     private val todoRepository: TodoRepository,
+    private val supabaseService: SupabaseService,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val prefs = context.getSharedPreferences("pairing", Context.MODE_PRIVATE)
+    private val myDeviceId by lazy { supabaseService.getDeviceId(context) }
     private val _uiState = MutableStateFlow(TodoUiState())
     val uiState: StateFlow<TodoUiState> = _uiState.asStateFlow()
 
     private var nextLocalId = -1L
 
     init {
+        refreshPairingState()
+    }
+
+    fun refreshPairingState() {
         val pairId = prefs.getString("pair_id", null)
-        _uiState.value = _uiState.value.copy(isPaired = !pairId.isNullOrEmpty())
-        if (!pairId.isNullOrEmpty()) {
-            loadLists()
-        } else {
-            _uiState.value = _uiState.value.copy(isLoading = false)
+        if (pairId.isNullOrEmpty()) {
+            _uiState.value = TodoUiState(isLoading = false)
+            return
         }
+
+        _uiState.update {
+            it.copy(isPaired = true, isLoading = it.lists.isEmpty(), error = null)
+        }
+        loadLists()
+    }
+
+    fun refresh() {
+        refreshPairingState()
     }
 
     fun loadLists() {
@@ -51,12 +65,14 @@ class TodoViewModel @Inject constructor(
                 } else {
                     emptyList()
                 }
+                val currentList = lists.firstOrNull { it.id == currentListId }
                 _uiState.update {
                     it.copy(
                         lists = lists,
                         currentListId = currentListId,
                         items = items,
-                        isLoading = false
+                        isLoading = false,
+                        canEditCurrentList = canEditList(currentList)
                     )
                 }
             } catch (e: Exception) {
@@ -74,21 +90,28 @@ class TodoViewModel @Inject constructor(
     fun selectList(listId: Long) {
         if (listId == _uiState.value.currentListId) return
         _uiState.update {
+            val currentList = it.lists.firstOrNull { list -> list.id == listId }
             it.copy(
                 currentListId = listId,
                 items = emptyList(),
                 isLoading = true,
-                error = null
+                error = null,
+                canEditCurrentList = canEditList(currentList)
             )
         }
         viewModelScope.launch {
             try {
                 val items = todoRepository.getItems(listId)
                 _uiState.update {
+                    val currentList = it.lists.firstOrNull { list -> list.id == listId }
                     if (it.currentListId != listId) {
                         it
                     } else {
-                        it.copy(items = items, isLoading = false)
+                        it.copy(
+                            items = items,
+                            isLoading = false,
+                            canEditCurrentList = canEditList(currentList)
+                        )
                     }
                 }
             } catch (e: Exception) {
@@ -116,6 +139,7 @@ class TodoViewModel @Inject constructor(
         val optimisticList = TodoList(
             id = localId,
             name = trimmedName,
+            ownerId = myDeviceId,
             isShared = isShared,
             createdAt = System.currentTimeMillis()
         )
@@ -126,7 +150,8 @@ class TodoViewModel @Inject constructor(
                 currentListId = localId,
                 items = emptyList(),
                 syncingListIds = it.syncingListIds + localId,
-                error = null
+                error = null,
+                canEditCurrentList = true
             )
         }
 
@@ -150,7 +175,12 @@ class TodoViewModel @Inject constructor(
                     state.copy(
                         lists = updatedLists,
                         currentListId = if (state.currentListId == localId) result.id else state.currentListId,
-                        syncingListIds = state.syncingListIds - localId
+                        syncingListIds = state.syncingListIds - localId,
+                        canEditCurrentList = canEditList(
+                            updatedLists.firstOrNull { list ->
+                                list.id == if (state.currentListId == localId) result.id else state.currentListId
+                            }
+                        )
                     )
                 }
             } catch (e: Exception) {
@@ -166,6 +196,11 @@ class TodoViewModel @Inject constructor(
     }
 
     fun deleteList(id: Long) {
+        val list = _uiState.value.lists.firstOrNull { it.id == id }
+        if (!canEditList(list)) {
+            _uiState.update { it.copy(error = personalListReadOnlyMessage) }
+            return
+        }
         viewModelScope.launch {
             try {
                 todoRepository.deleteList(id)
@@ -189,6 +224,10 @@ class TodoViewModel @Inject constructor(
             _uiState.update {
                 it.copy(error = "清单还在创建中，请稍等一下再添加任务。")
             }
+            return
+        }
+        if (!canEditCurrentList()) {
+            _uiState.update { it.copy(error = personalListReadOnlyMessage) }
             return
         }
 
@@ -239,6 +278,10 @@ class TodoViewModel @Inject constructor(
 
     fun toggleItem(item: TodoItem) {
         if (item.id <= 0 || item.id in _uiState.value.syncingItemIds) return
+        if (!canEditCurrentList()) {
+            _uiState.update { it.copy(error = personalListReadOnlyMessage) }
+            return
+        }
 
         val toggled = item.copy(
             isDone = !item.isDone,
@@ -281,6 +324,10 @@ class TodoViewModel @Inject constructor(
 
     fun deleteItem(id: Long) {
         if (id <= 0 || id in _uiState.value.syncingItemIds) return
+        if (!canEditCurrentList()) {
+            _uiState.update { it.copy(error = personalListReadOnlyMessage) }
+            return
+        }
 
         val snapshot = _uiState.value
         val removedIndex = snapshot.items.indexOfFirst { it.id == id }
@@ -319,6 +366,10 @@ class TodoViewModel @Inject constructor(
     }
 
     fun showAddItemSheet(show: Boolean) {
+        if (show && !canEditCurrentList()) {
+            _uiState.update { it.copy(error = personalListReadOnlyMessage) }
+            return
+        }
         _uiState.update { it.copy(showAddItemSheet = show) }
     }
 
@@ -347,9 +398,22 @@ class TodoViewModel @Inject constructor(
                 currentListId = fallbackListId,
                 items = if (fallbackListId == previousListId) previousItems else emptyList(),
                 syncingListIds = state.syncingListIds - localId,
+                canEditCurrentList = canEditList(updatedLists.firstOrNull { it.id == fallbackListId }),
                 error = message
             )
         }
+    }
+
+    private fun currentList(state: TodoUiState = _uiState.value): TodoList? {
+        val currentListId = state.currentListId ?: return null
+        return state.lists.firstOrNull { it.id == currentListId }
+    }
+
+    private fun canEditCurrentList(): Boolean = canEditList(currentList())
+
+    private fun canEditList(list: TodoList?): Boolean {
+        if (list == null) return false
+        return list.isShared || list.ownerId == myDeviceId
     }
 
     private fun rollbackCreateItem(localId: Long, message: String) {
@@ -366,6 +430,7 @@ class TodoViewModel @Inject constructor(
 
     companion object {
         private const val TAG = "TodoViewModel"
+        private const val personalListReadOnlyMessage = "这是对方的个人清单，只有对方可以编辑"
     }
 }
 
@@ -380,5 +445,6 @@ data class TodoUiState(
     val editingItem: TodoItem? = null,
     val syncingItemIds: Set<Long> = emptySet(),
     val syncingListIds: Set<Long> = emptySet(),
+    val canEditCurrentList: Boolean = false,
     val error: String? = null
 )

@@ -16,6 +16,8 @@ class PairingRepository @Inject constructor(
     }
 
     suspend fun createPairingCode(creatorUserId: String, creatorName: String): String {
+        cleanupPairsForUser(creatorUserId)
+
         val pairId = generatePairingCode()
         Log.d(TAG, "Creating pairing code: $pairId for user $creatorUserId")
         val data = mapOf(
@@ -35,51 +37,82 @@ class PairingRepository @Inject constructor(
         return pairId
     }
 
-    data class JoinResult(val success: Boolean, val partnerId: String = "")
+    data class JoinResult(
+        val success: Boolean,
+        val partnerId: String = "",
+        val pairInfo: PairingInfo? = null
+    )
 
     suspend fun joinPair(pairId: String, userId: String, joinerName: String): JoinResult {
-        val results = supabaseService.query(
-            TABLE,
-            "pairId=eq.$pairId&limit=1"
+        cleanupPairsForUser(userId)
+
+        val normalizedPairId = pairId.trim().uppercase()
+        val pair = getPairInfo(normalizedPairId) ?: return JoinResult(false)
+
+        val updatedPair = when {
+            pair.user1Id == userId || pair.user2Id == userId -> pair
+            pair.user1Id.isEmpty() -> {
+                supabaseService.update(
+                    TABLE,
+                    "pairId=eq.$normalizedPairId",
+                    mapOf("user1Id" to userId, "user1Name" to joinerName)
+                )
+                getPairInfo(normalizedPairId)
+            }
+            pair.user2Id.isEmpty() -> {
+                supabaseService.update(
+                    TABLE,
+                    "pairId=eq.$normalizedPairId",
+                    mapOf("user2Id" to userId, "user2Name" to joinerName)
+                )
+                getPairInfo(normalizedPairId)
+            }
+            else -> null
+        } ?: return JoinResult(false)
+
+        val partnerId = updatedPair.partnerIdFor(userId)
+        return JoinResult(
+            success = partnerId.isNotEmpty(),
+            partnerId = partnerId,
+            pairInfo = updatedPair
         )
-        if (results.isEmpty()) return JoinResult(false)
-
-        val obj = results[0]
-        val existingUser1 = obj["user1Id"] as? String ?: ""
-        val existingUser2 = obj["user2Id"] as? String ?: ""
-
-        return if (existingUser1.isEmpty()) {
-            supabaseService.update(TABLE, "pairId=eq.$pairId", mapOf("user1Id" to userId, "user1Name" to joinerName))
-            JoinResult(true, "")
-        } else if (existingUser2.isEmpty()) {
-            supabaseService.update(TABLE, "pairId=eq.$pairId", mapOf("user2Id" to userId, "user2Name" to joinerName))
-            JoinResult(true, existingUser1)
-        } else {
-            JoinResult(false)
-        }
     }
 
     suspend fun getPairInfo(pairId: String): PairingInfo? {
-        val results = supabaseService.query(TABLE, "pairId=eq.$pairId&limit=1")
+        val normalizedPairId = pairId.trim().uppercase()
+        val results = supabaseService.query(TABLE, "pairId=eq.$normalizedPairId&limit=1")
         if (results.isEmpty()) return null
         return PairingInfo.fromMap(results[0])
     }
 
-    /** 查询当前用户所属的配对信息 */
     suspend fun findPairByUserId(userId: String): PairingInfo? {
         val results = supabaseService.query(
             TABLE,
-            "or=(user1Id.eq.$userId,user2Id.eq.$userId)&limit=1"
+            "or=(user1Id.eq.$userId,user2Id.eq.$userId)"
         )
-        return if (results.isNotEmpty()) PairingInfo.fromMap(results[0]) else null
+        val pairs = results.map(PairingInfo::fromMap)
+        return pairs.firstOrNull { it.user1Id.isNotEmpty() && it.user2Id.isNotEmpty() }
+            ?: pairs.firstOrNull()
     }
 
-    /** 解除配对：删除配对记录 */
     suspend fun unpair(userId: String) {
-        // 找到该用户所属的配对记录并删除
-        val pair = findPairByUserId(userId)
-        if (pair != null) {
-            supabaseService.delete(TABLE, "pairId=eq.${pair.pairId}")
+        cleanupPairsForUser(userId)
+    }
+
+    private suspend fun cleanupPairsForUser(userId: String) {
+        if (userId.isEmpty()) return
+        runCatching {
+            supabaseService.delete(TABLE, "or=(user1Id.eq.$userId,user2Id.eq.$userId)")
+        }.onFailure {
+            Log.e(TAG, "cleanupPairsForUser failed: ${it.message}", it)
+        }
+    }
+
+    private fun PairingInfo.partnerIdFor(userId: String): String {
+        return when {
+            user1Id == userId -> user2Id
+            user2Id == userId -> user1Id
+            else -> ""
         }
     }
 

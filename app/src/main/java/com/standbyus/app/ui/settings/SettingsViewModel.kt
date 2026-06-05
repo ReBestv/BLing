@@ -1,13 +1,15 @@
 package com.standbyus.app.ui.settings
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.standbyus.app.data.model.PairingInfo
 import com.standbyus.app.data.remote.SupabaseService
 import com.standbyus.app.data.remote.ThemeRepository
+import com.standbyus.app.data.repository.PairingCleanupRepository
 import com.standbyus.app.data.repository.PairingRepository
+import com.standbyus.app.ui.theme.EmojiThemeManager
+import com.standbyus.app.ui.theme.EmojiThemeSet
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
@@ -15,13 +17,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import com.standbyus.app.ui.theme.EmojiThemeSet
-import com.standbyus.app.ui.theme.EmojiThemeManager
 import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val pairingRepository: PairingRepository,
+    private val pairingCleanupRepository: PairingCleanupRepository,
     private val supabaseService: SupabaseService,
     private val themeRepository: ThemeRepository,
     @ApplicationContext private val context: Context
@@ -63,7 +64,7 @@ class SettingsViewModel @Inject constructor(
     private val _partnerDisplayName = MutableStateFlow("对方")
     val partnerDisplayName: StateFlow<String> = _partnerDisplayName.asStateFlow()
 
-    private val _avatarEmoji = MutableStateFlow("🐱")
+    private val _avatarEmoji = MutableStateFlow("🙂")
     val avatarEmoji: StateFlow<String> = _avatarEmoji.asStateFlow()
 
     private val _myName = MutableStateFlow("")
@@ -72,11 +73,11 @@ class SettingsViewModel @Inject constructor(
     private val prefs = context.getSharedPreferences("pairing", Context.MODE_PRIVATE)
 
     init {
-        _avatarEmoji.value = prefs.getString("avatar_emoji", "🐱") ?: "🐱"
+        _avatarEmoji.value = prefs.getString("avatar_emoji", "🙂") ?: "🙂"
         _myName.value = prefs.getString("self_name", "") ?: ""
-        checkExistingPair()
         _nicknameInput.value = prefs.getString("partner_nickname", "") ?: ""
         updatePartnerDisplayName()
+        checkExistingPair()
         loadThemes()
     }
 
@@ -99,28 +100,25 @@ class SettingsViewModel @Inject constructor(
     private fun checkExistingPair() {
         if (prefs.getBoolean("is_paired", false)) {
             _isPaired.value = true
-            _loading.value = false
-            return
         }
         viewModelScope.launch {
-            try {
-                val uid = supabaseService.getCachedDeviceId()
-                val pair = pairingRepository.findPairByUserId(uid)
-                if (pair != null) {
-                    _isPaired.value = true
-                    cacheAll(pair, uid)
-                }
-            } catch (_: Exception) { }
+            val uid = supabaseService.getCachedDeviceId()
+            val pair = runCatching { pairingRepository.findPairByUserId(uid) }.getOrNull()
+            val partnerAssigned = pair?.partnerIdFor(uid).orEmpty().isNotEmpty()
+            if (pair != null && partnerAssigned) {
+                _isPaired.value = true
+                cacheAll(pair, uid)
+            } else {
+                _isPaired.value = false
+                clearPairingCache()
+                updatePartnerDisplayName()
+            }
             _loading.value = false
         }
     }
 
     private fun cacheAll(pair: PairingInfo, myUid: String) {
-        val partnerId = when {
-            pair.user1Id == myUid -> pair.user2Id
-            pair.user2Id == myUid -> pair.user1Id
-            else -> ""
-        }
+        val partnerId = pair.partnerIdFor(myUid)
         val partnerName = when {
             pair.user1Id == myUid -> pair.user2Name
             pair.user2Id == myUid -> pair.user1Name
@@ -138,18 +136,18 @@ class SettingsViewModel @Inject constructor(
 
     fun createCode() {
         viewModelScope.launch {
-            _status.value = "生成配对码中…"
+            _status.value = "生成配对码中..."
             try {
                 val uid = supabaseService.getCachedDeviceId()
                 val myName = _nameInput.value.trim().ifEmpty { "我" }
                 val code = pairingRepository.createPairingCode(uid, myName)
                 _pairingCode.value = code
-                _status.value = "配对码: $code，等待对方连接…"
+                _status.value = "配对码：$code，等待对方连接..."
                 prefs.edit().putString("self_name", myName).apply()
                 _myName.value = myName
                 pollPairingComplete(code)
             } catch (e: Exception) {
-                _status.value = "❌ 生成失败：${e.localizedMessage}"
+                _status.value = "生成失败：${e.localizedMessage ?: "请稍后重试"}"
             }
         }
     }
@@ -160,15 +158,11 @@ class SettingsViewModel @Inject constructor(
             delay(3000)
             try {
                 val pair = pairingRepository.getPairInfo(code) ?: return@repeat
-                val partnerAssigned = when {
-                    pair.user1Id == uid -> pair.user2Id.isNotEmpty()
-                    pair.user2Id == uid -> pair.user1Id.isNotEmpty()
-                    else -> pair.user1Id.isNotEmpty() && pair.user2Id.isNotEmpty()
-                }
+                val partnerAssigned = pair.partnerIdFor(uid).isNotEmpty()
                 if (partnerAssigned) {
                     _isPaired.value = true
                     _justPaired.value = true
-                    _status.value = "✅ 配对成功！"
+                    _status.value = "配对成功"
                     cacheAll(pair, uid)
                     val partnerName = when {
                         pair.user1Id == uid -> pair.user2Name
@@ -180,29 +174,32 @@ class SettingsViewModel @Inject constructor(
                     updatePartnerDisplayName(partnerName = partnerName)
                     return
                 }
-            } catch (_: Exception) { }
+            } catch (_: Exception) {
+            }
         }
     }
 
-    fun updateJoinCode(code: String) { _joinCodeInput.value = code }
+    fun updateJoinCode(code: String) {
+        _joinCodeInput.value = code
+    }
 
     fun joinPair() {
         viewModelScope.launch {
-            _status.value = "正在连接…"
+            _status.value = "正在连接..."
             try {
                 val uid = supabaseService.getCachedDeviceId()
                 val myName = _nameInput.value.trim().ifEmpty { "我" }
                 val pairId = _joinCodeInput.value
                 val pairInfo = pairingRepository.getPairInfo(pairId)
                 if (pairInfo == null) {
-                    _status.value = "❌ 配对码无效"
+                    _status.value = "配对码无效"
                     return@launch
                 }
                 val result = pairingRepository.joinPair(pairId, uid, myName)
                 if (result.success) {
                     _isPaired.value = true
                     _justPaired.value = true
-                    _status.value = "✅ 配对成功！"
+                    _status.value = "配对成功"
                     val partnerName = pairInfo.user1Name.ifEmpty { "" }
                     prefs.edit().apply {
                         putBoolean("is_paired", true)
@@ -215,27 +212,30 @@ class SettingsViewModel @Inject constructor(
                     _myName.value = myName
                     updatePartnerDisplayName(partnerName = partnerName)
                 } else {
-                    _status.value = "❌ 配对失败，请检查配对码"
+                    _status.value = "配对失败，请检查配对码"
                 }
             } catch (e: Exception) {
-                _status.value = "❌ 连接失败：${e.localizedMessage}"
+                _status.value = "连接失败：${e.localizedMessage ?: "请稍后重试"}"
             }
         }
     }
 
     fun unpair() {
         viewModelScope.launch {
-            try {
+            val hadFailures = runCatching {
                 val uid = supabaseService.getCachedDeviceId()
-                pairingRepository.unpair(uid)
-            } catch (_: Exception) { }
+                pairingCleanupRepository.unpairAndClearData(uid).hadFailures
+            }.getOrDefault(true)
             prefs.edit().clear().apply()
-            _avatarEmoji.value = "🐱"
+            _avatarEmoji.value = "🙂"
             _isPaired.value = false
             _justPaired.value = false
             _pairingCode.value = ""
             _joinCodeInput.value = ""
-            _status.value = "已解除配对"
+            _partnerNickname.value = ""
+            _nicknameInput.value = ""
+            _myName.value = ""
+            _status.value = if (hadFailures) "已解除配对，旧记录未完全清理" else "已解除配对"
             _partnerDisplayName.value = "对方"
         }
     }
@@ -249,7 +249,9 @@ class SettingsViewModel @Inject constructor(
         _justPaired.value = false
     }
 
-    fun updateNameInput(name: String) { _nameInput.value = name }
+    fun updateNameInput(name: String) {
+        _nameInput.value = name
+    }
 
     fun updateNickname(nickname: String) {
         _nicknameInput.value = nickname
@@ -266,5 +268,24 @@ class SettingsViewModel @Inject constructor(
             nickname = nickname,
             partnerName = partnerName
         )
+    }
+
+    private fun clearPairingCache() {
+        prefs.edit().apply {
+            remove("is_paired")
+            remove("partner_id")
+            remove("partner_name")
+            remove("pair_id")
+            remove("partner_nickname")
+            apply()
+        }
+    }
+
+    private fun PairingInfo.partnerIdFor(myUid: String): String {
+        return when {
+            user1Id == myUid -> user2Id
+            user2Id == myUid -> user1Id
+            else -> ""
+        }
     }
 }

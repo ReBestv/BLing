@@ -10,11 +10,11 @@ import com.standbyus.app.data.repository.PairingRepository
 import com.standbyus.app.ui.settings.SettingsDisplayName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel
 class HistoryViewModel @Inject constructor(
@@ -38,7 +38,7 @@ class HistoryViewModel @Inject constructor(
     val myId: StateFlow<String> = _myId.asStateFlow()
 
     private val _myAvatar = MutableStateFlow(
-        prefs.getString("avatar_emoji", "🐱") ?: "🐱"
+        prefs.getString("avatar_emoji", "🙂") ?: "🙂"
     )
     val myAvatar: StateFlow<String> = _myAvatar.asStateFlow()
 
@@ -46,7 +46,9 @@ class HistoryViewModel @Inject constructor(
         loadHistory()
     }
 
-    fun refresh() { loadHistory() }
+    fun refresh() {
+        loadHistory()
+    }
 
     private fun loadHistory() {
         viewModelScope.launch {
@@ -56,43 +58,61 @@ class HistoryViewModel @Inject constructor(
                 _myId.value = myId
                 _partnerName.value = resolvePartnerName()
                 if (myId.isEmpty()) {
+                    _statusHistory.value = emptyList()
                     _loading.value = false
                     return@launch
                 }
 
-                // 获取自己的状态
                 val myResults = supabaseService.query(
                     "statuses",
                     "userId=eq.$myId&order=updatedAt.desc&limit=20"
                 )
                 val myHistory = myResults.mapNotNull { raw ->
-                    try { UserStatus.fromMap(raw) } catch (_: Exception) { null }
-                }
-
-                // 获取对方的状态 — 优先使用缓存的 partner_id
-                val cachedPartnerId = prefs.getString("partner_id", null)
-                val partnerId = if (!cachedPartnerId.isNullOrEmpty()) {
-                    cachedPartnerId
-                } else {
-                    val pair = pairingRepository.findPairByUserId(myId)
-                    when {
-                        pair?.user1Id == myId && pair.user2Id.isNotEmpty() -> pair.user2Id
-                        pair?.user2Id == myId && pair.user1Id.isNotEmpty() -> pair.user1Id
-                        else -> null
+                    try {
+                        UserStatus.fromMap(raw)
+                    } catch (_: Exception) {
+                        null
                     }
                 }
 
-                val partnerHistory = if (partnerId != null) {
-                    val pResults = supabaseService.query(
+                val pair = runCatching { pairingRepository.findPairByUserId(myId) }
+                    .onFailure { Log.e(TAG, "pair lookup failed", it) }
+                    .getOrNull()
+                val partnerId = when {
+                    pair?.user1Id == myId && pair.user2Id.isNotEmpty() -> pair.user2Id
+                    pair?.user2Id == myId && pair.user1Id.isNotEmpty() -> pair.user1Id
+                    else -> ""
+                }
+
+                val partnerHistory = if (partnerId.isNotEmpty()) {
+                    prefs.edit().putString(KEY_PARTNER_ID, partnerId).apply()
+                    val partnerName = when {
+                        pair?.user1Id == myId -> pair.user2Name
+                        pair?.user2Id == myId -> pair.user1Name
+                        else -> ""
+                    }
+                    if (partnerName.isNotEmpty()) {
+                        prefs.edit().putString(KEY_PARTNER_NAME, partnerName).apply()
+                    }
+                    _partnerName.value = resolvePartnerName()
+
+                    val results = supabaseService.query(
                         "statuses",
-                        "userId=eq.$partnerId&order=updatedAt.desc&limit=30" // 扩大显示
+                        "userId=eq.$partnerId&order=updatedAt.desc&limit=30"
                     )
-                    pResults.mapNotNull { raw ->
-                        try { UserStatus.fromMap(raw) } catch (_: Exception) { null }
+                    results.mapNotNull { raw ->
+                        try {
+                            UserStatus.fromMap(raw)
+                        } catch (_: Exception) {
+                            null
+                        }
                     }
-                } else emptyList()
+                } else {
+                    clearPartnerCache()
+                    _partnerName.value = resolvePartnerName()
+                    emptyList()
+                }
 
-                // 合并并按时间降序排序
                 _statusHistory.value = (myHistory + partnerHistory)
                     .sortedByDescending { it.updatedAt }
             } catch (e: Exception) {
@@ -109,7 +129,20 @@ class HistoryViewModel @Inject constructor(
         )
     }
 
+    private fun clearPartnerCache() {
+        prefs.edit().apply {
+            remove(KEY_PARTNER_ID)
+            remove(KEY_PARTNER_NAME)
+            remove("partner_nickname")
+            remove("pair_id")
+            remove("is_paired")
+            apply()
+        }
+    }
+
     companion object {
         private const val TAG = "StandByHistoryVM"
+        private const val KEY_PARTNER_ID = "partner_id"
+        private const val KEY_PARTNER_NAME = "partner_name"
     }
 }

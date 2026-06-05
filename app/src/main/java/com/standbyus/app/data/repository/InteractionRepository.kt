@@ -4,6 +4,8 @@ import android.util.Log
 import com.standbyus.app.data.model.Interaction
 import com.standbyus.app.data.model.InteractionType
 import com.standbyus.app.data.remote.SupabaseService
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -13,8 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
 class InteractionRepository @Inject constructor(
@@ -39,11 +39,18 @@ class InteractionRepository @Inject constructor(
         return supabaseService.create(TABLE, interaction.toMap())?.let(Interaction::fromMap)
     }
 
-    suspend fun getLatestReceivedInteraction(myUserId: String): Interaction? {
-        val results = supabaseService.query(
-            TABLE,
-            "toUserId=eq.$myUserId&order=createdAt.desc&limit=1"
-        )
+    suspend fun getLatestReceivedInteraction(
+        myUserId: String,
+        partnerUserId: String? = null
+    ): Interaction? {
+        val query = buildString {
+            append("toUserId=eq.$myUserId")
+            if (!partnerUserId.isNullOrEmpty()) {
+                append("&fromUserId=eq.$partnerUserId")
+            }
+            append("&order=createdAt.desc&limit=1")
+        }
+        val results = supabaseService.query(TABLE, query)
         return results.firstOrNull()?.let(Interaction::fromMap)
     }
 
@@ -56,10 +63,13 @@ class InteractionRepository @Inject constructor(
         )
     }
 
-    fun observeLatestReceivedInteraction(myUserId: String): Flow<Interaction?> = callbackFlow {
+    fun observeLatestReceivedInteraction(
+        myUserId: String,
+        partnerUserId: String? = null
+    ): Flow<Interaction?> = callbackFlow {
         suspend fun fetchLatest() {
             try {
-                trySend(getLatestReceivedInteraction(myUserId))
+                trySend(getLatestReceivedInteraction(myUserId, partnerUserId))
             } catch (e: Exception) {
                 Log.e(TAG, "latest interaction query failed: ${e.message}")
             }

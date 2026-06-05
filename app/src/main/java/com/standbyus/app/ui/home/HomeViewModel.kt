@@ -9,20 +9,30 @@ import com.standbyus.app.data.model.InteractionType
 import com.standbyus.app.data.model.UserStatus
 import com.standbyus.app.data.remote.SupabaseService
 import com.standbyus.app.data.repository.InteractionRepository
+import com.standbyus.app.data.repository.PairingCleanupRepository
 import com.standbyus.app.data.repository.PairingRepository
 import com.standbyus.app.data.repository.StatusRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val statusRepository: StatusRepository,
     private val pairingRepository: PairingRepository,
+    private val pairingCleanupRepository: PairingCleanupRepository,
     private val interactionRepository: InteractionRepository,
     private val supabaseService: SupabaseService,
     @ApplicationContext private val context: Context
@@ -32,6 +42,16 @@ class HomeViewModel @Inject constructor(
 
     private val _myUserId = MutableStateFlow("")
     private val _partnerUserId = MutableStateFlow("")
+    private val _isPaired = MutableStateFlow(false)
+    val isPaired: StateFlow<Boolean> = _isPaired.asStateFlow()
+    private val _partnerDisplayName = MutableStateFlow("对方")
+    val partnerDisplayName: StateFlow<String> = _partnerDisplayName.asStateFlow()
+
+    private val _sendingInteractionType = MutableStateFlow<String?>(null)
+    val sendingInteractionType: StateFlow<String?> = _sendingInteractionType.asStateFlow()
+
+    private val _interactionError = MutableStateFlow("")
+    val interactionError: StateFlow<String> = _interactionError.asStateFlow()
 
     val myStatus: StateFlow<UserStatus?> = _myUserId.flatMapLatest { id ->
         if (id.isEmpty()) flowOf(null) else statusRepository.observeStatus(id)
@@ -45,126 +65,86 @@ class HomeViewModel @Inject constructor(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-    private val _partnerDisplayName = MutableStateFlow("对方")
-    val partnerDisplayName: StateFlow<String> = _partnerDisplayName.asStateFlow()
-
-    val latestInteraction: StateFlow<Interaction?> = _myUserId.flatMapLatest { id ->
-        if (id.isEmpty()) flowOf(null) else interactionRepository.observeLatestReceivedInteraction(id)
+    val latestInteraction: StateFlow<Interaction?> = combine(_myUserId, _partnerUserId) { myId, partnerId ->
+        myId to partnerId
+    }.flatMapLatest { (myId, partnerId) ->
+        if (myId.isEmpty() || partnerId.isEmpty()) {
+            flowOf(null)
+        } else {
+            interactionRepository.observeLatestReceivedInteraction(
+                myUserId = myId,
+                partnerUserId = partnerId
+            )
+        }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
-    private val _sendingInteractionType = MutableStateFlow<String?>(null)
-    val sendingInteractionType: StateFlow<String?> = _sendingInteractionType.asStateFlow()
-
-    private val _interactionError = MutableStateFlow("")
-    val interactionError: StateFlow<String> = _interactionError.asStateFlow()
-
     init {
-        try {
-            val uid = supabaseService.getCachedDeviceId()
-            Log.d(TAG, "deviceId=$uid")
-            _myUserId.value = uid
-
-            // 优先从缓存读取 partner ID
-            val cachedPartnerId = prefs.getString("partner_id", null)
-            if (!cachedPartnerId.isNullOrEmpty()) {
-                Log.d(TAG, "partner from cache: $cachedPartnerId")
-                _partnerUserId.value = cachedPartnerId
-                val cachedNickname = prefs.getString("partner_nickname", null)
-                val cachedPartnerName = prefs.getString("partner_name", null)
-                _partnerDisplayName.value = when {
-                    !cachedNickname.isNullOrEmpty() -> cachedNickname
-                    !cachedPartnerName.isNullOrEmpty() -> cachedPartnerName
-                    else -> "对方"
-                }
-                // 补充 pair_id 缓存（兼容旧版本未缓存 pair_id 的用户）
-                val cachedPairId = prefs.getString("pair_id", null)
-                if (cachedPairId.isNullOrEmpty()) {
-                    viewModelScope.launch {
-                        try {
-                            val pair = pairingRepository.findPairByUserId(uid)
-                            if (pair != null) {
-                                prefs.edit().putString("pair_id", pair.pairId).apply()
-                                Log.d(TAG, "backfilled pair_id=${pair.pairId}")
-                            }
-                        } catch (e: Exception) {
-                            Log.e(TAG, "pair_id backfill failed", e)
-                        }
-                    }
-                }
-            } else {
-                // 无缓存时联网查询
-                viewModelScope.launch {
-                    try {
-                        Log.d(TAG, "finding pair for $uid")
-                        val pair = pairingRepository.findPairByUserId(uid)
-                        Log.d(TAG, "pair=$pair")
-                        if (pair != null) {
-                            val partnerId = when {
-                                pair.user1Id == uid && pair.user2Id.isNotEmpty() -> pair.user2Id
-                                pair.user2Id == uid && pair.user1Id.isNotEmpty() -> pair.user1Id
-                                else -> ""
-                            }
-                            if (partnerId.isNotEmpty()) {
-                                prefs.edit().putString("partner_id", partnerId).apply()
-                                _partnerUserId.value = partnerId
-                            }
-                            prefs.edit().putString("pair_id", pair.pairId).apply()
-                            val partnerName = when {
-                                pair.user1Id == uid -> pair.user2Name
-                                pair.user2Id == uid -> pair.user1Name
-                                else -> ""
-                            }
-                            val cachedNickname = prefs.getString("partner_nickname", null)
-                            _partnerDisplayName.value = when {
-                                !cachedNickname.isNullOrEmpty() -> cachedNickname
-                                !partnerName.isNullOrEmpty() -> partnerName
-                                else -> "对方"
-                            }
-                        }
-                    } catch (e: Exception) {
-                        Log.e(TAG, "pair lookup failed", e)
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "init failed", e)
-        }
-        Log.d(TAG, "init end")
+        val uid = supabaseService.getCachedDeviceId()
+        Log.d(TAG, "deviceId=$uid")
+        _myUserId.value = uid
+        refreshPartner()
     }
 
     fun refreshPartner() {
-        val cachedPartnerId = prefs.getString("partner_id", null)
-        if (!cachedPartnerId.isNullOrEmpty() && _partnerUserId.value != cachedPartnerId) {
-            Log.d(TAG, "refreshPartner: updating from cache: $cachedPartnerId")
-            _partnerUserId.value = cachedPartnerId
-            val cachedNickname = prefs.getString("partner_nickname", null)
-            val cachedPartnerName = prefs.getString("partner_name", null)
-            _partnerDisplayName.value = when {
-                !cachedNickname.isNullOrEmpty() -> cachedNickname
-                !cachedPartnerName.isNullOrEmpty() -> cachedPartnerName
-                else -> "对方"
-            }
+        val uid = _myUserId.value.ifEmpty { supabaseService.getCachedDeviceId() }
+        if (uid.isEmpty()) {
+            clearPartnerState(clearLocal = false)
+            return
         }
-        // 补充 pair_id 缓存（兼容修复前已配对的用户）
-        val cachedPairId = prefs.getString("pair_id", null)
-        if (cachedPairId.isNullOrEmpty()) {
-            viewModelScope.launch {
-                try {
-                    val uid = supabaseService.getCachedDeviceId()
-                    val pair = pairingRepository.findPairByUserId(uid)
-                    if (pair != null) {
-                        prefs.edit().putString("pair_id", pair.pairId).apply()
-                        Log.d(TAG, "refreshPartner: cached pair_id=${pair.pairId}")
+
+        val cachedPartnerId = prefs.getString(KEY_PARTNER_ID, null)
+        val cachedPartnerName = prefs.getString(KEY_PARTNER_NAME, null)
+        val cachedNickname = prefs.getString(KEY_PARTNER_NICKNAME, null)
+
+        if (!cachedPartnerId.isNullOrEmpty()) {
+            _isPaired.value = true
+            _partnerUserId.value = cachedPartnerId
+            _partnerDisplayName.value = resolvePartnerDisplayName(cachedNickname, cachedPartnerName)
+        }
+
+        viewModelScope.launch {
+            try {
+                val pair = pairingRepository.findPairByUserId(uid)
+                val partnerId = when {
+                    pair?.user1Id == uid && pair.user2Id.isNotEmpty() -> pair.user2Id
+                    pair?.user2Id == uid && pair.user1Id.isNotEmpty() -> pair.user1Id
+                    else -> ""
+                }
+
+                if (partnerId.isEmpty()) {
+                    clearPartnerState(clearLocal = true)
+                    return@launch
+                }
+
+                val partnerName = when {
+                    pair?.user1Id == uid -> pair.user2Name
+                    pair?.user2Id == uid -> pair.user1Name
+                    else -> ""
+                }
+
+                prefs.edit().apply {
+                    putBoolean(KEY_IS_PAIRED, true)
+                    putString(KEY_PARTNER_ID, partnerId)
+                    putString(KEY_PAIR_ID, pair?.pairId)
+                    if (partnerName.isNotEmpty()) {
+                        putString(KEY_PARTNER_NAME, partnerName)
                     }
-                } catch (e: Exception) {
-                    Log.e(TAG, "refreshPartner: failed to cache pair_id", e)
+                    apply()
+                }
+
+                _isPaired.value = true
+                _partnerUserId.value = partnerId
+                _partnerDisplayName.value = resolvePartnerDisplayName(
+                    nickname = prefs.getString(KEY_PARTNER_NICKNAME, null),
+                    partnerName = partnerName.ifEmpty { prefs.getString(KEY_PARTNER_NAME, null) }
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "refreshPartner failed", e)
+                if (cachedPartnerId.isNullOrEmpty()) {
+                    clearPartnerState(clearLocal = false)
                 }
             }
         }
-    }
-
-    fun setPartnerId(partnerId: String) {
-        _partnerUserId.value = partnerId
     }
 
     fun sendInteraction(type: InteractionType) {
@@ -184,7 +164,7 @@ class HomeViewModel @Inject constructor(
                 )
             } catch (e: Exception) {
                 Log.e(TAG, "send interaction failed", e)
-                _interactionError.value = "刚刚没送达，等下再试试"
+                _interactionError.value = "刚刚没有送达，等下再试试"
             } finally {
                 _sendingInteractionType.value = null
             }
@@ -203,7 +183,49 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    private fun clearPartnerState(clearLocal: Boolean) {
+        val myUserId = _myUserId.value
+        val cachedPartnerId = prefs.getString(KEY_PARTNER_ID, null)
+        prefs.edit().apply {
+            remove(KEY_IS_PAIRED)
+            remove(KEY_PARTNER_ID)
+            remove(KEY_PARTNER_NAME)
+            remove(KEY_PARTNER_NICKNAME)
+            remove(KEY_PAIR_ID)
+            apply()
+        }
+        _isPaired.value = false
+        _partnerUserId.value = ""
+        _partnerDisplayName.value = "对方"
+
+        if (clearLocal && myUserId.isNotEmpty()) {
+            viewModelScope.launch {
+                runCatching {
+                    pairingCleanupRepository.clearLocalRelationshipData(
+                        userId = myUserId,
+                        partnerId = cachedPartnerId
+                    )
+                }.onFailure {
+                    Log.e(TAG, "clear local relationship data failed", it)
+                }
+            }
+        }
+    }
+
+    private fun resolvePartnerDisplayName(nickname: String?, partnerName: String?): String {
+        return when {
+            !nickname.isNullOrEmpty() -> nickname
+            !partnerName.isNullOrEmpty() -> partnerName
+            else -> "对方"
+        }
+    }
+
     companion object {
         private const val TAG = "StandByHomeVM"
+        private const val KEY_IS_PAIRED = "is_paired"
+        private const val KEY_PARTNER_ID = "partner_id"
+        private const val KEY_PARTNER_NAME = "partner_name"
+        private const val KEY_PARTNER_NICKNAME = "partner_nickname"
+        private const val KEY_PAIR_ID = "pair_id"
     }
 }

@@ -31,6 +31,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
@@ -40,6 +42,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -53,12 +56,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.standbyus.app.data.model.TodoItem
 import com.standbyus.app.data.model.TodoList
 import com.standbyus.app.ui.components.AppHeader
@@ -79,6 +85,19 @@ fun TodoScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refresh()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
@@ -113,26 +132,36 @@ fun TodoScreen(
                     onCreateList = { viewModel.showAddListDialog(true) }
                 )
                 else -> {
+                    val currentList = uiState.lists.firstOrNull { it.id == uiState.currentListId }
                     Column(modifier = Modifier.fillMaxSize()) {
                         ListTabs(
                             lists = uiState.lists,
                             currentListId = uiState.currentListId,
                             syncingListIds = uiState.syncingListIds,
-                            onSelectList = { viewModel.selectList(it) }
+                            onSelectList = { viewModel.selectList(it) },
+                            onDeleteList = { viewModel.deleteList(it.id) }
                         )
+
+                        currentList?.let { list ->
+                            ListPermissionBanner(
+                                list = list,
+                                canEdit = uiState.canEditCurrentList
+                            )
+                        }
 
                         Box(modifier = Modifier.weight(1f)) {
                             TaskList(
                                 items = uiState.items,
                                 isLoading = uiState.isLoading,
                                 syncingItemIds = uiState.syncingItemIds,
+                                canEdit = uiState.canEditCurrentList,
                                 onToggle = { viewModel.toggleItem(it) },
                                 onDelete = { viewModel.deleteItem(it.id) }
                             )
                         }
 
                         AddTaskButton(
-                            enabled = (uiState.currentListId ?: 0L) > 0L,
+                            enabled = (uiState.currentListId ?: 0L) > 0L && uiState.canEditCurrentList,
                             onClick = { viewModel.showAddItemSheet(true) }
                         )
                     }
@@ -166,6 +195,67 @@ fun TodoScreen(
                 viewModel.showAddItemSheet(false)
             }
         )
+    }
+}
+
+@Composable
+private fun ListPermissionBanner(
+    list: TodoList,
+    canEdit: Boolean
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        if (!list.isShared) {
+            FilterChip(
+                selected = true,
+                onClick = {},
+                enabled = false,
+                label = { Text(formatOwnerBadge(list.ownerId)) },
+                colors = FilterChipDefaults.filterChipColors(
+                    disabledContainerColor = Color(0xFFF5F0ED),
+                    disabledLabelColor = TextSecondary
+                )
+            )
+        }
+        FilterChip(
+            selected = true,
+            onClick = {},
+            enabled = false,
+            label = {
+                Text(if (list.isShared) "共同清单" else "个人清单")
+            },
+            colors = FilterChipDefaults.filterChipColors(
+                disabledContainerColor = PrimarySoft,
+                disabledLabelColor = PrimaryColor
+            )
+        )
+        if (!canEdit) {
+            FilterChip(
+                selected = true,
+                onClick = {},
+                enabled = false,
+                label = { Text("仅对方可编辑") },
+                colors = FilterChipDefaults.filterChipColors(
+                    disabledContainerColor = Color(0xFFF5F0ED),
+                    disabledLabelColor = TextSecondary
+                )
+            )
+        }
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
+}
+
+private fun formatOwnerBadge(ownerId: String): String {
+    val normalized = ownerId.filter { it.isLetterOrDigit() }.uppercase()
+    return if (normalized.length >= 4) {
+        "ID ${normalized.takeLast(4)}"
+    } else {
+        "ID ${normalized.ifBlank { "----" }}"
     }
 }
 
@@ -244,13 +334,18 @@ private fun EmptyListsPlaceholder(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ListTabs(
     lists: List<TodoList>,
     currentListId: Long?,
     syncingListIds: Set<Long>,
-    onSelectList: (Long) -> Unit
+    onSelectList: (Long) -> Unit,
+    onDeleteList: (TodoList) -> Unit
 ) {
+    val haptic = LocalHapticFeedback.current
+    var pendingDeleteList by remember(lists.map { it.id }) { mutableStateOf<TodoList?>(null) }
+
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
@@ -265,7 +360,14 @@ private fun ListTabs(
             Card(
                 modifier = Modifier
                     .animateContentSize()
-                    .clickable(enabled = !isSyncing) { onSelectList(list.id) },
+                    .combinedClickable(
+                        enabled = !isSyncing,
+                        onClick = { onSelectList(list.id) },
+                        onLongClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            pendingDeleteList = list
+                        }
+                    ),
                 colors = CardDefaults.cardColors(
                     containerColor = if (isSelected) PrimaryColor else SurfaceColor
                 ),
@@ -295,6 +397,29 @@ private fun ListTabs(
             }
         }
     }
+
+    pendingDeleteList?.let { list ->
+        AlertDialog(
+            onDismissRequest = { pendingDeleteList = null },
+            title = { Text("删除清单") },
+            text = { Text("确定要删除“${list.name}”吗？") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        pendingDeleteList = null
+                        onDeleteList(list)
+                    }
+                ) {
+                    Text("删除", color = PrimaryColor)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { pendingDeleteList = null }) {
+                    Text("取消")
+                }
+            }
+        )
+    }
 }
 
 @Composable
@@ -302,6 +427,7 @@ private fun TaskList(
     items: List<TodoItem>,
     isLoading: Boolean,
     syncingItemIds: Set<Long>,
+    canEdit: Boolean,
     onToggle: (TodoItem) -> Unit,
     onDelete: (TodoItem) -> Unit
 ) {
@@ -349,6 +475,7 @@ private fun TaskList(
                 TaskItemRow(
                     item = item,
                     isSyncing = item.id in syncingItemIds,
+                    canEdit = canEdit,
                     onToggle = { onToggle(item) },
                     onLongPressDelete = { pendingDeleteItem = item }
                 )
@@ -385,6 +512,7 @@ private fun TaskList(
 private fun TaskItemRow(
     item: TodoItem,
     isSyncing: Boolean,
+    canEdit: Boolean,
     onToggle: () -> Unit,
     onLongPressDelete: () -> Unit
 ) {
@@ -392,6 +520,7 @@ private fun TaskItemRow(
     val alpha by animateFloatAsState(
         targetValue = when {
             isSyncing -> 0.72f
+            !canEdit -> 0.78f
             item.isDone -> 0.6f
             else -> 1f
         },
@@ -404,7 +533,7 @@ private fun TaskItemRow(
             .animateContentSize()
             .alpha(alpha)
             .combinedClickable(
-                enabled = !isSyncing,
+                enabled = !isSyncing && canEdit,
                 onClick = onToggle,
                 onLongClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -426,8 +555,14 @@ private fun TaskItemRow(
                 modifier = Modifier
                     .size(24.dp)
                     .clip(CircleShape)
-                    .background(if (item.isDone) DoneCheckColor else PrimarySoft)
-                    .clickable(enabled = !isSyncing) { onToggle() },
+                    .background(
+                        when {
+                            item.isDone -> DoneCheckColor
+                            canEdit -> PrimarySoft
+                            else -> Color(0xFFF5F0ED)
+                        }
+                    )
+                    .clickable(enabled = !isSyncing && canEdit) { onToggle() },
                 contentAlignment = Alignment.Center
             ) {
                 if (isSyncing) {
@@ -457,6 +592,14 @@ private fun TaskItemRow(
                         text = "同步中",
                         fontSize = 11.sp,
                         color = PrimaryColor
+                    )
+                }
+
+                !canEdit -> {
+                    Text(
+                        text = "只读",
+                        fontSize = 11.sp,
+                        color = TextSecondary
                     )
                 }
 

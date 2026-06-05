@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -36,6 +37,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.standbyus.app.data.model.AlbumPhoto
@@ -59,8 +62,21 @@ fun AlbumScreen(
     val caption by viewModel.caption.collectAsState()
     val error by viewModel.error.collectAsState()
     val filterDays by viewModel.filterDays.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     var fullScreenPhoto by remember { mutableStateOf<AlbumPhoto?>(null) }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refresh()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     // 相册选择器
     val photoPicker = rememberLauncherForActivityResult(
@@ -195,7 +211,7 @@ fun AlbumScreen(
                             )
                             Spacer(Modifier.height(8.dp))
                             Text(
-                                "点击右上角上传第一张照片，把某个小瞬间留给你们两个。",
+                                "点击右上角上传第一张照片，把某个小瞬间留给我们。",
                                 fontSize = 13.sp,
                                 color = StandByUsLightColors.muted,
                                 textAlign = TextAlign.Center,

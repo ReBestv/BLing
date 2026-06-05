@@ -15,4 +15,7 @@ interface TodoItemDao {
 
     @Query("DELETE FROM todo_items WHERE id = :id")
     suspend fun deleteItem(id: Long)
+
+    @Query("DELETE FROM todo_items")
+    suspend fun clearAll()
 }
