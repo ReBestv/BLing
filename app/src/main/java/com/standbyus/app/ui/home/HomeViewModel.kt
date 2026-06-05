@@ -76,6 +76,21 @@ class HomeViewModel @Inject constructor(
                     !cachedPartnerName.isNullOrEmpty() -> cachedPartnerName
                     else -> "对方"
                 }
+                // 补充 pair_id 缓存（兼容旧版本未缓存 pair_id 的用户）
+                val cachedPairId = prefs.getString("pair_id", null)
+                if (cachedPairId.isNullOrEmpty()) {
+                    viewModelScope.launch {
+                        try {
+                            val pair = pairingRepository.findPairByUserId(uid)
+                            if (pair != null) {
+                                prefs.edit().putString("pair_id", pair.pairId).apply()
+                                Log.d(TAG, "backfilled pair_id=${pair.pairId}")
+                            }
+                        } catch (e: Exception) {
+                            Log.e(TAG, "pair_id backfill failed", e)
+                        }
+                    }
+                }
             } else {
                 // 无缓存时联网查询
                 viewModelScope.launch {
@@ -93,6 +108,7 @@ class HomeViewModel @Inject constructor(
                                 prefs.edit().putString("partner_id", partnerId).apply()
                                 _partnerUserId.value = partnerId
                             }
+                            prefs.edit().putString("pair_id", pair.pairId).apply()
                             val partnerName = when {
                                 pair.user1Id == uid -> pair.user2Name
                                 pair.user2Id == uid -> pair.user1Name
@@ -114,6 +130,37 @@ class HomeViewModel @Inject constructor(
             Log.e(TAG, "init failed", e)
         }
         Log.d(TAG, "init end")
+    }
+
+    fun refreshPartner() {
+        val cachedPartnerId = prefs.getString("partner_id", null)
+        if (!cachedPartnerId.isNullOrEmpty() && _partnerUserId.value != cachedPartnerId) {
+            Log.d(TAG, "refreshPartner: updating from cache: $cachedPartnerId")
+            _partnerUserId.value = cachedPartnerId
+            val cachedNickname = prefs.getString("partner_nickname", null)
+            val cachedPartnerName = prefs.getString("partner_name", null)
+            _partnerDisplayName.value = when {
+                !cachedNickname.isNullOrEmpty() -> cachedNickname
+                !cachedPartnerName.isNullOrEmpty() -> cachedPartnerName
+                else -> "对方"
+            }
+        }
+        // 补充 pair_id 缓存（兼容修复前已配对的用户）
+        val cachedPairId = prefs.getString("pair_id", null)
+        if (cachedPairId.isNullOrEmpty()) {
+            viewModelScope.launch {
+                try {
+                    val uid = supabaseService.getCachedDeviceId()
+                    val pair = pairingRepository.findPairByUserId(uid)
+                    if (pair != null) {
+                        prefs.edit().putString("pair_id", pair.pairId).apply()
+                        Log.d(TAG, "refreshPartner: cached pair_id=${pair.pairId}")
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "refreshPartner: failed to cache pair_id", e)
+                }
+            }
+        }
     }
 
     fun setPartnerId(partnerId: String) {

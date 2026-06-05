@@ -5,6 +5,8 @@ import androidx.room.Room
 import com.standbyus.app.data.local.AppDatabase
 import com.standbyus.app.data.local.CheckinDao
 import com.standbyus.app.data.local.StatusDao
+import com.standbyus.app.data.local.TodoItemDao
+import com.standbyus.app.data.local.TodoListDao
 import com.standbyus.app.data.remote.ThemeRepository
 import dagger.Module
 import dagger.Provides
@@ -29,6 +31,12 @@ object AppModule {
 
     @Provides
     fun provideCheckinDao(database: AppDatabase): CheckinDao = database.checkinDao()
+
+    @Provides
+    fun provideTodoListDao(db: AppDatabase): TodoListDao = db.todoListDao()
+
+    @Provides
+    fun provideTodoItemDao(db: AppDatabase): TodoItemDao = db.todoItemDao()
 
     @Provides
     @Singleton

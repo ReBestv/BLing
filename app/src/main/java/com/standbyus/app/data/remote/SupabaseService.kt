@@ -88,11 +88,17 @@ class SupabaseService @Inject constructor() {
     /** 创建记录 */
     suspend fun create(table: String, data: Map<String, Any>): Map<String, Any>? {
         val json = JSONObject(data as Map<*, *>).toString()
+        Log.d(TAG, "Creating in table '$table', data=$json")
         val request = Request.Builder()
             .url("${SupabaseConfig.REST_URL}$table")
             .post(json.toRequestBody(jsonType))
             .build()
-        return executeAndParse(request).firstOrNull()
+        val results = executeAndParse(request)
+        Log.d(TAG, "Create response count: ${results.size}")
+        if (results.isEmpty()) {
+            Log.w(TAG, "Create returned empty list. Check: 1) RLS policy 2) Table exists 3) 'Prefer: return=representation' header")
+        }
+        return results.firstOrNull()
     }
 
     /** 更新记录 */
@@ -143,6 +149,7 @@ class SupabaseService @Inject constructor() {
     private suspend fun executeAndParse(request: Request): List<Map<String, Any>> = withContext(Dispatchers.IO) {
         val response = client.newCall(request).execute()
         val bodyStr = response.body?.string() ?: throw IOException("空响应")
+        Log.d(TAG, "Response code: ${response.code}, body: $bodyStr")
         if (!response.isSuccessful) {
             throw IOException("Supabase 错误 (${response.code}): $bodyStr")
         }

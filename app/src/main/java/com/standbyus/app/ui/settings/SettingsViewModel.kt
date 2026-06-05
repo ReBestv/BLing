@@ -130,6 +130,7 @@ class SettingsViewModel @Inject constructor(
             putBoolean("is_paired", true)
             putString("partner_id", partnerId)
             putString("partner_name", partnerName)
+            putString("pair_id", pair.pairId)
             apply()
         }
         updatePartnerDisplayName(partnerName = partnerName)
@@ -208,6 +209,7 @@ class SettingsViewModel @Inject constructor(
                         putString("partner_id", result.partnerId)
                         putString("self_name", myName)
                         putString("partner_name", partnerName)
+                        putString("pair_id", pairInfo.pairId)
                         apply()
                     }
                     _myName.value = myName

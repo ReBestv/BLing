@@ -93,6 +93,10 @@ fun HomeScreen(
     val sendingInteractionType by viewModel.sendingInteractionType.collectAsState()
     val interactionError by viewModel.interactionError.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.refreshPartner()
+    }
+
     LaunchedEffect(latestInteraction?.id) {
         viewModel.markLatestInteractionRead()
     }

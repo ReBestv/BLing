@@ -7,4 +7,5 @@ object Routes {
     const val HISTORY = "history"
     const val CHECKIN = "checkin"
     const val SETTINGS = "settings"
+    const val TODO = "todo"
 }

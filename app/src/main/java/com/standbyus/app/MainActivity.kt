@@ -47,6 +47,7 @@ import com.standbyus.app.ui.history.HistoryScreen
 import com.standbyus.app.ui.home.HomeScreen
 import com.standbyus.app.ui.poststatus.PostStatusScreen
 import com.standbyus.app.ui.settings.SettingsScreen
+import com.standbyus.app.ui.todo.TodoScreen
 import com.standbyus.app.ui.theme.Border
 import com.standbyus.app.ui.theme.Primary
 import com.standbyus.app.ui.theme.StandByUsTheme
@@ -92,6 +93,7 @@ class MainActivity : ComponentActivity() {
                     val navItems = listOf(
                         BottomNavItem(Routes.HOME, NavIcons.Home, "首页"),
                         BottomNavItem(Routes.CHECKIN, NavIcons.Checkin, "打卡"),
+                        BottomNavItem(Routes.TODO, NavIcons.Todo, "待办"),
                         BottomNavItem(Routes.ALBUM, NavIcons.Album, "相册"),
                         BottomNavItem(Routes.HISTORY, NavIcons.Timeline, "时光轴")
                     )
@@ -128,6 +130,11 @@ class MainActivity : ComponentActivity() {
                             }
                             composable(Routes.CHECKIN) {
                                 CheckinScreen(
+                                    onBack = { navController.popBackStack() }
+                                )
+                            }
+                            composable(Routes.TODO) {
+                                TodoScreen(
                                     onBack = { navController.popBackStack() }
                                 )
                             }
