@@ -48,6 +48,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -63,7 +64,7 @@ import androidx.compose.material.icons.filled.Settings
 // Design tokens (matching preview.html spec)
 private val BgColor       = Color(0xFFFFF8F5)
 private val SurfaceColor  = Color(0xFFFFFFFF)
-private val PrimaryColor  = Color(0xFFFFB4A2)
+private val PrimaryColor  = Color(0xFFFF8E78)
 private val TextPrimary   = Color(0xFF5A4A42)
 private val TextSecondary = Color(0xFF9E8E86)
 private val BorderColor   = Color(0xFFF0EAE6)
@@ -208,6 +209,12 @@ private fun HomeInteractionFlow(
         modifier = modifier
             .offset(y = HomeInteractionFlowStyle.topOverlapDp.dp)
             .padding(horizontal = HomeInteractionFlowStyle.horizontalInsetDp.dp)
+            .shadow(
+                elevation = 12.dp,
+                shape = flowShape,
+                ambientColor = Color(0x125A4A42),
+                spotColor = Color(0x125A4A42)
+            )
             .clip(flowShape)
             .background(
                 Brush.verticalGradient(
@@ -217,6 +224,7 @@ private fun HomeInteractionFlow(
                     )
                 )
             )
+            .border(1.dp, Color(0x80FFFFFF), flowShape)
             .padding(
                 start = HomeInteractionFlowStyle.horizontalPaddingDp.dp,
                 top = HomeInteractionFlowStyle.topPaddingDp.dp,
@@ -305,12 +313,12 @@ private fun InteractionActionsGrid(
 
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         rows.forEachIndexed { rowIndex, rowTypes ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 rowTypes.forEachIndexed { columnIndex, type ->
                     InteractionActionButton(
@@ -366,11 +374,14 @@ private fun InteractionActionButton(
             } else {
                 Text(
                     text = type.sendText,
-                    fontSize = 14.sp,
+                    fontSize = 13.sp,
+                    lineHeight = 18.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = TextPrimary,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(horizontal = 12.dp)
                 )
             }
         }
@@ -405,15 +416,15 @@ private fun PartnerStatusCard(
         label = "floatY"
     )
 
-    val cardShape = RoundedCornerShape(24.dp)
+    val cardShape = RoundedCornerShape(34.dp)
 
     Box(
         modifier = modifier
             .shadow(
-                elevation = 8.dp,
+                elevation = 22.dp,
                 shape = cardShape,
-                ambientColor = PrimaryColor.copy(alpha = 0.15f),
-                spotColor = PrimaryColor.copy(alpha = 0.15f)
+                ambientColor = PrimaryColor.copy(alpha = 0.24f),
+                spotColor = PrimaryColor.copy(alpha = 0.24f)
             )
             .clip(cardShape)
             .drawBehind {
@@ -505,7 +516,7 @@ private fun MyStatusStrip(
 ) {
     Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(24.dp),
         color = HomeStatusBubbleStyle.myStatusContainerColor,
         shadowElevation = 0.dp,
         modifier = modifier
@@ -513,7 +524,8 @@ private fun MyStatusStrip(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 10.dp),
+                .border(1.dp, Color(0x66FFFFFF), RoundedCornerShape(24.dp))
+                .padding(vertical = 10.dp, horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -564,11 +576,15 @@ private fun QuickPostButton(
             .shadow(
                 elevation = 16.dp,
                 shape = RoundedCornerShape(28.dp),
-                ambientColor = Color(0x0F5A4A42),
-                spotColor = Color(0x0F5A4A42)
+                ambientColor = PrimaryColor.copy(alpha = 0.22f),
+                spotColor = PrimaryColor.copy(alpha = 0.22f)
             )
             .clip(RoundedCornerShape(28.dp))
-            .background(PrimaryColor)
+            .background(
+                Brush.horizontalGradient(
+                    listOf(PrimaryColor, Color(0xFFFFB99F))
+                )
+            )
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
@@ -604,31 +620,61 @@ private fun EmptyPartnerState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(text = "💕", fontSize = 64.sp)
-
-        Text(
-            text = "还没有绑定伴侣",
-            fontSize = 16.sp,
-            color = TextSecondary
-        )
-
-        // Custom primary button
-        Box(
+        Column(
             modifier = Modifier
-                .padding(top = 8.dp)
-                .height(56.dp)
+                .fillMaxWidth()
+                .shadow(
+                    elevation = 14.dp,
+                    shape = RoundedCornerShape(28.dp),
+                    ambientColor = Color(0x145A4A42),
+                    spotColor = Color(0x145A4A42)
+                )
                 .clip(RoundedCornerShape(28.dp))
-                .background(PrimaryColor)
-                .clickable { onGoToSettings() }
-                .padding(horizontal = 32.dp),
-            contentAlignment = Alignment.Center
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color(0xE6FFFFFF), Color(0x99FFFFFF))
+                    )
+                )
+                .border(1.dp, Color(0x80FFFFFF), RoundedCornerShape(28.dp))
+                .padding(horizontal = 24.dp, vertical = 30.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            Text(text = "💕", fontSize = 58.sp)
             Text(
-                text = "去绑定",
+                text = "还没有绑定伴侣",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color.White
+                color = TextPrimary
             )
+            Text(
+                text = "交换 6 位配对码后，就能看到彼此的状态和小回应。",
+                fontSize = 13.sp,
+                color = TextSecondary,
+                textAlign = TextAlign.Center,
+                lineHeight = 20.sp
+            )
+            Box(
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .height(52.dp)
+                    .clip(RoundedCornerShape(26.dp))
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(PrimaryColor, Color(0xFFFFB99F))
+                        )
+                    )
+                    .clickable { onGoToSettings() }
+                    .padding(horizontal = 32.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "去绑定",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
         }
     }
 }

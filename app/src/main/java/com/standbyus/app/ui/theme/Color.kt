@@ -5,11 +5,11 @@ import androidx.compose.ui.graphics.Color
 // ===== Design System v3 — StandBy Us Visual Spec v1.0 =====
 
 // ===== Primary =====
-val Primary = Color(0xFFFFB4A2)           // --accent-primary 主强调色
-val PrimaryDark = Color(0xFFE5A292)       // 强调色深色 自动推导
-val PrimaryLight = Color(0xFFFFD1C7)      // 强调色浅色 自动推导
-val PrimarySoft = Color(0xFFFEF0EC)       // --bg-tag 标签/徽章背景
-val PrimaryBg = Color(0xFFFFF8F5)         // --bg-primary 全局页面背景
+val Primary = Color(0xFFFF8E78)           // --accent-primary 主强调色
+val PrimaryDark = Color(0xFFEA7662)       // 强调色深色 自动推导
+val PrimaryLight = Color(0xFFFFB99F)      // 强调色浅色 自动推导
+val PrimarySoft = Color(0xFFFFF0EB)       // --bg-tag 标签/徽章背景
+val PrimaryBg = Color(0xFFFFF8F3)         // --bg-primary 全局页面背景
 
 // ===== Secondary =====
 val Secondary = Color(0xFFE8D5C4)         // --accent-secondary 奶茶色辅助色
@@ -20,17 +20,17 @@ val SecondaryLight = Color(0xFFF0E5DB)    // 自动推导
 val TertiaryColor = Color(0xFFD4E2D4)     // --accent-tertiary 薄荷灰绿
 
 // ===== Background & Surface =====
-val Background = Color(0xFFFFF8F5)        // --bg-primary
+val Background = Color(0xFFFFF8F3)        // --bg-primary
 val Surface = Color(0xFFFFFFFF)           // --bg-card
-val SurfaceVariant = Color(0xFFFEF0EC)    // --bg-tag
+val SurfaceVariant = Color(0xFFFFF0EB)    // --bg-tag
 
 // ===== Text =====
-val TextPrimary = Color(0xFF5A4A42)       // --text-primary 暖棕黑
-val TextSecondary = Color(0xFF9E8E86)     // --text-secondary 暖灰
+val TextPrimary = Color(0xFF3D3029)       // --text-primary 暖棕黑
+val TextSecondary = Color(0xFF8F7469)     // --text-secondary 暖灰
 val TextHint = Color(0xFFC4B5AD)          // --text-tertiary 浅灰棕
 
 // ===== Border & Shadow =====
-val Border = Color(0xFFF0EAE6)            // --divider 分割线
+val Border = Color(0xFFEFE2DA)            // --divider 分割线
 val BorderLight = Color(0xFFF9F7F5)       // 浅边框 自动推导
 val Shadow = Color(0x0F5A4A42)            // --shadow rgba(90, 74, 66, 0.06)
 

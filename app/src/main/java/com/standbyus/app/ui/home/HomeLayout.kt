@@ -14,7 +14,7 @@ data class HomeLayoutMetrics(
 )
 
 object HomeLayout {
-    private const val NATURAL_PARTNER_CARD_HEIGHT_DP = 320f
+    private const val NATURAL_PARTNER_CARD_HEIGHT_DP = 344f
     private const val MIN_PARTNER_CARD_HEIGHT_DP = 152.08f
 
     fun metrics(

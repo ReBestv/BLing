@@ -30,16 +30,16 @@ object CheckinLayout {
         availableHeightDp: Float
     ): CheckinLayoutMetrics {
         val cardWidth = (availableWidthDp * 0.9f).coerceIn(288f, 420f)
-        val heightScale = (availableHeightDp / 760f).coerceIn(0.82f, 1.04f)
-        val cardGap = (18f * heightScale).coerceIn(12f, 20f)
+        val heightScale = (availableHeightDp / 760f).coerceIn(0.78f, 1f)
+        val cardGap = (12f * heightScale).coerceIn(8f, 12f)
         val buttonSize = when {
-            availableHeightDp >= 840f -> 118f
-            availableHeightDp >= 720f -> 108f
-            else -> 100f
+            availableHeightDp >= 840f -> 104f
+            availableHeightDp >= 720f -> 96f
+            else -> 88f
         }
-        val buttonBottomPadding = if (availableHeightDp >= 700f) 14f else 8f
-        val pkVerticalPadding = (26f * heightScale).coerceIn(20f, 28f)
-        val statVerticalPadding = (18f * heightScale).coerceIn(14f, 20f)
+        val buttonBottomPadding = if (availableHeightDp >= 700f) 8f else 4f
+        val pkVerticalPadding = (18f * heightScale).coerceIn(14f, 20f)
+        val statVerticalPadding = (12f * heightScale).coerceIn(10f, 14f)
 
         return CheckinLayoutMetrics(
             cardWidthDp = cardWidth,

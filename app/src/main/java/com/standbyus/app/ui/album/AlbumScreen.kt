@@ -11,9 +11,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -26,6 +25,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -162,44 +162,55 @@ fun AlbumScreen(
                         CircularProgressIndicator()
                     }
                 } else if (photos.isEmpty()) {
-                    // 空状态
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("📷", fontSize = 64.sp)
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = layoutMetrics.horizontalPaddingDp.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(28.dp))
+                                .background(
+                                    Brush.verticalGradient(
+                                        listOf(Color(0xE6FFFFFF), Color(0x8CFFFFFF))
+                                    )
+                                )
+                                .border(
+                                    width = 1.dp,
+                                    color = Color(0x66FF8E78),
+                                    shape = RoundedCornerShape(28.dp)
+                                )
+                                .padding(horizontal = 24.dp, vertical = 34.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("▧", fontSize = 48.sp, color = Color(0xFFFF8E78))
                             Spacer(Modifier.height(12.dp))
                             Text(
-                                "还没有照片",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = StandByUsLightColors.fgSecondary
+                                "空相册也可以有第一束光",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = StandByUsLightColors.fg
                             )
-                            Spacer(Modifier.height(4.dp))
+                            Spacer(Modifier.height(8.dp))
                             Text(
-                                "点击右上角上传第一张",
+                                "点击右上角上传第一张照片，把某个小瞬间留给你们两个。",
                                 fontSize = 13.sp,
-                                color = StandByUsLightColors.muted
+                                color = StandByUsLightColors.muted,
+                                textAlign = TextAlign.Center,
+                                lineHeight = 20.sp
                             )
                         }
                     }
                 } else {
-                    // 3列照片网格
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(3),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = layoutMetrics.horizontalPaddingDp.dp),
-                        horizontalArrangement = Arrangement.spacedBy(layoutMetrics.gridGapDp.dp),
-                        verticalArrangement = Arrangement.spacedBy(layoutMetrics.gridGapDp.dp),
-                        contentPadding = PaddingValues(vertical = 12.dp)
-                    ) {
-                        items(photos, key = { it.id }) { photo ->
-                            PhotoCard(
-                                photo = photo,
-                                onClick = { fullScreenPhoto = photo },
-                                onDelete = { viewModel.deletePhoto(photo) }
-                            )
-                        }
-                    }
+                    AlbumMosaic(
+                        photos = photos,
+                        layoutMetrics = layoutMetrics,
+                        onPhotoClick = { fullScreenPhoto = it },
+                        onPhotoDelete = viewModel::deletePhoto,
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
             }
             }
@@ -375,24 +386,184 @@ fun AlbumScreen(
     }
 }
 
+@Composable
+private fun AlbumMosaic(
+    photos: List<AlbumPhoto>,
+    layoutMetrics: AlbumLayoutMetrics,
+    onPhotoClick: (AlbumPhoto) -> Unit,
+    onPhotoDelete: (AlbumPhoto) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val groups = remember(photos) { photos.chunked(6) }
+
+    LazyColumn(
+        modifier = modifier.padding(horizontal = layoutMetrics.horizontalPaddingDp.dp),
+        contentPadding = PaddingValues(top = 12.dp, bottom = 28.dp),
+        verticalArrangement = Arrangement.spacedBy((layoutMetrics.gridGapDp + 12f).dp)
+    ) {
+        itemsIndexed(
+            items = groups,
+            key = { index, group -> group.joinToString("-") { it.id.toString() }.ifEmpty { index.toString() } }
+        ) { groupIndex, groupPhotos ->
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(layoutMetrics.gridGapDp.dp)
+            ) {
+                MosaicLeadRow(
+                    photos = groupPhotos.take(3),
+                    mirror = groupIndex % 2 == 1,
+                    gapDp = layoutMetrics.gridGapDp,
+                    onPhotoClick = onPhotoClick,
+                    onPhotoDelete = onPhotoDelete
+                )
+
+                groupPhotos.getOrNull(3)?.let { photo ->
+                    PhotoCard(
+                        photo = photo,
+                        onClick = { onPhotoClick(photo) },
+                        onDelete = { onPhotoDelete(photo) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1.72f)
+                    )
+                }
+
+                MosaicDuoRow(
+                    photos = groupPhotos.drop(4).take(2),
+                    gapDp = layoutMetrics.gridGapDp,
+                    onPhotoClick = onPhotoClick,
+                    onPhotoDelete = onPhotoDelete
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun MosaicLeadRow(
+    photos: List<AlbumPhoto>,
+    mirror: Boolean,
+    gapDp: Float,
+    onPhotoClick: (AlbumPhoto) -> Unit,
+    onPhotoDelete: (AlbumPhoto) -> Unit
+) {
+    if (photos.isEmpty()) return
+
+    if (photos.size == 1) {
+        PhotoCard(
+            photo = photos[0],
+            onClick = { onPhotoClick(photos[0]) },
+            onDelete = { onPhotoDelete(photos[0]) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1.34f)
+        )
+        return
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(236.dp),
+        horizontalArrangement = Arrangement.spacedBy(gapDp.dp)
+    ) {
+        val bigCard: @Composable RowScope.() -> Unit = {
+            val photo = photos[0]
+            PhotoCard(
+                photo = photo,
+                onClick = { onPhotoClick(photo) },
+                onDelete = { onPhotoDelete(photo) },
+                modifier = Modifier
+                    .weight(1.08f)
+                    .fillMaxHeight()
+            )
+        }
+        val smallStack: @Composable RowScope.() -> Unit = {
+            Column(
+                modifier = Modifier
+                    .weight(0.92f)
+                    .fillMaxHeight(),
+                verticalArrangement = Arrangement.spacedBy(gapDp.dp)
+            ) {
+                photos.drop(1).forEach { photo ->
+                    PhotoCard(
+                        photo = photo,
+                        onClick = { onPhotoClick(photo) },
+                        onDelete = { onPhotoDelete(photo) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                    )
+                }
+            }
+        }
+
+        if (mirror) {
+            smallStack()
+            bigCard()
+        } else {
+            bigCard()
+            smallStack()
+        }
+    }
+}
+
+@Composable
+private fun MosaicDuoRow(
+    photos: List<AlbumPhoto>,
+    gapDp: Float,
+    onPhotoClick: (AlbumPhoto) -> Unit,
+    onPhotoDelete: (AlbumPhoto) -> Unit
+) {
+    if (photos.isEmpty()) return
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(gapDp.dp)
+    ) {
+        photos.forEachIndexed { index, photo ->
+            PhotoCard(
+                photo = photo,
+                onClick = { onPhotoClick(photo) },
+                onDelete = { onPhotoDelete(photo) },
+                modifier = Modifier
+                    .weight(if (index == 0) 0.94f else 1.06f)
+                    .aspectRatio(if (index == 0) 0.92f else 1.12f)
+                    .offset(y = if (index == 0) 8.dp else 0.dp)
+            )
+        }
+        if (photos.size == 1) {
+            Spacer(modifier = Modifier.weight(1f))
+        }
+    }
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun PhotoCard(
     photo: AlbumPhoto,
     onClick: () -> Unit = {},
-    onDelete: () -> Unit = {}
+    onDelete: () -> Unit = {},
+    modifier: Modifier = Modifier
 ) {
     var showConfirm by remember { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
+        modifier = modifier
+            .shadow(
+                elevation = 12.dp,
+                shape = RoundedCornerShape(25.dp),
+                ambientColor = Color(0x125A4A42),
+                spotColor = Color(0x125A4A42)
+            )
+            .clip(RoundedCornerShape(25.dp))
+            .background(Color(0xFFFFF0EB))
+            .border(1.dp, Color(0x80FFFFFF), RoundedCornerShape(25.dp))
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = { showConfirm = true }
             )
     ) {
-        // 图片 - 正方形
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(photo.url)
@@ -400,9 +571,8 @@ private fun PhotoCard(
                 .build(),
             contentDescription = photo.caption,
             modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .clip(RoundedCornerShape(12.dp)),
+                .matchParentSize()
+                .clip(RoundedCornerShape(25.dp)),
             contentScale = ContentScale.Crop
         )
 
@@ -417,7 +587,7 @@ private fun PhotoCard(
                         brush = Brush.verticalGradient(
                             colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
                         ),
-                        shape = RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp)
+                        shape = RoundedCornerShape(bottomStart = 25.dp, bottomEnd = 25.dp)
                     )
             )
             Text(
@@ -427,11 +597,12 @@ private fun PhotoCard(
                 color = Color.White,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
-                textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .padding(horizontal = 6.dp, vertical = 6.dp)
+                    .align(Alignment.BottomStart)
+                    .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(Color(0x66301E18))
+                    .padding(horizontal = 10.dp, vertical = 8.dp)
             )
         }
 

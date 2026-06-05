@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -43,14 +44,14 @@ import com.standbyus.app.ui.theme.EmojiThemeSet
 import com.standbyus.app.ui.theme.EmojiThemeManager
 
 // ===== Design Tokens =====
-private val Primary = Color(0xFFFFB4A2)
+private val Primary = Color(0xFFFF8E78)
 private val Danger = Color(0xFFE8505B)
 private val Surface = Color(0xFFFFFFFF)
-private val Background = Color(0xFFFFF8F5)
-private val Border = Color(0xFFF0EAE6)
-private val TextPrimary = Color(0xFF5A4A42)
-private val TextSecondary = Color(0xFF9E8E86)
-private val ToggleInactive = Color(0xFFC4C4C4)
+private val Background = Color(0xFFFFF8F3)
+private val Border = Color(0xFFEFE2DA)
+private val TextPrimary = Color(0xFF3D3029)
+private val TextSecondary = Color(0xFF8F7469)
+private val ToggleInactive = Color(0xFFE5D9D1)
 
 @Composable
 fun SettingsScreen(
@@ -256,13 +257,8 @@ fun SettingsScreen(
                             }
                             if (pairingCode.isNotEmpty()) {
                                 Spacer(modifier = Modifier.height(12.dp))
-                                Text(
-                                    text = pairingCode,
-                                    fontSize = 28.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Primary,
-                                    textAlign = TextAlign.Center,
-                                    letterSpacing = 4.sp,
+                                PairingCodeChips(
+                                    code = pairingCode,
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
@@ -595,16 +591,52 @@ private fun SectionCard(
         modifier = modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 16.dp,
-                shape = RoundedCornerShape(16.dp),
-                ambientColor = Color(0x1F5A4A42),
-                spotColor = Color(0x1F5A4A42)
+                elevation = 14.dp,
+                shape = RoundedCornerShape(27.dp),
+                ambientColor = Color(0x145A4A42),
+                spotColor = Color(0x145A4A42)
             )
-            .background(Surface, RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(27.dp))
+            .background(Surface.copy(alpha = 0.72f))
+            .border(1.dp, Color(0xADFFFFFF), RoundedCornerShape(27.dp))
             .padding(contentPadding),
         horizontalAlignment = horizontalAlignment,
         content = content
     )
+}
+
+@Composable
+private fun PairingCodeChips(
+    code: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        code.take(6).forEach { char ->
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(38.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(
+                        Brush.verticalGradient(
+                            listOf(Color(0xFFFFF0EB), Color(0xFFFFE4DA))
+                        )
+                    )
+                    .border(1.dp, Color(0x52FF8E78), RoundedCornerShape(14.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = char.toString(),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Black,
+                    color = Color(0xFF8B5146)
+                )
+            }
+        }
+    }
 }
 
 // ===== Section Title =====
@@ -615,7 +647,7 @@ private fun SectionTitle(text: String) {
         fontSize = 13.sp,
         fontWeight = FontWeight.Bold,
         color = TextSecondary,
-        letterSpacing = 0.5.sp,
+        letterSpacing = 0.8.sp,
         modifier = Modifier.padding(bottom = 16.dp)
     )
 }

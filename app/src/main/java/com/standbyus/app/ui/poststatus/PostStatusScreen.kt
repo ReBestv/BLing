@@ -47,10 +47,11 @@ import com.standbyus.app.data.model.ThemeSticker
 import com.standbyus.app.ui.theme.EmojiThemeManager
 import com.standbyus.app.ui.components.AppHeader
 
-// Design tokens — matches preview.html
-private val DesignPrimary = Color(0xFFFFB4A2)
-private val DesignBg = Color(0xFFFFF8F5)
-private val DesignBorder = Color(0xFFF0EAE6)
+// Design tokens — matches the redesign preview direction.
+private val DesignPrimary = Color(0xFFFF8E78)
+private val DesignPrimarySoft = Color(0xFFFFF0EB)
+private val DesignBg = Color(0xFFFFF8F3)
+private val DesignBorder = Color(0xFFEFE2DA)
 
 private fun isEmoji(text: String) = !text.startsWith("http")
 
@@ -187,7 +188,7 @@ fun PostStatusScreen(
                         )
                     },
                     textStyle = TextStyle(fontSize = 15.sp),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(26.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(layoutMetrics.noteHeightDp.dp),
@@ -197,8 +198,8 @@ fun PostStatusScreen(
                         focusedBorderColor = DesignPrimary,
                         unfocusedBorderColor = DesignBorder,
                         cursorColor = DesignPrimary,
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White
+                        focusedContainerColor = Color.White.copy(alpha = 0.84f),
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.72f)
                     )
                 )
 
@@ -231,14 +232,14 @@ fun PostStatusScreen(
                     .shadow(
                         elevation = 16.dp,
                         shape = RoundedCornerShape(28.dp),
-                        ambientColor = Color(0x0F5A4A42),
-                        spotColor = Color(0x0F5A4A42)
+                        ambientColor = DesignPrimary.copy(alpha = 0.22f),
+                        spotColor = DesignPrimary.copy(alpha = 0.22f)
                     ),
                 shape = RoundedCornerShape(28.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = DesignPrimary,
                     contentColor = Color.White,
-                    disabledContainerColor = DesignPrimary.copy(alpha = 0.6f),
+                    disabledContainerColor = DesignPrimary.copy(alpha = 0.48f),
                     disabledContentColor = Color.White.copy(alpha = 0.8f)
                 )
             ) {
@@ -504,12 +505,20 @@ private fun StickerGridPicker(
                 }
                 Surface(
                     onClick = { onStickerClick(sticker) },
-                    shape = RoundedCornerShape(18.dp),
-                    color = if (isSelected) DesignPrimary.copy(alpha = 0.16f) else Color.White,
+                    shape = RoundedCornerShape(22.dp),
+                    color = if (isSelected) DesignPrimarySoft else Color.White.copy(alpha = 0.70f),
                     border = BorderStroke(
                         width = if (isSelected) 2.dp else 1.dp,
-                        color = if (isSelected) DesignPrimary else DesignBorder
-                    )
+                        color = if (isSelected) DesignPrimary.copy(alpha = 0.42f) else Color.White.copy(alpha = 0.68f)
+                    ),
+                    modifier = Modifier
+                        .scale(if (isSelected) 1.04f else 1f)
+                        .shadow(
+                            elevation = if (isSelected) 12.dp else 0.dp,
+                            shape = RoundedCornerShape(22.dp),
+                            ambientColor = DesignPrimary.copy(alpha = 0.12f),
+                            spotColor = DesignPrimary.copy(alpha = 0.12f)
+                        )
                 ) {
                     Column(
                         modifier = Modifier
@@ -528,7 +537,7 @@ private fun StickerGridPicker(
                             contentDescription = sticker.label,
                             modifier = Modifier
                                 .size(imageSizeDp.dp)
-                                .clip(CircleShape),
+                                .clip(RoundedCornerShape(18.dp)),
                             contentScale = ContentScale.Fit
                         )
                         Spacer(modifier = Modifier.height(4.dp))
@@ -576,23 +585,25 @@ private fun PhraseSuggestionChips(
             items(phrases) { phrase ->
                 Surface(
                     onClick = { onPhraseClick(phrase) },
-                    shape = RoundedCornerShape(18.dp),
-                    color = Color.White,
+                    shape = RoundedCornerShape(999.dp),
+                    color = Color.White.copy(alpha = 0.72f),
                     border = BorderStroke(
                         width = 1.dp,
                         brush = Brush.horizontalGradient(
                             listOf(
-                                accentColor.copy(alpha = 0.4f),
-                                DesignBorder
+                                accentColor.copy(alpha = 0.34f),
+                                Color.White.copy(alpha = 0.78f)
                             )
                         )
-                    )
+                    ),
+                    shadowElevation = 0.dp
                 ) {
                     Text(
                         text = phrase,
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.SemiBold,
                         color = Color(0xFF5A4A42),
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 9.dp)
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)
                     )
                 }
             }

@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -16,15 +16,20 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
-// 视觉规范 v1.0 的 Header 专属 Token
-private val HeaderBgColor = Color(0xFFFFFFFF)
-private val DividerColor = Color(0xFFF0EAE6)
-private val TextPrimaryColor = Color(0xFF5A4A42)
+private val HeaderBgStart = Color(0xFFFFFAF6)
+private val HeaderBgEnd = Color(0xFFFFF3EC)
+private val DividerColor = Color(0xFFEFE2DA)
+private val TextPrimaryColor = Color(0xFF3D3029)
+private val IconContainerColor = Color(0xB3FFFFFF)
+private val IconTintColor = Color(0xFF8F7469)
 
 @Composable
 fun AppHeader(
@@ -36,8 +41,12 @@ fun AppHeader(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(HeaderBgColor)
-            .height(48.dp) // 极简高度
+            .background(
+                Brush.verticalGradient(
+                    colors = listOf(HeaderBgStart, HeaderBgEnd)
+                )
+            )
+            .height(50.dp)
             .drawBehind {
                 if (showDivider) {
                     drawLine(
@@ -48,37 +57,43 @@ fun AppHeader(
                     )
                 }
             }
-            .padding(horizontal = 4.dp), // 留出一点边距
+            .padding(horizontal = 12.dp),
         contentAlignment = Alignment.Center
     ) {
-        // 左侧返回按钮，强制统一使用规范的样式和 #5A4A42
         if (onBack != null) {
             IconButton(
                 onClick = onBack,
-                modifier = Modifier.align(Alignment.CenterStart)
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(13.dp))
+                    .background(IconContainerColor)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "返回",
-                    tint = TextPrimaryColor,
-                    modifier = Modifier.size(24.dp)
+                    tint = IconTintColor,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }
 
-        // 绝对水平、垂直居中的标题，文字再次放大
         Text(
             text = title,
-            style = MaterialTheme.typography.headlineLarge,
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.Bold
+            ),
             color = TextPrimaryColor
         )
 
-        // 右侧操作区图标插槽，调用方需注意图标应为 #9E8E86 等规范
         if (rightIcon != null) {
             Box(
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
-                    .padding(end = 4.dp)
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(13.dp))
+                    .background(IconContainerColor),
+                contentAlignment = Alignment.Center
             ) {
                 rightIcon()
             }

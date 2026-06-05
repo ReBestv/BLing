@@ -3,16 +3,16 @@ package com.standbyus.app.ui.home
 import androidx.compose.ui.graphics.Color
 
 object HomeInteractionActionButtonStyle {
-    const val heightDp = 42f
-    const val cornerRadiusDp = 18f
+    const val heightDp = 52f
+    const val cornerRadiusDp = 22f
 
-    val borderColor = Color(0x33FFB4A2)
+    val borderColor = Color(0x2EFF8E78)
 
     private val containerColors = listOf(
-        Color(0xFFFFF0EC),
-        Color(0xFFF7F0FF),
-        Color(0xFFFFF7E2),
-        Color(0xFFF0F6FF)
+        Color(0xCCFFFFFF),
+        Color(0xE6FFF2ED),
+        Color(0xE6FFF7E2),
+        Color(0xE6F1F8F3)
     )
 
     fun containerColorForIndex(index: Int): Color =

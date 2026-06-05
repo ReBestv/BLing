@@ -43,13 +43,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.standbyus.app.ui.components.AppHeader
 
 // ── Design Tokens ──
-private val BgColor = Color(0xFFFFF8F5)
+private val BgColor = Color(0xFFFFF8F3)
 private val SurfaceColor = Color(0xFFFFFFFF)
-private val PrimaryColor = Color(0xFFFFB4A2)
-private val GradientEnd = Color(0xFFFF9E8E)
-private val TextPrimary = Color(0xFF5A4A42)
-private val TextSecondary = Color(0xFF9E8E86)
-private val BorderColor = Color(0xFFF0EAE6)
+private val PrimaryColor = Color(0xFFFF8E78)
+private val GradientEnd = Color(0xFFFFB99F)
+private val TextPrimary = Color(0xFF3D3029)
+private val TextSecondary = Color(0xFF8F7469)
+private val BorderColor = Color(0xFFEFE2DA)
 private val WinAccent = Color(0xFFE8B84B)
 
 // ── Main Screen ──
@@ -123,7 +123,7 @@ private fun CheckinInfoPanel(
     Column(
         modifier = modifier.padding(top = 8.dp, bottom = 6.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceEvenly
+        verticalArrangement = Arrangement.Top
     ) {
         // ── PK Section (top) ──
         if (state.isPaired && state.pkStats != null) {
@@ -267,12 +267,12 @@ private fun PKCard(
             .background(SurfaceColor)
             .padding(vertical = verticalPaddingDp.dp, horizontal = 22.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(11.dp)
     ) {
         // Title
         Text(
             text = "🏆 本月拉屎大王对决",
-            fontSize = 18.sp,
+            fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
             color = TextPrimary
         )
@@ -286,17 +286,17 @@ private fun PKCard(
             // My side
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (isMeWinning) {
-                    Text(text = "👑", fontSize = 24.sp)
+                    Text(text = "👑", fontSize = 20.sp)
                 }
                 Text(
                     text = "我",
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = if (isMeWinning) WinAccent else TextPrimary
                 )
                 Text(
                     text = "${stats.myCount} 次",
-                    fontSize = 30.sp,
+                    fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (isMeWinning) WinAccent else TextPrimary
                 )
@@ -304,7 +304,7 @@ private fun PKCard(
 
             Text(
                 text = if (isTie) "🤝" else "VS",
-                fontSize = 20.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = TextSecondary
             )
@@ -312,17 +312,17 @@ private fun PKCard(
             // Partner side
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (!isMeWinning && !isTie) {
-                    Text(text = "👑", fontSize = 24.sp)
+                    Text(text = "👑", fontSize = 20.sp)
                 }
                 Text(
                     text = "TA",
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = if (!isMeWinning && !isTie) WinAccent else TextPrimary
                 )
                 Text(
                     text = "${stats.partnerCount} 次",
-                    fontSize = 30.sp,
+                    fontSize = 26.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (!isMeWinning && !isTie) WinAccent else TextPrimary
                 )
@@ -353,7 +353,7 @@ private fun PKCard(
                 isMeWinning -> "🎉 领先 ${stats.leadAmount} 次！"
                 else -> "💪 落后 ${stats.leadAmount} 次，继续努力！"
             },
-            fontSize = 14.sp,
+            fontSize = 13.sp,
             fontWeight = FontWeight.Medium,
             color = TextPrimary
         )
@@ -365,7 +365,8 @@ private fun PKCard(
                 } else {
                     "距离月底还有 ${stats.daysUntilMonthEnd} 天，每天多拉 ${stats.myCatchUpRate} 次就能反超！"
                 },
-                fontSize = 12.sp,
+                fontSize = 11.sp,
+                lineHeight = 16.sp,
                 color = TextSecondary
             )
         }
