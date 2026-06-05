@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StandBy Us - Android App 旧界面改造预览</title>
+<style>
+  @font-face {
+    font-family: "MiSans Local";
+    src: url("../../app/src/main/res/font/misans_regular.otf") format("opentype");
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Smiley Sans Local";
+    src: url("../../app/src/main/res/font/smiley_sans_oblique.otf") format("opentype");
+    font-display: swap;
+  }
+
+  :root {
+    --ink: #332821;
+    --ink-soft: #6f5b52;
+    --muted: #9d8d84;
+    --hairline: #eee1d9;
+    --paper: #fffaf6;
+    --paper-strong: #ffffff;
+    --wash: #fff4ee;
+    --coral: #ff8e78;
+    --coral-soft: #ffd2c7;
+    --apricot: #ffd9ac;
+    --mint: #d9eadf;
+    --sage: #7f9b82;
+    --blue: #d9e9ff;
+    --danger: #df6d61;
+    --shadow: rgba(84, 52, 39, 0.16);
+    --deep-shadow: rgba(36, 24, 19, 0.38);
+    --radius-xl: 30px;
+    --radius-lg: 24px;
+    --radius-md: 18px;
+    --radius-sm: 13px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    font-family: "MiSans Local", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background:
+      radial-gradient(circle at 9% 10%, rgba(255, 177, 148, 0.34), transparent 28%),
+      radial-gradient(circle at 91% 8%, rgba(217, 234, 223, 0.32), transparent 30%),
+      linear-gradient(145deg, #251c18 0%, #3a2a22 42%, #1d1715 100%);
+  }
+
+  .page {
+    width: min(1460px, 100%);
+    margin: 0 auto;
+    padding: 34px 26px 44px;
+  }
+
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(280px, 0.86fr) minmax(640px, 1.9fr);
+    gap: 30px;
+    align-items: start;
+  }
+
+  .panel {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 34px;
+    background:
+      linear-gradient(180deg, rgba(255, 250, 246, 0.94), rgba(255, 244, 238, 0.88)),
+      radial-gradient(circle at 16% 8%, rgba(255, 210, 199, 0.82), transparent 36%);
+    box-shadow: 0 28px 80px var(--deep-shadow);
+    overflow: hidden;
+  }
+
+  .brief {
+    position: sticky;
+    top: 24px;
+    padding: 28px;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    padding: 7px 11px;
+    border: 1px solid rgba(255, 142, 120, 0.34);
+    border-radius: 999px;
+    color: #8a5248;
+    background: rgba(255, 255, 255, 0.54);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: "Smiley Sans Local", "MiSans Local", sans-serif;
+    font-weight: 800;
+    margin: 0;
+  }
+
+  h1 {
+    max-width: 11ch;
+    font-size: clamp(42px, 5vw, 70px);
+    line-height: 0.95;
+    letter-spacing: -0.06em;
+    text-wrap: balance;
+  }
+
+  .subtitle {
+    margin: 18px 0 24px;
+    color: var(--ink-soft);
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .audit {
+    display: grid;
+    gap: 10px;
+  }
+
+  .audit-card {
+    padding: 13px 14px;
+    border-radius: 17px;
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(238, 225, 217, 0.88);
+  }
+
+  .audit-card strong {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 13px;
+  }
+
+  .audit-card span {
+    color: var(--ink-soft);
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 22px;
+  }
+
+  .principle {
+    min-height: 88px;
+    padding: 15px;
+    border-radius: 21px;
+    color: #4f3d35;
+    background: rgba(255, 255, 255, 0.58);
+    border: 1px solid rgba(255, 255, 255, 0.54);
+  }
+
+  .principle b {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 13px;
+  }
+
+  .principle p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
+  .showcase {
+    padding: 24px;
+  }
+
+  .showcase-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    align-items: end;
+    padding: 2px 4px 20px;
+  }
+
+  .showcase-head h2 {
+    font-size: clamp(26px, 3vw, 44px);
+    letter-spacing: -0.05em;
+  }
+
+  .legend {
+    max-width: 390px;
+    color: var(--ink-soft);
+    font-size: 13px;
+    line-height: 1.65;
+    text-align: right;
+  }
+
+  .phones {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(230px, 1fr));
+    gap: 20px;
+  }
+
+  .phone-wrap {
+    display: grid;
+    gap: 11px;
+  }
+
+  .phone-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 8px;
+    color: rgba(255, 250, 246, 0.84);
+    font-size: 12px;
+  }
+
+  .phone-label b {
+    color: #fffaf6;
+    font-size: 13px;
+  }
+
+  .phone {
+    aspect-ratio: 390 / 844;
+    min-height: 600px;
+    position: relative;
+    overflow: hidden;
+    border-radius: 38px;
+    background:
+      radial-gradient(circle at 14% 7%, rgba(255, 218, 194, 0.9), transparent 24%),
+      radial-gradient(circle at 86% 16%, rgba(217, 234, 223, 0.72), transparent 24%),
+      linear-gradient(180deg, #fff8f3 0%, #fff3ec 54%, #fffaf6 100%);
+    border: 8px solid #17110f;
+    box-shadow: 0 26px 56px rgba(29, 18, 14, 0.34);
+  }
+
+  .phone::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 10px;
+    z-index: 20;
+    width: 96px;
+    height: 25px;
+    transform: translateX(-50%);
+    border-radius: 0 0 17px 17px;
+    background: #17110f;
+  }
+
+  .status {
+    height: 44px;
+    padding: 14px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    color: rgba(80, 62, 54, 0.78);
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .appbar {
+    height: 56px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .brand {
+    font-family: "Smiley Sans Local", "MiSans Local", sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+  }
+
+  .icon-btn {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    border-radius: 15px;
+    color: #8f7469;
+    background: rgba(255, 255, 255, 0.54);
+    box-shadow: 0 8px 18px rgba(84, 52, 39, 0.06);
+  }
+
+  .gear {
+    width: 17px;
+    height: 17px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    position: relative;
+  }
+
+  .gear::before,
+  .gear::after {
+    content: "";
+    position: absolute;
+    inset: 5px -6px;
+    border-left: 3px solid currentColor;
+    border-right: 3px solid currentColor;
+  }
+
+  .gear::after {
+    transform: rotate(90deg);
+  }
+
+  .back {
+    width: 18px;
+    height: 18px;
+    border-left: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg) translateX(3px);
+  }
+
+  .phone-content {
+    height: calc(100% - 100px);
+    padding: 8px 18px 94px;
+    overflow: hidden;
+  }
+
+  .hero-card {
+    position: relative;
+    min-height: 290px;
+    display: grid;
+    place-items: center;
+    padding: 26px 22px;
+    overflow: hidden;
+    border-radius: 30px;
+    color: white;
+    background:
+      radial-gradient(circle at 20% 12%, rgba(255,255,255,0.44), transparent 26%),
+      radial-gradient(circle at 88% 88%, rgba(255, 244, 210, 0.42), transparent 32%),
+      linear-gradient(135deg, #ff9b84 0%, #ffb9a5 44%, #ffd2ae 100%);
+    border: 1px solid rgba(255,255,255,0.52);
+    box-shadow: 0 18px 38px rgba(255, 142, 120, 0.28);
+  }
+
+  .hero-card::after {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    right: -84px;
+    bottom: -105px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+  }
+
+  .mood-orb {
+    width: 124px;
+    height: 124px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 12px;
+    border-radius: 40px;
+    font-size: 74px;
+    background: rgba(255,255,255,0.22);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.42);
+    animation: float 3.2s ease-in-out infinite;
+  }
+
+  .hero-copy {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+
+  .hero-copy h3 {
+    font-size: 33px;
+    line-height: 1;
+    letter-spacing: -0.05em;
+    text-shadow: 0 3px 14px rgba(82, 38, 26, 0.22);
+  }
+
+  .hero-copy p {
+    margin: 8px 0 0;
+    font-size: 14px;
+    font-weight: 700;
+    opacity: 0.92;
+  }
+
+  .hero-copy small {
+    display: inline-flex;
+    margin-top: 13px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.86);
+    font-size: 11px;
+  }
+
+  .flow-card {
+    margin: -8px 8px 0;
+    padding: 18px 13px 14px;
+    border-radius: 0 0 25px 25px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.58), rgba(255,255,255,0.1));
+  }
+
+  .notice,
+  .mine-row,
+  .mini-card,
+  .setting-card,
+  .stat-row {
+    border: 1px solid rgba(238, 225, 217, 0.72);
+    background: rgba(255,255,255,0.66);
+  }
+
+  .notice {
+    min-height: 43px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 13px;
+    border-radius: 17px;
+    color: #5b443c;
+    font-size: 13px;
+    font-weight: 800;
+    text-align: center;
+  }
+
+  .mine-row {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-top: 10px;
+    padding: 8px 10px;
+    border-radius: 18px;
+  }
+
+  .small-mood {
+    width: 43px;
+    height: 43px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    border-radius: 16px;
+    font-size: 25px;
+    background: #fff0eb;
+  }
+
+  .mine-row strong {
+    display: block;
+    font-size: 13px;
+    color: var(--ink);
+  }
+
+  .mine-row span {
+    display: block;
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  .quick-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 11px;
+  }
+
+  .chip-action {
+    height: 41px;
+    border: 0;
+    border-radius: 999px;
+    color: #5b443c;
+    background: rgba(255,255,255,0.72);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    box-shadow: inset 0 0 0 1px rgba(255, 142, 120, 0.18);
+  }
+
+  .primary-cta {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 75px;
+    height: 55px;
+    border: 0;
+    border-radius: 999px;
+    color: white;
+    background: linear-gradient(135deg, #ff8e78, #ffb99f);
+    box-shadow: 0 16px 28px rgba(255, 142, 120, 0.31);
+    font: inherit;
+    font-weight: 900;
+    font-size: 15px;
+  }
+
+  .bottom-nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 68px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    align-items: start;
+    padding: 9px 10px 0;
+    border-top: 1px solid rgba(238, 225, 217, 0.82);
+    background: rgba(255, 252, 249, 0.88);
+    backdrop-filter: blur(18px);
+  }
+
+  .nav-item {
+    display: grid;
+    justify-items: center;
+    gap: 5px;
+    color: #ad9a91;
+    font-size: 10px;
+    font-weight: 800;
+  }
+
+  .nav-item.active {
+    color: var(--coral);
+  }
+
+  .nav-glyph {
+    width: 24px;
+    height: 24px;
+    position: relative;
+  }
+
+  .home-glyph::before {
+    content: "";
+    position: absolute;
+    inset: 7px 4px 3px;
+    border: 2px solid currentColor;
+    border-top: 0;
+    border-radius: 4px;
+  }
+
+  .home-glyph::after {
+    content: "";
+    position: absolute;
+    left: 5px;
+    top: 4px;
+    width: 14px;
+    height: 14px;
+    border-left: 2px solid currentColor;
+    border-top: 2px solid currentColor;
+    transform: rotate(45deg);
+  }
+
+  .check-glyph {
+    border: 2px solid currentColor;
+    border-radius: 50%;
+  }
+
+  .todo-glyph::before {
+    content: "";
+    position: absolute;
+    inset: 4px 5px;
+    border: 2px solid currentColor;
+    border-radius: 6px;
+  }
+
+  .album-glyph {
+    border: 2px solid currentColor;
+    border-radius: 6px;
+  }
+
+  .history-glyph::before {
+    content: "";
+    position: absolute;
+    left: 11px;
+    top: 3px;
+    bottom: 3px;
+    border-left: 2px solid currentColor;
+  }
+
+  .history-glyph::after {
+    content: "";
+    position: absolute;
+    left: 7px;
+    top: 5px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 9px 0 currentColor;
+  }
+
+  .section-title {
+    margin: 6px 2px 11px;
+    color: var(--ink-soft);
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .sticker {
+    min-height: 72px;
+    display: grid;
+    place-items: center;
+    gap: 2px;
+    padding: 6px 2px;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.66);
+    border: 1px solid rgba(238, 225, 217, 0.7);
+    color: var(--ink-soft);
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  .sticker.active {
+    border-color: rgba(255, 142, 120, 0.74);
+    background: rgba(255, 236, 230, 0.86);
+    box-shadow: 0 10px 20px rgba(255, 142, 120, 0.13);
+  }
+
+  .sticker i,
+  .mood-pill i {
+    font-style: normal;
+    font-size: 27px;
+  }
+
+  .mood-scroll,
+  .phrase-scroll {
+    display: flex;
+    gap: 9px;
+    overflow: hidden;
+  }
+
+  .mood-pill {
+    width: 58px;
+    flex: 0 0 auto;
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 800;
+  }
+
+  .mood-pill i {
+    width: 45px;
+    height: 45px;
+    display: grid;
+    place-items: center;
+    border-radius: 17px;
+    background: #fff2ed;
+    border: 1px solid rgba(238, 225, 217, 0.84);
+  }
+
+  .mood-pill.active {
+    color: var(--ink);
+  }
+
+  .mood-pill.active i {
+    transform: scale(1.08);
+    background: #ffe5dc;
+    border-color: var(--coral);
+    box-shadow: 0 10px 20px rgba(255, 142, 120, 0.2);
+  }
+
+  .phrase {
+    flex: 0 0 auto;
+    padding: 9px 13px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 142, 120, 0.32);
+    background: rgba(255, 255, 255, 0.66);
+    color: #5b443c;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .note-box {
+    height: 104px;
+    padding: 14px;
+    border-radius: 20px;
+    color: var(--muted);
+    background: rgba(255,255,255,0.76);
+    border: 1px solid rgba(238, 225, 217, 0.92);
+    font-size: 13px;
+  }
+
+  .publish-btn {
+    bottom: 24px;
+  }
+
+  .mini-card {
+    border-radius: 24px;
+    padding: 16px;
+    box-shadow: 0 14px 28px rgba(84, 52, 39, 0.08);
+  }
+
+  .pk-card {
+    padding: 18px;
+    text-align: center;
+  }
+
+  .pk-title {
+    margin-bottom: 12px;
+    font-size: 15px;
+    font-weight: 900;
+  }
+
+  .duel {
+    display: grid;
+    grid-template-columns: 1fr 44px 1fr;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .duel strong {
+    display: block;
+    margin-top: 3px;
+    font-size: 31px;
+    letter-spacing: -0.04em;
+  }
+
+  .duel span {
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  .vs {
+    display: grid;
+    place-items: center;
+    height: 44px;
+    border-radius: 16px;
+    color: #8a6b59;
+    background: #fff1dc;
+    font-weight: 900;
+  }
+
+  .progress {
+    height: 9px;
+    margin-top: 14px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #f0e6dd;
+  }
+
+  .progress i {
+    display: block;
+    width: 58%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #efb454, #ff8e78);
+  }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    padding: 12px 6px;
+    border-radius: 22px;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat i {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 6px;
+    border-radius: 14px;
+    background: #fff0eb;
+    font-style: normal;
+  }
+
+  .stat strong {
+    display: block;
+    font-size: 16px;
+    letter-spacing: -0.03em;
+  }
+
+  .stat span {
+    color: var(--muted);
+    font-size: 10px;
+  }
+
+  .big-button {
+    width: 112px;
+    height: 112px;
+    display: grid;
+    place-items: center;
+    margin: 18px auto 0;
+    border-radius: 50%;
+    color: white;
+    background: radial-gradient(circle at 28% 24%, #ffd6c7, #ff8e78 58%, #ee7764);
+    box-shadow: 0 20px 38px rgba(255, 142, 120, 0.33);
+    font-size: 46px;
+    position: relative;
+  }
+
+  .big-button::before,
+  .big-button::after {
+    content: "";
+    position: absolute;
+    inset: -12px;
+    border: 2px solid rgba(255, 142, 120, 0.34);
+    border-radius: 50%;
+    animation: ripple 2.8s infinite;
+  }
+
+  .big-button::after {
+    animation-delay: 0.9s;
+  }
+
+  .photo-rail {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 10px;
+    height: 220px;
+  }
+
+  .photo {
+    position: relative;
+    overflow: hidden;
+    border-radius: 24px;
+    background:
+      radial-gradient(circle at 30% 25%, rgba(255,255,255,0.5), transparent 26%),
+      linear-gradient(135deg, #e9cfb3, #c99578);
+  }
+
+  .photo:nth-child(2) {
+    background: linear-gradient(135deg, #bdd9ce, #8fb197);
+  }
+
+  .photo:nth-child(3) {
+    background: linear-gradient(135deg, #e7d8f1, #be9ece);
+  }
+
+  .photo span {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    padding: 8px 10px;
+    border-radius: 14px;
+    color: white;
+    background: rgba(43, 32, 27, 0.34);
+    backdrop-filter: blur(10px);
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .photo-stack {
+    display: grid;
+    gap: 10px;
+  }
+
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    margin: 6px 0 12px;
+  }
+
+  .filter {
+    padding: 8px 12px;
+    border-radius: 999px;
+    color: var(--muted);
+    background: rgba(255,255,255,0.56);
+    border: 1px solid rgba(238, 225, 217, 0.72);
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .filter.active {
+    color: white;
+    background: var(--coral);
+    border-color: transparent;
+  }
+
+  .empty-frame {
+    display: grid;
+    place-items: center;
+    min-height: 205px;
+    padding: 22px;
+    border-radius: 28px;
+    text-align: center;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.7), rgba(255,255,255,0.36)),
+      radial-gradient(circle at 50% 0%, rgba(255, 210, 199, 0.56), transparent 42%);
+    border: 1px dashed rgba(255, 142, 120, 0.36);
+  }
+
+  .empty-frame strong {
+    display: block;
+    margin-top: 10px;
+    font-size: 17px;
+  }
+
+  .empty-frame p {
+    margin: 6px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .setting-card {
+    padding: 16px;
+    border-radius: 24px;
+    margin-bottom: 12px;
+  }
+
+  .profile-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .avatar {
+    width: 58px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #fff0eb, #ffffff);
+    box-shadow: 0 10px 20px rgba(84, 52, 39, 0.09);
+    font-size: 30px;
+  }
+
+  .profile-row strong {
+    display: block;
+    font-size: 15px;
+  }
+
+  .profile-row span {
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  .pair-card {
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 16% 8%, rgba(255, 219, 206, 0.9), transparent 35%),
+      rgba(255,255,255,0.7);
+  }
+
+  .pair-code {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .pair-code span {
+    display: grid;
+    place-items: center;
+    height: 38px;
+    border-radius: 12px;
+    color: #875145;
+    background: #fff2ed;
+    font-weight: 900;
+  }
+
+  .toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 13px 0;
+    border-top: 1px solid rgba(238, 225, 217, 0.72);
+    color: var(--ink-soft);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .toggle {
+    width: 48px;
+    height: 28px;
+    border-radius: 999px;
+    padding: 3px;
+    background: #e5d9d1;
+  }
+
+  .toggle i {
+    display: block;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 3px 8px rgba(84, 52, 39, 0.18);
+  }
+
+  .theme-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .theme-pill {
+    padding: 9px 11px;
+    border-radius: 999px;
+    color: var(--muted);
+    background: rgba(255,255,255,0.62);
+    border: 1px solid rgba(238, 225, 217, 0.78);
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .theme-pill.active {
+    color: #895246;
+    border-color: rgba(255, 142, 120, 0.5);
+    background: #fff0eb;
+  }
+
+  .caption-note {
+    margin-top: 22px;
+    padding: 17px 20px;
+    border-radius: 24px;
+    color: rgba(255,250,246,0.78);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.13);
+    line-height: 1.7;
+    font-size: 13px;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  @keyframes ripple {
+    0% { transform: scale(0.9); opacity: 0.72; }
+    100% { transform: scale(1.35); opacity: 0; }
+  }
+
+  @media (max-width: 1120px) {
+    .hero {
+      grid-template-columns: 1fr;
+    }
+
+    .brief {
+      position: static;
+    }
+  }
+
+  @media (max-width: 880px) {
+    .page {
+      padding: 18px 14px 30px;
+    }
+
+    .phones,
+    .principles {
+      grid-template-columns: 1fr;
+    }
+
+    .showcase-head {
+      display: block;
+    }
+
+    .legend {
+      margin-top: 10px;
+      text-align: left;
+    }
+
+    .phone {
+      min-height: auto;
+    }
+  }
+</style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <aside class="panel brief">
+        <div class="eyebrow">REDESIGN AUDIT · Android Compose</div>
+        <h1>把“旧界面”改成更会陪伴的界面</h1>
+        <p class="subtitle">
+          这版先不改功能，只重塑移动端观感：保留 StandBy Us 已有的珊瑚暖色、中文字体和状态分享逻辑，把布局做得更有呼吸感，状态更清楚，触控更像真正的 Android App。
+        </p>
+
+        <div class="audit">
+          <div class="audit-card">
+            <strong>1. 层级偏平均</strong>
+            <span>状态卡、互动区、按钮和底部导航都在争注意力；需要让“TA 现在怎样”成为第一视觉焦点。</span>
+          </div>
+          <div class="audit-card">
+            <strong>2. 固定高度太多</strong>
+            <span>小屏会显得挤，大屏又显得空；预览改用弹性区块、底部安全留白和内容优先级。</span>
+          </div>
+          <div class="audit-card">
+            <strong>3. 卡片感过重</strong>
+            <span>白卡、边框、阴影重复出现，亲密感被“后台面板感”稀释；新方案降低边框，改成软玻璃和连续流。</span>
+          </div>
+          <div class="audit-card">
+            <strong>4. 状态反馈不够完整</strong>
+            <span>加载、空状态、禁用、发送中、选中态需要更贴合页面形状，而不是只靠转圈或变灰。</span>
+          </div>
+          <div class="audit-card">
+            <strong>5. 导航像工具，不像陪伴 App</strong>
+            <span>底部导航应更轻、更稳定，当前页要明确，但不能抢主内容。</span>
+          </div>
+        </div>
+
+        <div class="principles">
+          <div class="principle">
+            <b>柔和但不幼稚</b>
+            <p>低饱和珊瑚色 + 奶油纸面 + 情绪色点缀。</p>
+          </div>
+          <div class="principle">
+            <b>内容先于装饰</b>
+            <p>先看 TA 的状态，再处理互动和发布。</p>
+          </div>
+          <div class="principle">
+            <b>触控有回应</b>
+            <p>按钮、筛选、选中项都预留 pressed/loading/disabled 状态。</p>
+          </div>
+        </div>
+      </aside>
+
+      <section class="showcase">
+        <div class="showcase-head">
+          <h2>HTML 预览稿</h2>
+          <p class="legend">
+            下面是准备迁移到 Compose 的视觉方向：先看结构、层级和状态，不把它当最终像素稿死抠。小狐狸先把路照亮，后面再搬砖。
+          </p>
+        </div>
+
+        <div class="phones">
+          <article class="phone-wrap">
+            <div class="phone-label"><b>首页</b><span>状态主视觉 + 连续互动流</span></div>
+            <div class="phone">
+              <div class="status"><span>9:41</span><span>5G 100%</span></div>
+              <header class="appbar">
+                <div class="brand">StandBy Us</div>
+                <div class="icon-btn"><i class="gear"></i></div>
+              </header>
+              <section class="phone-content">
+                <div class="hero-card">
+                  <div class="hero-copy">
+                    <div class="mood-orb">😤</div>
+                    <h3>加班中</h3>
+                    <p>有点生气 · 想快点回家</p>
+                    <small>刚刚更新 · 周五 21:18</small>
+                  </div>
+                </div>
+                <div class="flow-card">
+                  <div class="notice">小周说：我在等你，慢慢来</div>
+                  <div class="mine-row">
+                    <div class="small-mood">😴</div>
+                    <div>
+                      <strong>我的状态：准备睡觉</strong>
+                      <span>轻点这里更新自己的瞬间</span>
+                    </div>
+                  </div>
+                  <div class="quick-actions">
+                    <button class="chip-action">抱抱一下</button>
+                    <button class="chip-action">辛苦了</button>
+                    <button class="chip-action">我也想你</button>
+                    <button class="chip-action">现在怎样</button>
+                  </div>
+                </div>
+              </section>
+              <button class="primary-cta">发布我的状态</button>
+              <nav class="bottom-nav">
+                <div class="nav-item active"><i class="nav-glyph home-glyph"></i><span>首页</span></div>
+                <div class="nav-item"><i class="nav-glyph check-glyph"></i><span>打卡</span></div>
+                <div class="nav-item"><i class="nav-glyph todo-glyph"></i><span>待办</span></div>
+                <div class="nav-item"><i class="nav-glyph album-glyph"></i><span>相册</span></div>
+                <div class="nav-item"><i class="nav-glyph history-glyph"></i><span>时光</span></div>
+              </nav>
+            </div>
+          </article>
+
+          <article class="phone-wrap">
+            <div class="phone-label"><b>发布状态</b><span>贴纸优先 + 情绪色反馈</span></div>
+            <div class="phone">
+              <div class="status"><span>9:41</span><span>5G 100%</span></div>
+              <header class="appbar">
+                <div class="icon-btn"><i class="back"></i></div>
+                <div class="brand">发布状态</div>
+                <div style="width:40px"></div>
+              </header>
+              <section class="phone-content">
+                <div class="section-title">今天这一下，像什么？</div>
+                <div class="sticker-grid">
+                  <div class="sticker active"><i>🫠</i><span>融化</span></div>
+                  <div class="sticker"><i>🥺</i><span>委屈</span></div>
+                  <div class="sticker"><i>😴</i><span>睡觉</span></div>
+                  <div class="sticker"><i>💪</i><span>奋斗</span></div>
+                  <div class="sticker"><i>😘</i><span>亲亲</span></div>
+                  <div class="sticker"><i>📺</i><span>看剧</span></div>
+                  <div class="sticker"><i>🍚</i><span>干饭</span></div>
+                  <div class="sticker"><i>🌙</i><span>发呆</span></div>
+                </div>
+
+                <div class="section-title" style="margin-top:18px">心情底色</div>
+                <div class="mood-scroll">
+                  <div class="mood-pill active"><i>😊</i><span>开心</span></div>
+                  <div class="mood-pill"><i>😢</i><span>难过</span></div>
+                  <div class="mood-pill"><i>😷</i><span>生病</span></div>
+                  <div class="mood-pill"><i>😴</i><span>睡觉</span></div>
+                  <div class="mood-pill"><i>🤔</i><span>思考</span></div>
+                </div>
+
+                <div class="section-title" style="margin-top:17px">常用短句</div>
+                <div class="phrase-scroll">
+                  <div class="phrase">想被抱一下</div>
+                  <div class="phrase">今天有点累</div>
+                  <div class="phrase">晚点回你</div>
+                </div>
+
+                <div class="section-title" style="margin-top:17px">补充说明</div>
+                <div class="note-box">写一句小备注，可选。最多 30 个字，保持轻松，不打扰。</div>
+              </section>
+              <button class="primary-cta publish-btn">发布状态</button>
+            </div>
+          </article>
+
+          <article class="phone-wrap">
+            <div class="phone-label"><b>签到</b><span>数据更轻，按钮更有仪式感</span></div>
+            <div class="phone">
+              <div class="status"><span>9:41</span><span>5G 100%</span></div>
+              <header class="appbar">
+                <div class="brand">拉了么</div>
+                <div class="icon-btn"><i class="gear"></i></div>
+              </header>
+              <section class="phone-content">
+                <div class="mini-card pk-card">
+                  <div class="pk-title">本月默契挑战</div>
+                  <div class="duel">
+                    <div><span>我</span><strong>12</strong></div>
+                    <div class="vs">VS</div>
+                    <div><span>TA</span><strong>9</strong></div>
+                  </div>
+                  <div class="progress"><i></i></div>
+                </div>
+
+                <div class="stat-row" style="margin-top:16px">
+                  <div class="stat"><i>💬</i><strong>2 次</strong><span>今天</span></div>
+                  <div class="stat"><i>⏱</i><strong>4h</strong><span>间隔</span></div>
+                  <div class="stat"><i>🌿</i><strong>稳定</strong><span>风险</span></div>
+                </div>
+
+                <div class="stat-row" style="margin-top:12px">
+                  <div class="stat"><i>📊</i><strong>18 次</strong><span>本周</span></div>
+                  <div class="stat"><i>📈</i><strong>2.6</strong><span>平均</span></div>
+                  <div class="stat"><i>🔥</i><strong>5 天</strong><span>连续</span></div>
+                </div>
+
+                <div class="big-button">💬</div>
+              </section>
+              <nav class="bottom-nav">
+                <div class="nav-item"><i class="nav-glyph home-glyph"></i><span>首页</span></div>
+                <div class="nav-item active"><i class="nav-glyph check-glyph"></i><span>打卡</span></div>
+                <div class="nav-item"><i class="nav-glyph todo-glyph"></i><span>待办</span></div>
+                <div class="nav-item"><i class="nav-glyph album-glyph"></i><span>相册</span></div>
+                <div class="nav-item"><i class="nav-glyph history-glyph"></i><span>时光</span></div>
+              </nav>
+            </div>
+          </article>
+
+          <article class="phone-wrap">
+            <div class="phone-label"><b>相册</b><span>减少九宫格工具感</span></div>
+            <div class="phone">
+              <div class="status"><span>9:41</span><span>5G 100%</span></div>
+              <header class="appbar">
+                <div class="icon-btn"><i class="back"></i></div>
+                <div class="brand">我们的相册</div>
+                <div class="icon-btn">＋</div>
+              </header>
+              <section class="phone-content">
+                <div class="filter-row">
+                  <div class="filter active">全部</div>
+                  <div class="filter">近 7 天</div>
+                  <div class="filter">近 30 天</div>
+                </div>
+                <div class="photo-rail">
+                  <div class="photo"><span>下班路上的云</span></div>
+                  <div class="photo-stack">
+                    <div class="photo"><span>夜宵</span></div>
+                    <div class="photo"><span>电影票</span></div>
+                  </div>
+                </div>
+                <div class="empty-frame" style="margin-top:14px">
+                  <div>
+                    <div style="font-size:42px">▧</div>
+                    <strong>空状态也要有邀请感</strong>
+                    <p>没有照片时，给出“上传第一张”的明确行动，而不是只显示空白。</p>
+                  </div>
+                </div>
+              </section>
+              <nav class="bottom-nav">
+                <div class="nav-item"><i class="nav-glyph home-glyph"></i><span>首页</span></div>
+                <div class="nav-item"><i class="nav-glyph check-glyph"></i><span>打卡</span></div>
+                <div class="nav-item"><i class="nav-glyph todo-glyph"></i><span>待办</span></div>
+                <div class="nav-item active"><i class="nav-glyph album-glyph"></i><span>相册</span></div>
+                <div class="nav-item"><i class="nav-glyph history-glyph"></i><span>时光</span></div>
+              </nav>
+            </div>
+          </article>
+
+          <article class="phone-wrap">
+            <div class="phone-label"><b>设置</b><span>配对流程分组更明确</span></div>
+            <div class="phone">
+              <div class="status"><span>9:41</span><span>5G 100%</span></div>
+              <header class="appbar">
+                <div class="icon-btn"><i class="back"></i></div>
+                <div class="brand">设置</div>
+                <div style="width:40px"></div>
+              </header>
+              <section class="phone-content">
+                <div class="setting-card">
+                  <div class="profile-row">
+                    <div class="avatar">🦊</div>
+                    <div>
+                      <strong>小陈</strong>
+                      <span>头像、昵称和展示名称</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="setting-card pair-card">
+                  <div class="section-title" style="margin:0 0 8px">配对状态</div>
+                  <strong>把这 6 位码发给 TA</strong>
+                  <div class="pair-code">
+                    <span>8</span><span>Q</span><span>2</span><span>M</span><span>K</span><span>7</span>
+                  </div>
+                  <button class="chip-action" style="width:100%; margin-top:12px; background:#ff8e78; color:white">复制配对码</button>
+                </div>
+
+                <div class="setting-card">
+                  <div class="section-title" style="margin:0 0 2px">外观</div>
+                  <div class="toggle-row">
+                    <span>跟随系统深色模式</span>
+                    <div class="toggle"><i></i></div>
+                  </div>
+                  <div class="theme-row">
+                    <div class="theme-pill active">默认</div>
+                    <div class="theme-pill">小新</div>
+                    <div class="theme-pill">猫猫</div>
+                  </div>
+                </div>
+
+                <div class="setting-card">
+                  <div class="section-title" style="margin:0 0 8px">关于</div>
+                  <span style="color:var(--muted); font-size:12px; line-height:1.6">特效预览、版本信息和隐私说明可以在这里收纳，不干扰主要配对任务。</span>
+                </div>
+              </section>
+            </div>
+          </article>
+        </div>
+
+        <div class="caption-note">
+          下一步落地 Compose 时，我建议先改全局 Header / BottomNav / SectionCard / 主按钮 token，再处理首页和发布页。这样视觉提升最大，功能风险最低，也更方便逐屏回归。
+        </div>
+      </section>
+    </section>
+  </main>
+</body>
+</html>
