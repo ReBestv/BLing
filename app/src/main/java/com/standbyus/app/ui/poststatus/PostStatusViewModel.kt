@@ -42,10 +42,17 @@ class PostStatusViewModel @Inject constructor(
     fun selectFeeling(feeling: Feeling) {
         selectedFeeling = if (selectedFeeling == feeling) null else feeling
     }
+
+    fun clearFeelingSelection() {
+        selectedFeeling = null
+    }
+
     fun selectSticker(sticker: ThemeSticker) {
         selectedStickerId = if (selectedStickerId == sticker.id) null else sticker.id
     }
-    fun updateCustomDoing(value: String) { customDoing = value }
+    fun updateCustomDoing(value: String) {
+        customDoing = PostStatusInputRules.sanitizeDetailInput(value)
+    }
 
     fun publish() {
         viewModelScope.launch {
@@ -60,7 +67,7 @@ class PostStatusViewModel @Inject constructor(
             )
             val stickerBehavior = snapshot.stickerLabel.orEmpty()
             val moodLabel = snapshot.feelingLabel.orEmpty()
-            val detailText = customDoing.trim()
+            val detailText = PostStatusInputRules.publishNote(customDoing)
 
             val status = UserStatus(
                 userId = userId,

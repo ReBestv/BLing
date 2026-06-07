@@ -81,7 +81,9 @@ private fun UserStatus.primaryPartnerActionText(): String {
         .ifEmpty { customDoing.ifEmpty { doing } }
 }
 
-private fun UserStatus.partnerMoodText(): String = feelingLabel
+private fun UserStatus.partnerMoodText(): String {
+    return if (stickerId != null) "" else feelingLabel
+}
 
 // Main screen
 

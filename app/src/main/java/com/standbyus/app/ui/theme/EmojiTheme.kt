@@ -43,6 +43,7 @@ data class EmojiThemeSet(
 object EmojiThemeManager {
     private const val PREFS_NAME = "emoji_theme"
     private const val KEY_THEME_ID = "theme_id"
+    private const val NEUTRAL_FEELING_COLOR_HEX = "#ffffe5dc"
 
     val defaultTheme = EmojiThemeSet(
         id = "default",
@@ -93,14 +94,20 @@ object EmojiThemeManager {
         return createSnapshot(getCurrentTheme(context), feelingKey).feelingLabel
     }
 
+    fun inferFeelingFromSticker(sticker: ThemeSticker): Feeling? {
+        return sticker.tags.firstNotNullOfOrNull { tag -> Feeling.fromKey(tag) }
+    }
+
     fun createSnapshot(
         theme: EmojiThemeSet,
         feelingKey: String?,
         stickerId: String? = null
     ): StatusFeelingSnapshot {
-        val definition = feelingKey?.let { Feeling.fromKey(it) }
-        val themeFeeling = definition?.let { theme.feelingByKey(it.key) }
         val selectedSticker = stickerId?.let { theme.stickerById(it) }
+        val explicitDefinition = feelingKey?.let { Feeling.fromKey(it) }
+        val inferredDefinition = selectedSticker?.let { inferFeelingFromSticker(it) }
+        val definition = if (selectedSticker != null) inferredDefinition else explicitDefinition
+        val themeFeeling = definition?.let { theme.feelingByKey(it.key) }
         val selectedStickerAsset = selectedSticker?.let { sticker ->
             when {
                 sticker.asset.startsWith("http://") -> sticker.asset
@@ -125,7 +132,7 @@ object EmojiThemeManager {
             feelingLabel = definition?.let { themeFeeling?.label ?: it.displayName }.orEmpty(),
             feelingAsset = asset,
             feelingFallbackEmoji = definition?.emoji.orEmpty(),
-            feelingColor = definition?.color?.toHex().orEmpty(),
+            feelingColor = definition?.color?.toHex() ?: NEUTRAL_FEELING_COLOR_HEX,
             stickerId = selectedSticker?.id,
             stickerLabel = selectedSticker?.label,
             stickerAsset = selectedStickerAsset

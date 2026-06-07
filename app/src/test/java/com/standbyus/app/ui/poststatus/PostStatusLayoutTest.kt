@@ -19,7 +19,6 @@ class PostStatusLayoutTest {
         assertEquals(6f, metrics.stickerCardVerticalPaddingDp, 0.001f)
         assertEquals(10f, metrics.stickerGridHorizontalGapDp, 0.001f)
         assertEquals(10f, metrics.stickerGridVerticalGapDp, 0.001f)
-        assertEquals(50f, metrics.moodRowCircleSizeDp, 0.001f)
         assertEquals(120f, metrics.noteHeightDp, 0.001f)
     }
 
@@ -36,7 +35,6 @@ class PostStatusLayoutTest {
         assertEquals(6f, metrics.stickerCardVerticalPaddingDp, 0.001f)
         assertEquals(8f, metrics.stickerGridHorizontalGapDp, 0.001f)
         assertEquals(8f, metrics.stickerGridVerticalGapDp, 0.001f)
-        assertEquals(46f, metrics.moodRowCircleSizeDp, 0.001f)
         assertEquals(96f, metrics.noteHeightDp, 0.001f)
     }
 

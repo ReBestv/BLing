@@ -52,30 +52,30 @@ class CheckinLayoutTest {
     }
 
     @Test
-    fun `grows the checkin button on tall screens`() {
+    fun `uses the largest checkin button on tall screens`() {
         val metrics = CheckinLayout.metrics(availableWidthDp = 393f, availableHeightDp = 860f)
 
-        assertEquals(118f, metrics.buttonSizeDp, 0.001f)
+        assertEquals(104f, metrics.buttonSizeDp, 0.001f)
     }
 
     @Test
     fun `keeps the checkin button compact on short screens`() {
         val metrics = CheckinLayout.metrics(availableWidthDp = 393f, availableHeightDp = 560f)
 
-        assertEquals(100f, metrics.buttonSizeDp, 0.001f)
+        assertEquals(88f, metrics.buttonSizeDp, 0.001f)
     }
 
     @Test
     fun `keeps button medium when card area still needs room`() {
         val metrics = CheckinLayout.metrics(availableWidthDp = 393f, availableHeightDp = 760f)
 
-        assertEquals(108f, metrics.buttonSizeDp, 0.001f)
+        assertEquals(96f, metrics.buttonSizeDp, 0.001f)
     }
 
     @Test
     fun `reduces statistic card padding to keep the third row visible`() {
         val metrics = CheckinLayout.metrics(availableWidthDp = 393f, availableHeightDp = 760f)
 
-        assertEquals(18f, metrics.statVerticalPaddingDp, 0.001f)
+        assertEquals(12f, metrics.statVerticalPaddingDp, 0.001f)
     }
 }

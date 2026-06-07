@@ -8,14 +8,14 @@ class HomeInteractionFlowStyleTest {
 
     @Test
     fun `uses a soft continuous flow treatment below partner status`() {
-        assertEquals(-8f, HomeInteractionFlowStyle.topOverlapDp, 0.001f)
-        assertEquals(2f, HomeInteractionFlowStyle.horizontalInsetDp, 0.001f)
-        assertEquals(18f, HomeInteractionFlowStyle.topPaddingDp, 0.001f)
-        assertEquals(12f, HomeInteractionFlowStyle.horizontalPaddingDp, 0.001f)
-        assertEquals(16f, HomeInteractionFlowStyle.bottomPaddingDp, 0.001f)
-        assertEquals(10f, HomeInteractionFlowStyle.itemGapDp, 0.001f)
-        assertEquals(24f, HomeInteractionFlowStyle.cornerRadiusDp, 0.001f)
-        assertEquals(Color(0x85FFF8F4), HomeInteractionFlowStyle.topColor)
-        assertEquals(Color(0x00FFFAF6), HomeInteractionFlowStyle.bottomColor)
+        assertEquals(0f, HomeInteractionFlowStyle.topOverlapDp, 0.001f)
+        assertEquals(10f, HomeInteractionFlowStyle.horizontalInsetDp, 0.001f)
+        assertEquals(24f, HomeInteractionFlowStyle.topPaddingDp, 0.001f)
+        assertEquals(13f, HomeInteractionFlowStyle.horizontalPaddingDp, 0.001f)
+        assertEquals(14f, HomeInteractionFlowStyle.bottomPaddingDp, 0.001f)
+        assertEquals(12f, HomeInteractionFlowStyle.itemGapDp, 0.001f)
+        assertEquals(28f, HomeInteractionFlowStyle.cornerRadiusDp, 0.001f)
+        assertEquals(Color(0xC4FFFFFF), HomeInteractionFlowStyle.topColor)
+        assertEquals(Color(0x55FFFFFF), HomeInteractionFlowStyle.bottomColor)
     }
 }

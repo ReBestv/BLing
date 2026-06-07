@@ -63,8 +63,11 @@ class StandByWidget : GlanceAppWidget() {
                         style = TextStyle(fontSize = 46.sp)
                     )
                     Spacer(modifier = GlanceModifier.height(4.dp))
+                    val titleText = status.stickerLabel.orEmpty()
+                        .ifEmpty { status.feelingLabel }
+                        .ifEmpty { "对方状态" }
                     Text(
-                        text = status.feelingLabel.ifEmpty { "对方状态" },
+                        text = titleText,
                         style = TextStyle(
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
@@ -72,8 +75,7 @@ class StandByWidget : GlanceAppWidget() {
                         )
                     )
 
-                    val doingText = status.stickerLabel.orEmpty()
-                        .ifEmpty { status.customDoing.ifEmpty { status.doing } }
+                    val doingText = status.customDoing.ifEmpty { status.doing }
                     if (doingText.isNotEmpty()) {
                         Spacer(modifier = GlanceModifier.height(2.dp))
                         Text(

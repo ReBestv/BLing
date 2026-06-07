@@ -3,6 +3,9 @@ package com.standbyus.app
 import android.app.Application
 import android.util.Log
 import androidx.glance.appwidget.updateAll
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import coil.decode.ImageDecoderDecoder
 import com.standbyus.app.data.remote.SupabaseService
 import com.standbyus.app.data.remote.ThemeRepository
 import com.standbyus.app.notification.PartnerEventNotifier
@@ -16,7 +19,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltAndroidApp
-class StandByApplication : Application() {
+class StandByApplication : Application(), ImageLoaderFactory {
 
     companion object {
         private const val TAG = "StandByApp"
@@ -32,6 +35,16 @@ class StandByApplication : Application() {
     lateinit var partnerEventNotifier: PartnerEventNotifier
 
     private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    override fun newImageLoader(): ImageLoader {
+        return ImageLoader.Builder(this)
+            .components {
+                // Min SDK 31 guarantees ImageDecoder support for animated GIF/WebP/HEIF assets.
+                add(ImageDecoderDecoder.Factory())
+            }
+            .crossfade(true)
+            .build()
+    }
 
     override fun onCreate() {
         super.onCreate()

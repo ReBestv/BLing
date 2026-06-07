@@ -39,6 +39,7 @@ private val TextSecondary = Color(0xFF9E8E86)
 private val FgColor = Color(0xFF5A4A42)
 private val BgColor = Color(0xFFFFF8F5)
 private val CardBg = Color(0xFFFFFFFF)
+private val NeutralFeelingColor = Color(0xFFFFE5DC)
 
 @Composable
 fun HistoryScreen(
@@ -195,9 +196,14 @@ private fun TimelineEntry(
     layoutMetrics: HistoryLayoutMetrics
 ) {
     val feeling = Feeling.fromKey(status.feelingKey)
-    val feelingColor = feeling?.color ?: Color(0xFFFFD180)
-    val moodName = status.feelingLabel.ifEmpty { feeling?.displayName ?: "开心" }
-    val activityText = status.customDoing.ifEmpty { status.doing }.ifEmpty { moodName }
+    val feelingColor = feeling?.color ?: NeutralFeelingColor
+    val moodName = status.feelingLabel
+        .ifEmpty { feeling?.displayName ?: status.stickerLabel.orEmpty() }
+        .ifEmpty { "状态" }
+    val activityText = status.customDoing
+        .ifEmpty { status.doing }
+        .ifEmpty { status.stickerLabel.orEmpty() }
+        .ifEmpty { moodName }
     val formattedTime = SimpleDateFormat("HH:mm", Locale.getDefault())
         .format(Date(status.updatedAt))
     val bubbleModifier = when (val width = HistoryEntryLayout.bubbleWidth(isMe)) {

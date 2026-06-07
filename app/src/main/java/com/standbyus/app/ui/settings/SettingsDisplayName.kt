@@ -1,5 +1,7 @@
 package com.standbyus.app.ui.settings
 
+import com.standbyus.app.ui.theme.StatusEmoji
+
 object SettingsDisplayName {
     fun resolvePartnerDisplayName(
         nickname: String?,
@@ -13,12 +15,18 @@ object SettingsDisplayName {
 
     private fun looksLikeAssetPath(value: String): Boolean {
         val lower = value.lowercase()
-        return lower.startsWith("http://") ||
-            lower.startsWith("https://") ||
+        return StatusEmoji.isRemoteAsset(value) ||
             lower.contains("/storage/") ||
             lower.endsWith(".png") ||
             lower.endsWith(".jpg") ||
             lower.endsWith(".jpeg") ||
-            lower.endsWith(".webp")
+            lower.endsWith(".webp") ||
+            lower.endsWith(".gif") ||
+            lower.endsWith(".heif") ||
+            lower.endsWith(".heic") ||
+            lower.endsWith(".mov") ||
+            lower.endsWith(".mp4") ||
+            lower.endsWith(".m4v") ||
+            lower.endsWith(".webm")
     }
 }

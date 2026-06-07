@@ -1,6 +1,7 @@
 package com.standbyus.app.ui.history
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,6 +25,12 @@ class HistoryViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val prefs = context.getSharedPreferences("pairing", Context.MODE_PRIVATE)
+    private val avatarPreferenceListener =
+        SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == KEY_AVATAR_EMOJI) {
+                refreshMyAvatar()
+            }
+        }
 
     private val _statusHistory = MutableStateFlow<List<UserStatus>>(emptyList())
     val statusHistory: StateFlow<List<UserStatus>> = _statusHistory.asStateFlow()
@@ -38,15 +45,17 @@ class HistoryViewModel @Inject constructor(
     val myId: StateFlow<String> = _myId.asStateFlow()
 
     private val _myAvatar = MutableStateFlow(
-        prefs.getString("avatar_emoji", "🙂") ?: "🙂"
+        readMyAvatar()
     )
     val myAvatar: StateFlow<String> = _myAvatar.asStateFlow()
 
     init {
+        prefs.registerOnSharedPreferenceChangeListener(avatarPreferenceListener)
         loadHistory()
     }
 
     fun refresh() {
+        refreshMyAvatar()
         loadHistory()
     }
 
@@ -54,6 +63,7 @@ class HistoryViewModel @Inject constructor(
         viewModelScope.launch {
             _loading.value = true
             try {
+                refreshMyAvatar()
                 val myId = supabaseService.getCachedDeviceId()
                 _myId.value = myId
                 _partnerName.value = resolvePartnerName()
@@ -122,6 +132,16 @@ class HistoryViewModel @Inject constructor(
         }
     }
 
+    private fun readMyAvatar(): String {
+        return prefs.getString(KEY_AVATAR_EMOJI, DEFAULT_AVATAR)
+            ?.takeIf { it.isNotEmpty() }
+            ?: DEFAULT_AVATAR
+    }
+
+    private fun refreshMyAvatar() {
+        _myAvatar.value = readMyAvatar()
+    }
+
     private fun resolvePartnerName(): String {
         return SettingsDisplayName.resolvePartnerDisplayName(
             nickname = prefs.getString("partner_nickname", ""),
@@ -144,5 +164,12 @@ class HistoryViewModel @Inject constructor(
         private const val TAG = "StandByHistoryVM"
         private const val KEY_PARTNER_ID = "partner_id"
         private const val KEY_PARTNER_NAME = "partner_name"
+        private const val KEY_AVATAR_EMOJI = "avatar_emoji"
+        private const val DEFAULT_AVATAR = "\uD83D\uDE42"
+    }
+
+    override fun onCleared() {
+        prefs.unregisterOnSharedPreferenceChangeListener(avatarPreferenceListener)
+        super.onCleared()
     }
 }

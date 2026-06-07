@@ -143,9 +143,10 @@ fun TodoScreen(
                         )
 
                         currentList?.let { list ->
-                            ListPermissionBanner(
+                            ListOwnershipBanner(
                                 list = list,
-                                canEdit = uiState.canEditCurrentList
+                                canEdit = uiState.canEditCurrentList,
+                                ownerName = uiState.currentListOwnerName
                             )
                         }
 
@@ -201,8 +202,11 @@ fun TodoScreen(
 @Composable
 private fun ListPermissionBanner(
     list: TodoList,
-    canEdit: Boolean
+    canEdit: Boolean,
+    ownerName: String
 ) {
+    val personalListLabel = "${ownerName.ifBlank { "我" }}的个人清单"
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -214,7 +218,7 @@ private fun ListPermissionBanner(
                 selected = true,
                 onClick = {},
                 enabled = false,
-                label = { Text(formatOwnerBadge(list.ownerId)) },
+                label = { Text(ownerName.ifBlank { "我" }) },
                 colors = FilterChipDefaults.filterChipColors(
                     disabledContainerColor = Color(0xFFF5F0ED),
                     disabledLabelColor = TextSecondary
@@ -250,13 +254,49 @@ private fun ListPermissionBanner(
     Spacer(modifier = Modifier.height(8.dp))
 }
 
-private fun formatOwnerBadge(ownerId: String): String {
-    val normalized = ownerId.filter { it.isLetterOrDigit() }.uppercase()
-    return if (normalized.length >= 4) {
-        "ID ${normalized.takeLast(4)}"
+@Composable
+private fun ListOwnershipBanner(
+    list: TodoList,
+    canEdit: Boolean,
+    ownerName: String
+) {
+    val primaryLabel = if (list.isShared) {
+        "共同清单"
     } else {
-        "ID ${normalized.ifBlank { "----" }}"
+        "${ownerName.ifBlank { "我" }}的个人清单"
     }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        FilterChip(
+            selected = true,
+            onClick = {},
+            enabled = false,
+            label = { Text(primaryLabel) },
+            colors = FilterChipDefaults.filterChipColors(
+                disabledContainerColor = PrimarySoft,
+                disabledLabelColor = PrimaryColor
+            )
+        )
+        if (!canEdit) {
+            FilterChip(
+                selected = true,
+                onClick = {},
+                enabled = false,
+                label = { Text("仅对方可编辑") },
+                colors = FilterChipDefaults.filterChipColors(
+                    disabledContainerColor = Color(0xFFF5F0ED),
+                    disabledLabelColor = TextSecondary
+                )
+            )
+        }
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
 }
 
 @Composable

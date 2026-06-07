@@ -64,10 +64,29 @@ fun PostStatusScreen(
     val focusManager = LocalFocusManager.current
     val themeVersion by EmojiThemeManager.themeVersion.collectAsState()
     val currentTheme = remember(themeVersion) { EmojiThemeManager.getCurrentTheme(context) }
+    val hasThemeStickers = currentTheme.stickers.isNotEmpty()
+    val selectedSticker = remember(currentTheme, viewModel.selectedStickerId) {
+        currentTheme.stickerById(viewModel.selectedStickerId.orEmpty())
+    }
+    val selectedStickerFeeling = remember(selectedSticker) {
+        selectedSticker?.let { EmojiThemeManager.inferFeelingFromSticker(it) }
+    }
+    val statusAccentFeeling = if (hasThemeStickers) {
+        selectedStickerFeeling
+    } else {
+        viewModel.selectedFeeling
+    }
+
+    LaunchedEffect(hasThemeStickers) {
+        if (hasThemeStickers) {
+            viewModel.clearFeelingSelection()
+        }
+    }
 
     // Animated background tint based on selected feeling
     val bgTint by animateColorAsState(
-        targetValue = (viewModel.selectedFeeling?.color ?: PostStatusViewModel.NeutralFeelingColor).copy(alpha = 0.08f),
+        targetValue = (statusAccentFeeling?.color ?: PostStatusViewModel.NeutralFeelingColor)
+            .copy(alpha = 0.08f),
         animationSpec = tween(400)
     )
 
@@ -114,7 +133,6 @@ fun PostStatusScreen(
                 ) {
                 Spacer(modifier = Modifier.height(layoutMetrics.topSpacerDp.dp))
 
-                val hasThemeStickers = currentTheme.stickers.isNotEmpty()
                 if (hasThemeStickers) {
                     StickerGridPicker(
                         stickers = currentTheme.stickers,
@@ -134,20 +152,7 @@ fun PostStatusScreen(
                     Spacer(modifier = Modifier.height(layoutMetrics.sectionGapDp.dp))
                 }
 
-                if (hasThemeStickers) {
-                    MoodRowPicker(
-                        feelings = Feeling.entries,
-                        selectedFeeling = viewModel.selectedFeeling,
-                        onFeelingClick = viewModel::selectFeeling,
-                        themeVersion = themeVersion,
-                        circleSizeDp = layoutMetrics.moodRowCircleSizeDp,
-                        imageSizeDp = layoutMetrics.moodRowImageSizeDp,
-                        itemWidthDp = layoutMetrics.moodRowItemWidthDp,
-                        labelLineHeightSp = layoutMetrics.moodLabelLineHeightSp,
-                        useDefaultEmoji = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                } else {
+                if (!hasThemeStickers) {
                     MoodGridPicker(
                         feelings = Feeling.entries,
                         selectedFeeling = viewModel.selectedFeeling,
@@ -169,7 +174,8 @@ fun PostStatusScreen(
                 Spacer(modifier = Modifier.height(layoutMetrics.sectionGapDp.dp))
 
                 PhraseSuggestionChips(
-                    selectedFeeling = viewModel.selectedFeeling,
+                    selectedSticker = selectedSticker,
+                    selectedFeeling = statusAccentFeeling,
                     onPhraseClick = viewModel::updateCustomDoing,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -314,53 +320,6 @@ private fun MoodGridPicker(
                 labelLineHeightSp = labelLineHeightSp,
                 useDefaultEmoji = useDefaultEmoji
             )
-        }
-    }
-}
-
-@Composable
-private fun MoodRowPicker(
-    feelings: List<Feeling>,
-    selectedFeeling: Feeling?,
-    onFeelingClick: (Feeling) -> Unit,
-    themeVersion: Int,
-    circleSizeDp: Float,
-    imageSizeDp: Float,
-    itemWidthDp: Float,
-    labelLineHeightSp: Float,
-    useDefaultEmoji: Boolean,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        Text(
-            text = "心情底色",
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color(0xFF807975)
-        )
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(end = 4.dp)
-        ) {
-            items(feelings) { feeling ->
-                Box(modifier = Modifier.width(itemWidthDp.dp)) {
-                    MoodOption(
-                        feeling = feeling,
-                        isSelected = feeling == selectedFeeling,
-                        onClick = { onFeelingClick(feeling) },
-                        themeVersion = themeVersion,
-                        circleSizeDp = circleSizeDp,
-                        imageSizeDp = imageSizeDp,
-                        emojiTextSizeSp = 24f,
-                        labelTopGapDp = 4f,
-                        labelLineHeightSp = labelLineHeightSp,
-                        useDefaultEmoji = useDefaultEmoji
-                    )
-                }
-            }
         }
     }
 }
@@ -558,13 +517,16 @@ private fun StickerGridPicker(
 
 @Composable
 private fun PhraseSuggestionChips(
+    selectedSticker: ThemeSticker?,
     selectedFeeling: Feeling?,
     onPhraseClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val phrases = remember(selectedFeeling) {
-        selectedFeeling?.let { StatusPhraseSuggestions.forFeeling(it) }
-            ?: StatusPhraseSuggestions.fallbackPhrases()
+    val phrases = remember(selectedSticker, selectedFeeling) {
+        StatusPhraseSuggestions.forSticker(
+            sticker = selectedSticker,
+            inferredFeeling = selectedFeeling
+        )
     }
     val accentColor = selectedFeeling?.color ?: PostStatusViewModel.NeutralFeelingColor
 

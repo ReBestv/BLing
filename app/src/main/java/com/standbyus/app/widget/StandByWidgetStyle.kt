@@ -11,7 +11,7 @@ object StandByWidgetStyle {
     val emptyBackgroundColor = Color(0xFFFFF8F5)
 
     fun backgroundColorFor(feelingKey: String?): Color {
-        val feeling = Feeling.fromKey(feelingKey.orEmpty()) ?: Feeling.HAPPY
+        val feeling = Feeling.fromKey(feelingKey.orEmpty())
         return HomePartnerStatusCardSurfaceStyle.gradientColorsFor(feeling)[1]
     }
 }

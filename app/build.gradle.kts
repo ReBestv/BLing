@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.glance.material3)
     implementation(libs.coroutines.android)
     implementation(libs.coil)
+    implementation(libs.coil.gif)
     testImplementation(libs.junit)
     testImplementation(libs.json)
 }

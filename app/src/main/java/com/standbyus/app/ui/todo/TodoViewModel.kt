@@ -8,6 +8,7 @@ import com.standbyus.app.data.model.TodoItem
 import com.standbyus.app.data.model.TodoList
 import com.standbyus.app.data.remote.SupabaseService
 import com.standbyus.app.data.repository.TodoRepository
+import com.standbyus.app.ui.settings.SettingsDisplayName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -72,7 +73,8 @@ class TodoViewModel @Inject constructor(
                         currentListId = currentListId,
                         items = items,
                         isLoading = false,
-                        canEditCurrentList = canEditList(currentList)
+                        canEditCurrentList = canEditList(currentList),
+                        currentListOwnerName = ownerNameFor(currentList)
                     )
                 }
             } catch (e: Exception) {
@@ -96,7 +98,8 @@ class TodoViewModel @Inject constructor(
                 items = emptyList(),
                 isLoading = true,
                 error = null,
-                canEditCurrentList = canEditList(currentList)
+                canEditCurrentList = canEditList(currentList),
+                currentListOwnerName = ownerNameFor(currentList)
             )
         }
         viewModelScope.launch {
@@ -110,7 +113,8 @@ class TodoViewModel @Inject constructor(
                         it.copy(
                             items = items,
                             isLoading = false,
-                            canEditCurrentList = canEditList(currentList)
+                            canEditCurrentList = canEditList(currentList),
+                            currentListOwnerName = ownerNameFor(currentList)
                         )
                     }
                 }
@@ -151,7 +155,8 @@ class TodoViewModel @Inject constructor(
                 items = emptyList(),
                 syncingListIds = it.syncingListIds + localId,
                 error = null,
-                canEditCurrentList = true
+                canEditCurrentList = true,
+                currentListOwnerName = myOwnerName()
             )
         }
 
@@ -177,6 +182,11 @@ class TodoViewModel @Inject constructor(
                         currentListId = if (state.currentListId == localId) result.id else state.currentListId,
                         syncingListIds = state.syncingListIds - localId,
                         canEditCurrentList = canEditList(
+                            updatedLists.firstOrNull { list ->
+                                list.id == if (state.currentListId == localId) result.id else state.currentListId
+                            }
+                        ),
+                        currentListOwnerName = ownerNameFor(
                             updatedLists.firstOrNull { list ->
                                 list.id == if (state.currentListId == localId) result.id else state.currentListId
                             }
@@ -206,7 +216,9 @@ class TodoViewModel @Inject constructor(
                 todoRepository.deleteList(id)
                 val currentId = _uiState.value.currentListId
                 if (currentId == id) {
-                    _uiState.update { it.copy(currentListId = null, items = emptyList()) }
+                    _uiState.update {
+                        it.copy(currentListId = null, items = emptyList(), currentListOwnerName = "")
+                    }
                 }
                 loadLists()
             } catch (e: Exception) {
@@ -399,6 +411,7 @@ class TodoViewModel @Inject constructor(
                 items = if (fallbackListId == previousListId) previousItems else emptyList(),
                 syncingListIds = state.syncingListIds - localId,
                 canEditCurrentList = canEditList(updatedLists.firstOrNull { it.id == fallbackListId }),
+                currentListOwnerName = ownerNameFor(updatedLists.firstOrNull { it.id == fallbackListId }),
                 error = message
             )
         }
@@ -414,6 +427,26 @@ class TodoViewModel @Inject constructor(
     private fun canEditList(list: TodoList?): Boolean {
         if (list == null) return false
         return list.isShared || list.ownerId == myDeviceId
+    }
+
+    private fun ownerNameFor(list: TodoList?): String {
+        if (list == null || list.isShared) return ""
+        return if (list.ownerId == myDeviceId) {
+            myOwnerName()
+        } else {
+            partnerOwnerName()
+        }
+    }
+
+    private fun myOwnerName(): String {
+        return prefs.getString("self_name", "").orEmpty().trim().ifEmpty { "我" }
+    }
+
+    private fun partnerOwnerName(): String {
+        return SettingsDisplayName.resolvePartnerDisplayName(
+            nickname = null,
+            partnerName = prefs.getString("partner_name", "")
+        )
     }
 
     private fun rollbackCreateItem(localId: Long, message: String) {
@@ -446,5 +479,6 @@ data class TodoUiState(
     val syncingItemIds: Set<Long> = emptySet(),
     val syncingListIds: Set<Long> = emptySet(),
     val canEditCurrentList: Boolean = false,
+    val currentListOwnerName: String = "",
     val error: String? = null
 )

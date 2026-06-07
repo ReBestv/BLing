@@ -10,9 +10,9 @@ class HomeLayoutTest {
         val metrics = HomeLayout.metrics(availableWidthDp = 393f, availableHeightDp = 620f)
 
         assertEquals(16f, metrics.horizontalPaddingDp, 0.001f)
-        assertEquals(320f, metrics.partnerCardHeightDp, 0.001f)
-        assertEquals(156f, metrics.partnerEmojiSizeDp, 0.001f)
-        assertEquals(4f, metrics.partnerContentGapDp, 0.001f)
+        assertEquals(344f, metrics.partnerCardHeightDp, 0.001f)
+        assertEquals(176f, metrics.partnerEmojiSizeDp, 0.001f)
+        assertEquals(8f, metrics.partnerContentGapDp, 0.001f)
     }
 
     @Test
@@ -20,8 +20,8 @@ class HomeLayoutTest {
         val metrics = HomeLayout.metrics(availableWidthDp = 393f, availableHeightDp = 420f)
 
         assertEquals(152.08f, metrics.partnerCardHeightDp, 0.01f)
-        assertEquals(108f, metrics.partnerEmojiSizeDp, 0.001f)
-        assertEquals(2.48f, metrics.partnerContentGapDp, 0.01f)
+        assertEquals(124f, metrics.partnerEmojiSizeDp, 0.001f)
+        assertEquals(4.96f, metrics.partnerContentGapDp, 0.01f)
     }
 
     @Test

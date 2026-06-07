@@ -7,12 +7,12 @@ import org.junit.Test
 class HomeBackgroundStyleTest {
 
     @Test
-    fun `uses warm peach to soft lavender background colors`() {
+    fun `uses a warm peach background gradient`() {
         assertEquals(
             listOf(
-                Color(0xFFFFF1EC),
-                Color(0xFFFFFAF7),
-                Color(0xFFF5F3FF)
+                Color(0xFFFFE8DE),
+                Color(0xFFFFF5EF),
+                Color(0xFFFFFAF6)
             ),
             HomeBackgroundStyle.gradientColors
         )

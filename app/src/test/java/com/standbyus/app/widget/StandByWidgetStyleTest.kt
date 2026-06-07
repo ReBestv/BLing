@@ -19,9 +19,9 @@ class StandByWidgetStyleTest {
     }
 
     @Test
-    fun `falls back to happy palette when feeling key is missing`() {
+    fun `falls back to neutral palette when feeling key is missing`() {
         assertEquals(
-            HomePartnerStatusCardSurfaceStyle.gradientColorsFor(Feeling.HAPPY)[1],
+            HomePartnerStatusCardSurfaceStyle.gradientColorsFor(null)[1],
             StandByWidgetStyle.backgroundColorFor("")
         )
     }
