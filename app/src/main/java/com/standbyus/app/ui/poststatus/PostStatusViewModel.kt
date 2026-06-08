@@ -1,0 +1,111 @@
+package com.standbyus.app.ui.poststatus
+
+import android.content.Context
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.standbyus.app.data.model.Feeling
+import com.standbyus.app.data.model.ThemeSticker
+import com.standbyus.app.data.model.UserStatus
+import com.standbyus.app.data.model.toHex
+import androidx.compose.ui.graphics.Color
+import com.standbyus.app.data.remote.SupabaseService
+import com.standbyus.app.data.repository.StatusRepository
+import com.standbyus.app.ui.theme.EmojiThemeManager
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class PostStatusViewModel @Inject constructor(
+    private val statusRepository: StatusRepository,
+    private val supabaseService: SupabaseService,
+    @ApplicationContext private val context: Context
+) : ViewModel() {
+
+    var selectedFeeling by mutableStateOf<Feeling?>(null)
+        private set
+    var customDoing by mutableStateOf("")
+        private set
+    var selectedStickerId by mutableStateOf<String?>(null)
+        private set
+    var isPublishing by mutableStateOf(false)
+        private set
+    var published by mutableStateOf(false)
+        private set
+    var error by mutableStateOf("")
+        private set
+
+    fun selectFeeling(feeling: Feeling) {
+        selectedFeeling = if (selectedFeeling == feeling) null else feeling
+    }
+
+    fun clearFeelingSelection() {
+        selectedFeeling = null
+    }
+
+    fun selectSticker(sticker: ThemeSticker) {
+        selectedStickerId = if (selectedStickerId == sticker.id) null else sticker.id
+    }
+    fun updateCustomDoing(value: String) {
+        customDoing = PostStatusInputRules.sanitizeDetailInput(value)
+    }
+
+    fun publish() {
+        viewModelScope.launch {
+            isPublishing = true
+            error = ""
+
+            val userId = supabaseService.getCachedDeviceId()
+            val snapshot = EmojiThemeManager.createSnapshot(
+                theme = EmojiThemeManager.getCurrentTheme(context),
+                feelingKey = selectedFeeling?.key,
+                stickerId = selectedStickerId
+            )
+            val stickerBehavior = snapshot.stickerLabel.orEmpty()
+            val moodLabel = snapshot.feelingLabel.orEmpty()
+            val detailText = PostStatusInputRules.publishNote(customDoing)
+            val prefs = context.getSharedPreferences("pairing", Context.MODE_PRIVATE)
+            val avatarEmoji = prefs.getString("avatar_emoji", DEFAULT_AVATAR_EMOJI)
+                ?.takeIf { it.isNotEmpty() }
+                ?: DEFAULT_AVATAR_EMOJI
+            val avatarUrl = prefs.getString("avatar_url", "") ?: ""
+
+            val status = UserStatus(
+                userId = userId,
+                doing = stickerBehavior,
+                customDoing = "",
+                themeId = snapshot.themeId,
+                themeName = snapshot.themeName,
+                feelingKey = snapshot.feelingKey,
+                feelingLabel = moodLabel,
+                feelingAsset = snapshot.feelingAsset,
+                feelingFallbackEmoji = snapshot.feelingFallbackEmoji,
+                feelingColor = snapshot.feelingColor,
+                stickerId = snapshot.stickerId,
+                stickerLabel = snapshot.stickerLabel,
+                stickerAsset = snapshot.stickerAsset,
+                avatarEmoji = avatarEmoji,
+                avatarUrl = avatarUrl,
+                note = detailText
+            )
+            try {
+                statusRepository.updateStatus(status)
+                isPublishing = false
+                published = true
+            } catch (e: Exception) {
+                error = "发布失败：${e.localizedMessage}"
+                isPublishing = false
+            }
+        }
+    }
+
+    companion object {
+        val NeutralFeelingColor: Color = Color(0xFFFFE5DC)
+        val NeutralFeelingColorHex: String = NeutralFeelingColor.toHex()
+        private const val DEFAULT_AVATAR_EMOJI = "\uD83D\uDE42"
+    }
+}

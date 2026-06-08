@@ -1,0 +1,145 @@
+{
+  "id": "emoji_motion",
+  "name": "动态表情",
+  "bucket": "emoji-motion",
+  "icon": "red_heart.webp",
+  "stickers": [
+    {
+      "id": "red_heart",
+      "label": "爱你",
+      "asset": "red_heart.webp",
+      "tags": [
+        "love"
+      ]
+    },
+    {
+      "id": "blowing_kiss",
+      "label": "亲亲",
+      "asset": "blowing_kiss.webp",
+      "tags": [
+        "kiss",
+        "love"
+      ]
+    },
+    {
+      "id": "hugging_face",
+      "label": "抱抱",
+      "asset": "hugging_face.webp",
+      "tags": [
+        "happy",
+        "love"
+      ]
+    },
+    {
+      "id": "heart_eyes",
+      "label": "心动",
+      "asset": "heart_eyes.webp",
+      "tags": [
+        "love",
+        "happy"
+      ]
+    },
+    {
+      "id": "smiling_blush",
+      "label": "开心",
+      "asset": "smiling_blush.webp",
+      "tags": [
+        "happy"
+      ]
+    },
+    {
+      "id": "thinking_face",
+      "label": "想你",
+      "asset": "thinking_face.webp",
+      "tags": [
+        "missing",
+        "thinking"
+      ]
+    },
+    {
+      "id": "sleepy_face",
+      "label": "困了",
+      "asset": "sleepy_face.webp",
+      "tags": [
+        "tired",
+        "sleeping"
+      ]
+    },
+    {
+      "id": "sleeping_face",
+      "label": "睡觉",
+      "asset": "sleeping_face.webp",
+      "tags": [
+        "sleeping",
+        "tired"
+      ]
+    },
+    {
+      "id": "tired_face",
+      "label": "累了",
+      "asset": "tired_face.webp",
+      "tags": [
+        "tired"
+      ]
+    },
+    {
+      "id": "crying_face",
+      "label": "委屈",
+      "asset": "crying_face.webp",
+      "tags": [
+        "sad",
+        "upset"
+      ]
+    },
+    {
+      "id": "angry_face",
+      "label": "生气",
+      "asset": "angry_face.webp",
+      "tags": [
+        "angry"
+      ]
+    },
+    {
+      "id": "medical_mask",
+      "label": "生病",
+      "asset": "medical_mask.webp",
+      "tags": [
+        "sick"
+      ]
+    },
+    {
+      "id": "savoring_food",
+      "label": "干饭",
+      "asset": "savoring_food.webp",
+      "tags": [
+        "doing"
+      ]
+    },
+    {
+      "id": "sunglasses_face",
+      "label": "悠闲",
+      "asset": "sunglasses_face.webp",
+      "tags": [
+        "relaxed"
+      ]
+    },
+    {
+      "id": "flexed_biceps",
+      "label": "加油",
+      "asset": "flexed_biceps.webp",
+      "tags": [
+        "hustling",
+        "doing"
+      ]
+    },
+    {
+      "id": "winking_face",
+      "label": "调皮",
+      "asset": "winking_face.webp",
+      "tags": [
+        "happy"
+      ]
+    }
+  ],
+  "feelings": []
+}

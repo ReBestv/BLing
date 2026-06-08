@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StandBy Us - 相册预览</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif;
+    background: #1a1a2e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: #FFF8F5;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 20px 80px rgba(0,0,0,0.3);
+    border: 1px solid rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 44px;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 28px 0;
+    font-size: 12px;
+    color: #6B5A50;
+  }
+
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 20px;
+  }
+  .top-bar h1 { font-size: 18px; font-weight: 600; color: #2D1810; }
+  .top-bar .upload-btn {
+    width: 36px; height: 36px;
+    background: #FF7E67;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(255,126,103,0.3);
+  }
+
+  .photo-grid {
+    flex: 1;
+    padding: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    align-content: start;
+    overflow-y: auto;
+  }
+
+  .photo-card {
+    border-radius: 14px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .photo-card:hover { transform: scale(1.02); }
+
+  .photo-img {
+    width: 100%;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+  }
+
+  .photo-caption {
+    padding: 8px 10px 10px;
+    font-size: 13px;
+    color: #2D1810;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .photo-time {
+    font-size: 11px;
+    color: #6B5A50;
+    padding: 0 10px 10px;
+  }
+
+  .bottom-nav {
+    display: flex;
+    height: 64px;
+    border-top: 1px solid #E8DDD6;
+    background: white;
+    padding-bottom: 8px;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: 11px;
+    color: #6B5A50;
+    cursor: pointer;
+  }
+  .nav-item.active { color: #FF7E67; }
+  .nav-item .icon { font-size: 22px; }
+
+  /* 上传底部弹窗 */
+  .upload-sheet {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
+    z-index: 10;
+  }
+  .upload-handle {
+    width: 36px; height: 4px;
+    background: #E8DDD6;
+    border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+  .upload-preview {
+    width: 120px; height: 120px;
+    background: #FFF0EA;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    margin: 0 auto 16px;
+  }
+  .upload-input {
+    width: 100%;
+    border: 1px solid #E8DDD6;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-size: 15px;
+    outline: none;
+    margin-bottom: 16px;
+    color: #2D1810;
+  }
+  .upload-input:focus { border-color: #FF7E67; }
+  .upload-submit {
+    width: 100%;
+    padding: 14px;
+    background: #FF7E67;
+    color: white;
+    border: none;
+    border-radius: 24px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0);
+    z-index: 9;
+    pointer-events: none;
+  }
+
+  /* 空状态 */
+  .empty-state {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #6B5A50;
+  }
+  .empty-state .big { font-size: 64px; margin-bottom: 12px; }
+  .empty-state .text { font-size: 16px; }
+  .empty-state .sub { font-size: 13px; color: #B5A89E; margin-top: 4px; }
+
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+  <div class="status-bar">
+    <span>9:41</span>
+    <span>🔋</span>
+  </div>
+
+  <!-- 相册有照片的状态 -->
+  <div id="hasPhotos">
+    <div class="top-bar">
+      <h1>共同相册</h1>
+      <div class="upload-btn" onclick="showUpload()">＋</div>
+    </div>
+    <div class="photo-grid">
+      <div class="photo-card">
+        <div class="photo-img" style="background:linear-gradient(135deg,#FFD93D,#FF9F43)">🏖️</div>
+        <div class="photo-caption">今天的海边太美了</div>
+        <div class="photo-time">5月10日</div>
+      </div>
+      <div class="photo-card">
+        <div class="photo-img" style="background:linear-gradient(135deg,#FD79A8,#E84393)">🍜</div>
+        <div class="photo-caption">一起吃拉面</div>
+        <div class="photo-time">5月9日</div>
+      </div>
+      <div class="photo-card">
+        <div class="photo-img" style="background:linear-gradient(135deg,#55EFC4,#00B894)">🌳</div>
+        <div class="photo-caption">散步遇到的猫咪</div>
+        <div class="photo-time">5月8日</div>
+      </div>
+      <div class="photo-card">
+        <div class="photo-img" style="background:linear-gradient(135deg,#FF9F43,#FDCB6E)">☕</div>
+        <div class="photo-caption">早安咖啡</div>
+        <div class="photo-time">5月7日</div>
+      </div>
+      <div class="photo-card">
+        <div class="photo-img" style="background:linear-gradient(135deg,#A29BFE,#6C5CE7)">🌙</div>
+        <div class="photo-caption"></div>
+        <div class="photo-time">5月6日</div>
+      </div>
+      <div class="photo-card">
+        <div class="photo-img" style="background:linear-gradient(135deg,#00CEC9,#0984E3)">🎂</div>
+        <div class="photo-caption">生日惊喜</div>
+        <div class="photo-time">5月5日</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 空状态 -->
+  <div id="emptyState" class="hidden" style="position:absolute;top:0;left:0;right:0;bottom:0;background:#FFF8F5;z-index:5;">
+    <div class="top-bar" style="padding-top:52px;">
+      <h1>共同相册</h1>
+      <div class="upload-btn" onclick="showUpload()">＋</div>
+    </div>
+    <div class="empty-state">
+      <div class="big">🖼️</div>
+      <div class="text">还没有照片</div>
+      <div class="sub">点击右上角 ＋ 上传第一张</div>
+    </div>
+  </div>
+
+  <!-- 遮罩 -->
+  <div class="overlay" id="overlay" onclick="hideUpload()"></div>
+
+  <!-- 上传弹窗 -->
+  <div class="upload-sheet hidden" id="uploadSheet">
+    <div class="upload-handle"></div>
+    <div class="upload-preview">🖼️</div>
+    <input class="upload-input" placeholder="写一句小记（可选）" maxlength="50">
+    <button class="upload-submit">发布到相册</button>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item"><span class="icon">🏠</span>首页</div>
+    <div class="nav-item active"><span class="icon">🖼️</span>相册</div>
+    <div class="nav-item"><span class="icon">📜</span>历史</div>
+  </div>
+</div>
+
+<script>
+  let showEmpty = false;
+  function toggleState() {
+    document.getElementById('hasPhotos').classList.toggle('hidden', showEmpty);
+    document.getElementById('emptyState').classList.toggle('hidden', !showEmpty);
+  }
+
+  function showUpload() {
+    document.getElementById('uploadSheet').classList.remove('hidden');
+    document.getElementById('overlay').style.background = 'rgba(0,0,0,0.3)';
+    document.getElementById('overlay').style.pointerEvents = 'auto';
+  }
+
+  function hideUpload() {
+    document.getElementById('uploadSheet').classList.add('hidden');
+    document.getElementById('overlay').style.background = 'rgba(0,0,0,0)';
+    document.getElementById('overlay').style.pointerEvents = 'none';
+  }
+
+  // 点击切换空状态预览
+  document.querySelector('.top-bar h1').onclick = function() {
+    showEmpty = !showEmpty;
+    toggleState();
+  };
+</script>
+</body>
+</html>

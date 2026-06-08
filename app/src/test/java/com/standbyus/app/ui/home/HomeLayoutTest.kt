@@ -1,0 +1,33 @@
+package com.standbyus.app.ui.home
+
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
+class HomeLayoutTest {
+
+    @Test
+    fun `keeps partner card expressive while reserving interaction bubbles`() {
+        val metrics = HomeLayout.metrics(availableWidthDp = 393f, availableHeightDp = 620f)
+
+        assertEquals(16f, metrics.horizontalPaddingDp, 0.001f)
+        assertEquals(302f, metrics.partnerCardHeightDp, 0.001f)
+        assertEquals(154.51f, metrics.partnerEmojiSizeDp, 0.01f)
+        assertEquals(7.02f, metrics.partnerContentGapDp, 0.01f)
+    }
+
+    @Test
+    fun `compresses partner card and emoji on short phones`() {
+        val metrics = HomeLayout.metrics(availableWidthDp = 393f, availableHeightDp = 420f)
+
+        assertEquals(152.08f, metrics.partnerCardHeightDp, 0.01f)
+        assertEquals(124f, metrics.partnerEmojiSizeDp, 0.001f)
+        assertEquals(4.96f, metrics.partnerContentGapDp, 0.01f)
+    }
+
+    @Test
+    fun `uses narrower gutters on compact phones`() {
+        val metrics = HomeLayout.metrics(availableWidthDp = 340f, availableHeightDp = 620f)
+
+        assertEquals(12f, metrics.horizontalPaddingDp, 0.001f)
+    }
+}

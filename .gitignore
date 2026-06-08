@@ -1,0 +1,55 @@
+# Gradle / Android
+.gradle/
+.kotlin/
+build/
+**/build/
+*.apk
+*.aab
+*.ap_
+*.hprof
+
+# Local machine config
+local.properties
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+keystore.properties
+
+# IDEs
+.idea/
+*.iml
+
+# Local agent/tooling state
+.claude/
+.codex/
+.graphify*
+graphify-out/
+.sisyphus/
+.superpowers/
+conversations/
+output/
+
+# Generated or temporary assets
+tmp_fonts/
+app/src/main/res_backup/
+*.bak
+__pycache__/
+*.pyc
+/APP简介.md
+
+# Historical generated files kept out of the public repo
+/docs/superpowers/specs/2026-05-20-celebration-events-v1-design.md
+/docs/superpowers/specs/2026-05-20-intimate-interaction-memory-design.md
+/docs/superpowers/plans/2026-05-20-intimate-interactions-celebrations-v1.md
+/docs/superpowers/plans/2026-05-20-keyed-theme-status-refactor.md
+/docs/superpowers/plans/2026-05-21-poop-checkin-notification.md
+/docs/superpowers/plans/2026-05-21-theme-stickers.md
+/docs/superpowers/specs/2026-05-21-theme-stickers-design.md
+/app/src/main/res/drawable-nodpi/birthday_splash.webp
+/themes/VV/
+/themes/VV_processed_512_webp/
+/themes/VV_processed_512_webp_en/
+/themes/VV_processed_512_webp_en_preview.png
+/themes/VV_processed_preview.png
