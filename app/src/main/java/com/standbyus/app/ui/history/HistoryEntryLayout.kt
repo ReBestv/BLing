@@ -39,7 +39,7 @@ object HistoryEntryLayout {
 
     fun moodBadgeSize(): Dp = 56.dp
 
-    fun moodImageSize(): Dp = 40.dp
+    fun moodImageSize(): Dp = 50.dp
 
     fun moodToTextGap(): Dp = 14.dp
 }

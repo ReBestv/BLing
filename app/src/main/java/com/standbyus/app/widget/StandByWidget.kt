@@ -119,7 +119,7 @@ class StandByWidget : GlanceAppWidget() {
         )
         Spacer(modifier = GlanceModifier.height(2.dp))
         Text(
-            text = "点按打开 StandBy Us",
+            text = "点按打开 Bling",
             style = TextStyle(
                 fontSize = 12.sp,
                 color = ColorProvider(StandByWidgetStyle.secondaryTextColor)

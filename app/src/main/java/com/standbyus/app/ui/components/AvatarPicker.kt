@@ -43,7 +43,7 @@ val allAvatarEmojis: List<String> = avatarCategories.flatMap { it.emojis }
 fun AvatarPicker(
     selectedEmoji: String,
     onAvatarSelected: (String) -> Unit,
-    columns: Int = 5,
+    columns: Int = 4,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(

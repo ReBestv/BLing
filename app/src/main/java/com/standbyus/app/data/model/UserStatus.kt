@@ -27,6 +27,8 @@ data class UserStatus(
     val stickerId: String? = null,
     val stickerLabel: String? = null,
     val stickerAsset: String? = null,
+    val avatarEmoji: String = DEFAULT_AVATAR_EMOJI,
+    val avatarUrl: String = "",
     val note: String = "",
     val updatedAt: Long = System.currentTimeMillis(),
     val source: String = "manual"
@@ -45,12 +47,16 @@ data class UserStatus(
         stickerId?.let { put("stickerId", it) }
         stickerLabel?.let { put("stickerLabel", it) }
         stickerAsset?.let { put("stickerAsset", it) }
+        put("avatarEmoji", avatarEmoji)
+        put("avatarUrl", avatarUrl)
         put("note", note)
         put("updatedAt", updatedAt)
         put("source", source)
     }
 
     companion object {
+        const val DEFAULT_AVATAR_EMOJI = "\uD83D\uDE42"
+
         fun fromMap(map: Map<String, Any>): UserStatus {
             val legacyLabel = map["feeling"] as? String
             val explicitKey = map["feelingKey"] as? String
@@ -75,6 +81,8 @@ data class UserStatus(
                 stickerId = map["stickerId"] as? String,
                 stickerLabel = map["stickerLabel"] as? String,
                 stickerAsset = map["stickerAsset"] as? String,
+                avatarEmoji = map["avatarEmoji"] as? String ?: DEFAULT_AVATAR_EMOJI,
+                avatarUrl = map["avatarUrl"] as? String ?: "",
                 note = map["note"] as? String ?: "",
                 updatedAt = (map["updatedAt"] as? Number)?.toLong() ?: System.currentTimeMillis(),
                 source = map["source"] as? String ?: "manual"

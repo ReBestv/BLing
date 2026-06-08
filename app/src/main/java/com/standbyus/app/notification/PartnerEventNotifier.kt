@@ -80,7 +80,7 @@ class PartnerEventNotifier @Inject constructor(
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle("StandByUs")
+            .setContentTitle("Bling")
             .setContentText("拉屎大王发力中，噗噗噗^(*￣(oo)￣)^~~~~~")
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setCategory(NotificationCompat.CATEGORY_MESSAGE)

@@ -64,4 +64,20 @@ class UserStatusTest {
         assertEquals("吃饭", restored.stickerLabel)
         assertEquals("https://example.com/themes/VV/eating.webp", restored.stickerAsset)
     }
+
+    @Test
+    fun writesAndReadsAvatarSnapshotFields() {
+        val status = UserStatus(
+            avatarEmoji = "🥰",
+            avatarUrl = "https://example.com/avatars/me.jpg"
+        )
+
+        val map = status.toMap()
+        val restored = UserStatus.fromMap(map)
+
+        assertEquals("🥰", map["avatarEmoji"])
+        assertEquals("https://example.com/avatars/me.jpg", map["avatarUrl"])
+        assertEquals("🥰", restored.avatarEmoji)
+        assertEquals("https://example.com/avatars/me.jpg", restored.avatarUrl)
+    }
 }

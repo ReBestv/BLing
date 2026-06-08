@@ -26,10 +26,15 @@ object HomeLayout {
         val contentGap = (16f * verticalScale).coerceIn(10f, 16f)
         val topSpacer = (8f * verticalScale).coerceIn(4f, 8f)
         val bottomSpacer = (8f * verticalScale).coerceIn(4f, 8f)
-        val availablePartnerHeight = MIN_PARTNER_CARD_HEIGHT_DP +
+        val desiredPartnerHeight = MIN_PARTNER_CARD_HEIGHT_DP +
             (availableHeightDp - 420f) *
             ((NATURAL_PARTNER_CARD_HEIGHT_DP - MIN_PARTNER_CARD_HEIGHT_DP) / 200f)
-        val partnerCardHeight = availablePartnerHeight
+        val fittingPartnerHeight = availableHeightDp -
+            topSpacer -
+            bottomSpacer -
+            contentGap -
+            HomeInteractionFlowStyle.expandedContentHeightDp
+        val partnerCardHeight = minOf(desiredPartnerHeight, fittingPartnerHeight)
             .coerceIn(MIN_PARTNER_CARD_HEIGHT_DP, NATURAL_PARTNER_CARD_HEIGHT_DP)
         val partnerScale = (partnerCardHeight / NATURAL_PARTNER_CARD_HEIGHT_DP).coerceIn(0.62f, 1f)
         val partnerEmojiSize = (HomePartnerStatusCardStyle.emojiSizeDp * partnerScale)

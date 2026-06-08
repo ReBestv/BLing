@@ -1,13 +1,17 @@
 package com.standbyus.app.ui.settings
 
 import android.content.Context
+import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.standbyus.app.data.model.PairingInfo
 import com.standbyus.app.data.remote.SupabaseService
 import com.standbyus.app.data.remote.ThemeRepository
+import com.standbyus.app.data.repository.AvatarRepository
 import com.standbyus.app.data.repository.PairingCleanupRepository
 import com.standbyus.app.data.repository.PairingRepository
+import com.standbyus.app.data.repository.StatusRepository
 import com.standbyus.app.ui.theme.EmojiThemeManager
 import com.standbyus.app.ui.theme.EmojiThemeSet
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +27,8 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val pairingRepository: PairingRepository,
     private val pairingCleanupRepository: PairingCleanupRepository,
+    private val avatarRepository: AvatarRepository,
+    private val statusRepository: StatusRepository,
     private val supabaseService: SupabaseService,
     private val themeRepository: ThemeRepository,
     @ApplicationContext private val context: Context
@@ -67,6 +73,12 @@ class SettingsViewModel @Inject constructor(
     private val _avatarEmoji = MutableStateFlow("🙂")
     val avatarEmoji: StateFlow<String> = _avatarEmoji.asStateFlow()
 
+    private val _avatarUrl = MutableStateFlow("")
+    val avatarUrl: StateFlow<String> = _avatarUrl.asStateFlow()
+
+    private val _avatarUploading = MutableStateFlow(false)
+    val avatarUploading: StateFlow<Boolean> = _avatarUploading.asStateFlow()
+
     private val _myName = MutableStateFlow("")
     val myName: StateFlow<String> = _myName.asStateFlow()
 
@@ -74,6 +86,7 @@ class SettingsViewModel @Inject constructor(
 
     init {
         _avatarEmoji.value = prefs.getString("avatar_emoji", "🙂") ?: "🙂"
+        _avatarUrl.value = prefs.getString("avatar_url", "") ?: ""
         _myName.value = prefs.getString("self_name", "") ?: ""
         _nicknameInput.value = prefs.getString("partner_nickname", "") ?: ""
         updatePartnerDisplayName()
@@ -82,8 +95,30 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun selectAvatar(emoji: String) {
-        _avatarEmoji.value = emoji
-        prefs.edit().putString("avatar_emoji", emoji).apply()
+        saveAvatar(emoji = emoji, avatarUrl = "")
+        syncAvatarSnapshot()
+    }
+
+    fun uploadAvatar(uri: Uri) {
+        viewModelScope.launch {
+            _avatarUploading.value = true
+            _status.value = "正在上传头像..."
+            try {
+                val uid = cachedOrNewDeviceId()
+                val uploadedUrl = avatarRepository.uploadAvatar(uri, uid)
+                saveAvatar(
+                    emoji = _avatarEmoji.value.ifEmpty { DEFAULT_AVATAR },
+                    avatarUrl = uploadedUrl
+                )
+                syncAvatarSnapshot()
+                _status.value = "头像已更新"
+            } catch (e: Exception) {
+                Log.e(TAG, "upload avatar failed", e)
+                _status.value = "头像上传失败：${e.localizedMessage ?: "请稍后重试"}"
+            } finally {
+                _avatarUploading.value = false
+            }
+        }
     }
 
     private fun loadThemes() {
@@ -228,6 +263,7 @@ class SettingsViewModel @Inject constructor(
             }.getOrDefault(true)
             prefs.edit().clear().apply()
             _avatarEmoji.value = "🙂"
+            _avatarUrl.value = ""
             _isPaired.value = false
             _justPaired.value = false
             _pairingCode.value = ""
@@ -281,11 +317,47 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    private fun saveAvatar(emoji: String, avatarUrl: String) {
+        val normalizedEmoji = emoji.ifEmpty { DEFAULT_AVATAR }
+        _avatarEmoji.value = normalizedEmoji
+        _avatarUrl.value = avatarUrl
+        prefs.edit().apply {
+            putString("avatar_emoji", normalizedEmoji)
+            putString("avatar_url", avatarUrl)
+            apply()
+        }
+    }
+
+    private fun syncAvatarSnapshot() {
+        viewModelScope.launch {
+            runCatching {
+                statusRepository.updateAvatarSnapshot(
+                    userId = cachedOrNewDeviceId(),
+                    avatarEmoji = _avatarEmoji.value.ifEmpty { DEFAULT_AVATAR },
+                    avatarUrl = _avatarUrl.value
+                )
+            }.onFailure {
+                Log.e(TAG, "sync avatar snapshot failed", it)
+            }
+        }
+    }
+
+    private fun cachedOrNewDeviceId(): String {
+        return supabaseService.getCachedDeviceId().ifEmpty {
+            supabaseService.getDeviceId(context)
+        }
+    }
+
     private fun PairingInfo.partnerIdFor(myUid: String): String {
         return when {
             user1Id == myUid -> user2Id
             user2Id == myUid -> user1Id
             else -> ""
         }
+    }
+
+    companion object {
+        private const val TAG = "StandBySettingsVM"
+        private const val DEFAULT_AVATAR = "\uD83D\uDE42"
     }
 }

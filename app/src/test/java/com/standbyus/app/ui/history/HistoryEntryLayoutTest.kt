@@ -61,7 +61,7 @@ class HistoryEntryLayoutTest {
         assertEquals(12.dp, HistoryEntryLayout.cardHorizontalPadding())
         assertEquals(8.dp, HistoryEntryLayout.cardVerticalPadding())
         assertEquals(56.dp, HistoryEntryLayout.moodBadgeSize())
-        assertEquals(40.dp, HistoryEntryLayout.moodImageSize())
+        assertEquals(50.dp, HistoryEntryLayout.moodImageSize())
         assertEquals(14.dp, HistoryEntryLayout.moodToTextGap())
     }
 }

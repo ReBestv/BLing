@@ -1,7 +1,8 @@
 package com.standbyus.app.ui.settings
 
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -39,6 +40,7 @@ import com.standbyus.app.ui.celebration.CelebrationOverlay
 import com.standbyus.app.ui.celebration.CelebrationStyle
 import com.standbyus.app.ui.components.AppHeader
 import com.standbyus.app.ui.components.AvatarPicker
+import com.standbyus.app.ui.components.UserAvatar
 import com.standbyus.app.ui.components.allAvatarEmojis
 import com.standbyus.app.ui.theme.EmojiThemeSet
 import com.standbyus.app.ui.theme.EmojiThemeManager
@@ -51,7 +53,6 @@ private val Background = Color(0xFFFFF8F3)
 private val Border = Color(0xFFEFE2DA)
 private val TextPrimary = Color(0xFF3D3029)
 private val TextSecondary = Color(0xFF8F7469)
-private val ToggleInactive = Color(0xFFE5D9D1)
 
 @Composable
 fun SettingsScreen(
@@ -69,15 +70,17 @@ fun SettingsScreen(
     val nickname by viewModel.nicknameInput.collectAsState()
     val partnerDisplayName by viewModel.partnerDisplayName.collectAsState()
     val avatarEmoji by viewModel.avatarEmoji.collectAsState()
+    val avatarUrl by viewModel.avatarUrl.collectAsState()
+    val avatarUploading by viewModel.avatarUploading.collectAsState()
     val myName by viewModel.myName.collectAsState()
-
-    // Dark mode local state (visual only)
-    var isDarkMode by remember { mutableStateOf(false) }
 
     // Avatar picker dialog state
     var showAvatarPicker by remember { mutableStateOf(false) }
     var showEffectPreviewOptions by remember { mutableStateOf(false) }
     var previewCelebration by remember { mutableStateOf<CelebrationDay?>(null) }
+    val avatarPhotoPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri -> uri?.let { viewModel.uploadAvatar(it) } }
 
     // 动态主题列表
     val themes by viewModel.availableThemes.collectAsState()
@@ -125,16 +128,28 @@ fun SettingsScreen(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            // Avatar circle
                             Box(
-                                modifier = Modifier
-                                    .size(layoutMetrics.profileAvatarSizeDp.dp)
-                                    .shadow(12.dp, CircleShape, ambientColor = Primary.copy(alpha = 0.3f))
-                                    .clip(CircleShape)
-                                    .background(Color(0xFFF5F0ED)),
+                                modifier = Modifier.shadow(
+                                    12.dp,
+                                    CircleShape,
+                                    ambientColor = Primary.copy(alpha = 0.3f)
+                                ),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(text = avatarEmoji, fontSize = 32.sp)
+                                UserAvatar(
+                                    avatarUrl = avatarUrl,
+                                    avatarEmoji = avatarEmoji,
+                                    size = layoutMetrics.profileAvatarSizeDp.dp,
+                                    borderColor = Color.White,
+                                    textSize = 32.sp
+                                )
+                                if (avatarUploading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(26.dp),
+                                        strokeWidth = 2.dp,
+                                        color = Primary
+                                    )
+                                }
                             }
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
@@ -145,7 +160,7 @@ fun SettingsScreen(
                                 )
                                 Spacer(modifier = Modifier.height(2.dp))
                                 Text(
-                                    text = "点击更换头像",
+                                    text = "照片或表情头像，会展示给对方",
                                     fontSize = 12.sp,
                                     color = TextSecondary
                                 )
@@ -236,6 +251,17 @@ fun SettingsScreen(
                                 color = TextSecondary
                             )
                             Spacer(modifier = Modifier.height(8.dp))
+                            AvatarPhotoPickerRow(
+                                avatarUrl = avatarUrl,
+                                avatarEmoji = avatarEmoji,
+                                uploading = avatarUploading,
+                                onPickPhoto = {
+                                    avatarPhotoPicker.launch(
+                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                    )
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
                             InlineAvatarPicker(
                                 selectedEmoji = avatarEmoji,
                                 onSelected = { viewModel.selectAvatar(it) }
@@ -318,6 +344,17 @@ fun SettingsScreen(
                                 color = TextSecondary
                             )
                             Spacer(modifier = Modifier.height(8.dp))
+                            AvatarPhotoPickerRow(
+                                avatarUrl = avatarUrl,
+                                avatarEmoji = avatarEmoji,
+                                uploading = avatarUploading,
+                                onPickPhoto = {
+                                    avatarPhotoPicker.launch(
+                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                    )
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
                             InlineAvatarPicker(
                                 selectedEmoji = avatarEmoji,
                                 onSelected = { viewModel.selectAvatar(it) }
@@ -358,14 +395,6 @@ fun SettingsScreen(
                     SectionCard(contentPadding = layoutMetrics.cardPaddingDp.dp) {
                         SectionTitle(text = "外观")
 
-                        // 深色模式 toggle
-                        ToggleRow(
-                            label = "🌙 深色模式",
-                            isActive = isDarkMode,
-                            onToggle = { isDarkMode = !isDarkMode },
-                            showDivider = true
-                        )
-
                         // 动态主题列表
                         Column(modifier = Modifier.fillMaxWidth()) {
                             themes.forEach { theme ->
@@ -393,7 +422,7 @@ fun SettingsScreen(
                         Spacer(modifier = Modifier.height(20.dp))
 
                         Text(
-                            text = "StandByUs v1.0.0",
+                            text = "Bling v1.0.0",
                             fontSize = 13.sp,
                             color = TextSecondary
                         )
@@ -448,12 +477,25 @@ fun SettingsScreen(
                                 color = TextPrimary
                             )
                         }
+                        AvatarPhotoPickerRow(
+                            avatarUrl = avatarUrl,
+                            avatarEmoji = avatarEmoji,
+                            uploading = avatarUploading,
+                            onPickPhoto = {
+                                avatarPhotoPicker.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                )
+                            },
+                            modifier = Modifier.padding(horizontal = 16.dp)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
                         AvatarPicker(
                             selectedEmoji = avatarEmoji,
                             onAvatarSelected = {
                                 viewModel.selectAvatar(it)
                                 showAvatarPicker = false
                             },
+                            columns = 4,
                             modifier = Modifier.heightIn(max = layoutMetrics.avatarPickerMaxHeightDp.dp)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
@@ -652,77 +694,6 @@ private fun SectionTitle(text: String) {
     )
 }
 
-// ===== Toggle Row =====
-@Composable
-private fun ToggleRow(
-    label: String,
-    isActive: Boolean,
-    onToggle: () -> Unit,
-    showDivider: Boolean
-) {
-    Column {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) { onToggle() }
-                .padding(vertical = 14.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = label,
-                fontSize = 15.sp,
-                color = TextPrimary
-            )
-            CustomToggle(
-                isActive = isActive,
-                onToggle = onToggle
-            )
-        }
-        if (showDivider) {
-            HorizontalDivider(color = Border, thickness = 1.dp)
-        }
-    }
-}
-
-// ===== Custom Toggle =====
-@Composable
-private fun CustomToggle(
-    isActive: Boolean,
-    onToggle: () -> Unit
-) {
-    val thumbOffset by animateDpAsState(
-        targetValue = if (isActive) 24.dp else 2.dp,
-        animationSpec = tween(durationMillis = 200),
-        label = "thumbOffset"
-    )
-
-    Box(
-        modifier = Modifier
-            .width(52.dp)
-            .height(28.dp)
-            .clip(RoundedCornerShape(14.dp))
-            .background(if (isActive) Primary else ToggleInactive)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) { onToggle() }
-            .padding(2.dp),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Box(
-            modifier = Modifier
-                .offset(x = thumbOffset)
-                .size(24.dp)
-                .shadow(2.dp, CircleShape)
-                .background(Color.White, CircleShape)
-        )
-    }
-}
-
 // ===== Theme Row =====
 @Composable
 private fun ThemeRow(
@@ -783,6 +754,64 @@ private fun ThemeRow(
         }
 
         HorizontalDivider(color = Border, thickness = 0.5.dp)
+    }
+}
+
+@Composable
+private fun AvatarPhotoPickerRow(
+    avatarUrl: String,
+    avatarEmoji: String,
+    uploading: Boolean,
+    onPickPhoto: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(18.dp))
+            .background(Color(0xFFFFF8F5))
+            .border(1.dp, Border, RoundedCornerShape(18.dp))
+            .clickable(enabled = !uploading) { onPickPhoto() }
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            UserAvatar(
+                avatarUrl = avatarUrl,
+                avatarEmoji = avatarEmoji,
+                size = 42.dp,
+                textSize = 22.sp,
+                borderColor = Color.White
+            )
+            if (uploading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.dp,
+                    color = Primary
+                )
+            }
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = if (avatarUrl.isBlank()) "从相册选择" else "更换照片头像",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = TextPrimary
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = "",
+                fontSize = 12.sp,
+                color = TextSecondary
+            )
+        }
+        Text(
+            text = if (uploading) "上传中" else "选择",
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+            color = Primary
+        )
     }
 }
 

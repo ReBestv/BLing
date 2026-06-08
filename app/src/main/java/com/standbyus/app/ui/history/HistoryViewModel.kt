@@ -27,8 +27,8 @@ class HistoryViewModel @Inject constructor(
     private val prefs = context.getSharedPreferences("pairing", Context.MODE_PRIVATE)
     private val avatarPreferenceListener =
         SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-            if (key == KEY_AVATAR_EMOJI) {
-                refreshMyAvatar()
+            if (key == KEY_AVATAR_EMOJI || key == KEY_AVATAR_URL) {
+                refreshMyAvatarSnapshot()
             }
         }
 
@@ -49,13 +49,18 @@ class HistoryViewModel @Inject constructor(
     )
     val myAvatar: StateFlow<String> = _myAvatar.asStateFlow()
 
+    private val _myAvatarUrl = MutableStateFlow(
+        readMyAvatarUrl()
+    )
+    val myAvatarUrl: StateFlow<String> = _myAvatarUrl.asStateFlow()
+
     init {
         prefs.registerOnSharedPreferenceChangeListener(avatarPreferenceListener)
         loadHistory()
     }
 
     fun refresh() {
-        refreshMyAvatar()
+        refreshMyAvatarSnapshot()
         loadHistory()
     }
 
@@ -63,7 +68,7 @@ class HistoryViewModel @Inject constructor(
         viewModelScope.launch {
             _loading.value = true
             try {
-                refreshMyAvatar()
+                refreshMyAvatarSnapshot()
                 val myId = supabaseService.getCachedDeviceId()
                 _myId.value = myId
                 _partnerName.value = resolvePartnerName()
@@ -138,8 +143,13 @@ class HistoryViewModel @Inject constructor(
             ?: DEFAULT_AVATAR
     }
 
-    private fun refreshMyAvatar() {
+    private fun readMyAvatarUrl(): String {
+        return prefs.getString(KEY_AVATAR_URL, "") ?: ""
+    }
+
+    private fun refreshMyAvatarSnapshot() {
         _myAvatar.value = readMyAvatar()
+        _myAvatarUrl.value = readMyAvatarUrl()
     }
 
     private fun resolvePartnerName(): String {
@@ -165,6 +175,7 @@ class HistoryViewModel @Inject constructor(
         private const val KEY_PARTNER_ID = "partner_id"
         private const val KEY_PARTNER_NAME = "partner_name"
         private const val KEY_AVATAR_EMOJI = "avatar_emoji"
+        private const val KEY_AVATAR_URL = "avatar_url"
         private const val DEFAULT_AVATAR = "\uD83D\uDE42"
     }
 

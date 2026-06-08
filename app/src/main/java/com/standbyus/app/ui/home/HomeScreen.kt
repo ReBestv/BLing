@@ -1,11 +1,11 @@
 package com.standbyus.app.ui.home
 
+import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,6 +24,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
@@ -39,6 +41,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
@@ -129,7 +132,7 @@ fun HomeScreen(
     ) {
         // Sticky app bar
         AppHeader(
-            title = "StandBy Us",
+            title = "Bling",
             rightIcon = {
                 Icon(
                     imageVector = Icons.Filled.Settings,
@@ -149,42 +152,43 @@ fun HomeScreen(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
+                    .clipToBounds()
             ) {
                 val layoutMetrics = HomeLayout.metrics(
                     availableWidthDp = maxWidth.value,
                     availableHeightDp = maxHeight.value
                 )
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = layoutMetrics.horizontalPaddingDp.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(layoutMetrics.contentGapDp.dp)
-            ) {
-                Spacer(modifier = Modifier.height(layoutMetrics.topSpacerDp.dp))
-
-                PartnerStatusCard(
-                    status = partnerStatus!!,
-                    userName = partnerDisplayName,
-                    layoutMetrics = layoutMetrics,
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(layoutMetrics.partnerCardHeightDp.dp)
-                )
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = layoutMetrics.horizontalPaddingDp.dp)
+                        .padding(
+                            top = layoutMetrics.topSpacerDp.dp,
+                            bottom = layoutMetrics.bottomSpacerDp.dp
+                        ),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(layoutMetrics.contentGapDp.dp)
+                ) {
+                    PartnerStatusCard(
+                        status = partnerStatus!!,
+                        layoutMetrics = layoutMetrics,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(layoutMetrics.partnerCardHeightDp.dp)
+                    )
 
-                HomeInteractionFlow(
-                    latestInteraction = latestInteraction,
-                    partnerDisplayName = partnerDisplayName,
-                    myStatus = myStatus,
-                    sendingInteractionType = sendingInteractionType,
-                    interactionError = interactionError,
-                    onNavigateToPost = onNavigateToPost,
-                    onActionClick = viewModel::sendInteraction,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(layoutMetrics.bottomSpacerDp.dp))
-            }
+                    HomeInteractionFlow(
+                        latestInteraction = latestInteraction,
+                        partnerDisplayName = partnerDisplayName,
+                        myStatus = myStatus,
+                        sendingInteractionType = sendingInteractionType,
+                        interactionError = interactionError,
+                        onNavigateToPost = onNavigateToPost,
+                        onActionClick = viewModel::sendInteraction,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         } else if (isPaired) {
             Box(
@@ -345,12 +349,12 @@ private fun InteractionActionsGrid(
 
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+        verticalArrangement = Arrangement.spacedBy(HomeInteractionFlowStyle.actionGridGapDp.dp)
     ) {
         rows.forEachIndexed { rowIndex, rowTypes ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(HomeInteractionFlowStyle.actionGridGapDp.dp)
             ) {
                 rowTypes.forEachIndexed { columnIndex, type ->
                     InteractionActionButton(
@@ -425,7 +429,6 @@ private fun InteractionActionButton(
 @Composable
 private fun PartnerStatusCard(
     status: UserStatus,
-    userName: String,
     layoutMetrics: HomeLayoutMetrics,
     modifier: Modifier = Modifier
 ) {
@@ -435,8 +438,6 @@ private fun PartnerStatusCard(
     val primaryActionText = status.primaryPartnerActionText()
     val moodText = status.partnerMoodText()
     val detailText = status.note
-
-    // Float animation for emoji: 3s ease-in-out, -8px
     val infiniteTransition = rememberInfiniteTransition(label = "emojiFloat")
     val floatOffset by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -486,7 +487,6 @@ private fun PartnerStatusCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(layoutMetrics.partnerContentGapDp.dp)
         ) {
-            // Large emoji with float animation
             StatusEmojiImage(
                 value = status.feelingAsset,
                 feelingKey = status.feelingKey,

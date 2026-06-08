@@ -68,6 +68,11 @@ class PostStatusViewModel @Inject constructor(
             val stickerBehavior = snapshot.stickerLabel.orEmpty()
             val moodLabel = snapshot.feelingLabel.orEmpty()
             val detailText = PostStatusInputRules.publishNote(customDoing)
+            val prefs = context.getSharedPreferences("pairing", Context.MODE_PRIVATE)
+            val avatarEmoji = prefs.getString("avatar_emoji", DEFAULT_AVATAR_EMOJI)
+                ?.takeIf { it.isNotEmpty() }
+                ?: DEFAULT_AVATAR_EMOJI
+            val avatarUrl = prefs.getString("avatar_url", "") ?: ""
 
             val status = UserStatus(
                 userId = userId,
@@ -83,6 +88,8 @@ class PostStatusViewModel @Inject constructor(
                 stickerId = snapshot.stickerId,
                 stickerLabel = snapshot.stickerLabel,
                 stickerAsset = snapshot.stickerAsset,
+                avatarEmoji = avatarEmoji,
+                avatarUrl = avatarUrl,
                 note = detailText
             )
             try {
@@ -99,5 +106,6 @@ class PostStatusViewModel @Inject constructor(
     companion object {
         val NeutralFeelingColor: Color = Color(0xFFFFE5DC)
         val NeutralFeelingColorHex: String = NeutralFeelingColor.toHex()
+        private const val DEFAULT_AVATAR_EMOJI = "\uD83D\uDE42"
     }
 }

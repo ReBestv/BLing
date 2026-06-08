@@ -19,6 +19,8 @@ data class StatusEntity(
     val stickerId: String?,
     val stickerLabel: String?,
     val stickerAsset: String?,
+    val avatarEmoji: String,
+    val avatarUrl: String,
     val note: String,
     val updatedAt: Long,
     val source: String
@@ -38,6 +40,8 @@ fun UserStatus.toEntity() = StatusEntity(
     stickerId = stickerId,
     stickerLabel = stickerLabel,
     stickerAsset = stickerAsset,
+    avatarEmoji = avatarEmoji,
+    avatarUrl = avatarUrl,
     note = note,
     updatedAt = updatedAt,
     source = source
@@ -57,6 +61,8 @@ fun StatusEntity.toUserStatus() = UserStatus(
     stickerId = stickerId,
     stickerLabel = stickerLabel,
     stickerAsset = stickerAsset,
+    avatarEmoji = avatarEmoji,
+    avatarUrl = avatarUrl,
     note = note,
     updatedAt = updatedAt,
     source = source

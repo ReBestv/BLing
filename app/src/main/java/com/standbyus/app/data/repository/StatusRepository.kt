@@ -50,6 +50,18 @@ class StatusRepository @Inject constructor(
         // Widget 缓存
     }
 
+    suspend fun updateAvatarSnapshot(userId: String, avatarEmoji: String, avatarUrl: String) {
+        if (userId.isEmpty()) return
+        supabaseService.update(
+            TABLE,
+            "userId=eq.$userId",
+            mapOf(
+                "avatarEmoji" to avatarEmoji,
+                "avatarUrl" to avatarUrl
+            )
+        )
+    }
+
     private val widgetScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     fun updateWidgetCache(status: UserStatus) {
@@ -67,6 +79,8 @@ class StatusRepository @Inject constructor(
             putString("stickerId", status.stickerId)
             putString("stickerLabel", status.stickerLabel)
             putString("stickerAsset", status.stickerAsset)
+            putString("avatarEmoji", status.avatarEmoji)
+            putString("avatarUrl", status.avatarUrl)
             putString("note", status.note)
             putLong("updatedAt", status.updatedAt)
             apply()

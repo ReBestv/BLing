@@ -26,6 +26,7 @@ import com.standbyus.app.data.model.Feeling
 import com.standbyus.app.data.model.UserStatus
 import com.standbyus.app.ui.components.AppHeader
 import com.standbyus.app.ui.components.StatusEmojiImage
+import com.standbyus.app.ui.components.UserAvatar
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -72,6 +73,7 @@ fun HistoryScreen(
     }
 
     val myAvatar by viewModel.myAvatar.collectAsState()
+    val myAvatarUrl by viewModel.myAvatarUrl.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize().background(BgColor)) {
         // ——— Custom App Bar ———
@@ -142,6 +144,7 @@ fun HistoryScreen(
                                 isMe = status.userId == myId,
                                 partnerName = partnerName,
                                 myAvatar = myAvatar,
+                                myAvatarUrl = myAvatarUrl,
                                 layoutMetrics = layoutMetrics
                             )
                         }
@@ -193,6 +196,7 @@ private fun TimelineEntry(
     isMe: Boolean,
     partnerName: String,
     myAvatar: String,
+    myAvatarUrl: String,
     layoutMetrics: HistoryLayoutMetrics
 ) {
     val feeling = Feeling.fromKey(status.feelingKey)
@@ -215,6 +219,8 @@ private fun TimelineEntry(
             .wrapContentWidth()
     }
     val dotSize = layoutMetrics.dotSizeDp.dp
+    val entryAvatarUrl = if (isMe) myAvatarUrl.ifEmpty { status.avatarUrl } else status.avatarUrl
+    val entryAvatarEmoji = if (isMe) myAvatar.ifEmpty { status.avatarEmoji } else status.avatarEmoji
 
     // Use parity of timestamp for hand-diary style rotation (+1 or -1)
     val rotationDeg = if ((status.updatedAt % 2).toInt() == 0) 1f else -1f
@@ -227,7 +233,7 @@ private fun TimelineEntry(
         horizontalArrangement = HistoryEntryLayout.horizontalArrangement(isMe)
     ) {
         if (!isMe) {
-            // ——— Other person's dot (Left) ———
+            // ——— Other person's avatar dot (Left) ———
             Box(
                 modifier = Modifier
                     .padding(top = 4.dp, end = 12.dp)
@@ -237,20 +243,15 @@ private fun TimelineEntry(
                         CircleShape,
                         ambientColor = TimelineDotBorder.copy(alpha = 0.35f),
                         spotColor = TimelineDotBorder.copy(alpha = 0.35f)
-                    )
-                    .border(2.dp, TimelineDotBorder, CircleShape)
-                    .padding(2.dp)
-                    .background(feelingColor, CircleShape),
+                    ),
                 contentAlignment = Alignment.Center
             ) {
-                StatusEmojiImage(
-                    value = status.feelingAsset,
-                    feelingKey = status.feelingKey,
-                    feelingLabel = status.feelingLabel,
-                    size = (layoutMetrics.dotSizeDp * 0.7f).dp,
-                    textSize = (layoutMetrics.dotSizeDp * 0.6f).sp,
-                    tintColor = feelingColor,
-                    fallbackEmoji = status.feelingFallbackEmoji
+                UserAvatar(
+                    avatarUrl = entryAvatarUrl,
+                    avatarEmoji = entryAvatarEmoji,
+                    size = dotSize,
+                    textSize = (layoutMetrics.dotSizeDp * 0.52f).sp,
+                    borderColor = TimelineDotBorder
                 )
             }
         }
@@ -282,8 +283,7 @@ private fun TimelineEntry(
                 if (!isMe) {
                     MoodBadge(
                         status = status,
-                        feelingColor = feelingColor,
-                        moodName = moodName
+                        feelingColor = feelingColor
                     )
                     Spacer(modifier = Modifier.width(HistoryEntryLayout.moodToTextGap()))
                 }
@@ -335,15 +335,14 @@ private fun TimelineEntry(
                     Spacer(modifier = Modifier.width(HistoryEntryLayout.moodToTextGap()))
                     MoodBadge(
                         status = status,
-                        feelingColor = feelingColor,
-                        moodName = moodName
+                        feelingColor = feelingColor
                     )
                 }
             }
         }
 
         if (isMe) {
-            // ——— My dot (Right) — with avatar emoji ———
+            // ——— My avatar dot (Right) ———
             Box(
                 modifier = Modifier
                     .padding(top = 4.dp, start = HistoryEntryLayout.avatarGap(isMe))
@@ -353,15 +352,15 @@ private fun TimelineEntry(
                         CircleShape,
                         ambientColor = TimelineDotBorder.copy(alpha = 0.35f),
                         spotColor = TimelineDotBorder.copy(alpha = 0.35f)
-                    )
-                    .border(2.dp, TimelineDotBorder, CircleShape)
-                    .padding(2.dp)
-                    .background(Color(0xFFF5F0ED), CircleShape),
+                    ),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = myAvatar,
-                    fontSize = (layoutMetrics.dotSizeDp * 0.6f).sp
+                UserAvatar(
+                    avatarUrl = entryAvatarUrl,
+                    avatarEmoji = entryAvatarEmoji,
+                    size = dotSize,
+                    textSize = (layoutMetrics.dotSizeDp * 0.52f).sp,
+                    borderColor = TimelineDotBorder
                 )
             }
         }
@@ -371,32 +370,21 @@ private fun TimelineEntry(
 @Composable
 private fun MoodBadge(
     status: UserStatus,
-    feelingColor: Color,
-    moodName: String
+    feelingColor: Color
 ) {
     Box(
         modifier = Modifier
-            .size(HistoryEntryLayout.moodBadgeSize())
-            .background(feelingColor.copy(alpha = 0.14f), CircleShape),
+            .size(HistoryEntryLayout.moodBadgeSize()),
         contentAlignment = Alignment.Center
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            StatusEmojiImage(
-                value = status.feelingAsset,
-                feelingKey = status.feelingKey,
-                feelingLabel = status.feelingLabel,
-                size = HistoryEntryLayout.moodImageSize(),
-                textSize = 32.sp,
-                tintColor = feelingColor,
-                fallbackEmoji = status.feelingFallbackEmoji
-            )
-            Text(
-                text = moodName,
-                fontSize = 9.sp,
-                fontWeight = FontWeight.Bold,
-                color = feelingColor,
-                maxLines = 1
-            )
-        }
+        StatusEmojiImage(
+            value = status.feelingAsset,
+            feelingKey = status.feelingKey,
+            feelingLabel = status.feelingLabel,
+            size = HistoryEntryLayout.moodImageSize(),
+            textSize = 42.sp,
+            tintColor = feelingColor,
+            fallbackEmoji = status.feelingFallbackEmoji
+        )
     }
 }

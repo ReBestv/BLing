@@ -332,6 +332,9 @@ fun AlbumScreen(
         fullScreenPhoto?.let { photo ->
             var scale by remember { mutableFloatStateOf(1f) }
             var offset by remember { mutableStateOf(Offset.Zero) }
+            val uploadedAtLabel = remember(photo.createdAt) {
+                albumUploadedAtLabel(photo.createdAt)
+            }
             
             Box(
                 modifier = Modifier
@@ -385,17 +388,43 @@ fun AlbumScreen(
                     )
                 }
                 
-                // 标题
-                if (photo.caption.isNotEmpty()) {
-                    Text(
-                        text = photo.caption,
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .padding(bottom = 48.dp)
-                            .padding(horizontal = 24.dp)
-                    )
+                // 标题与上传时间
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    Color.Black.copy(alpha = 0.72f)
+                                )
+                            )
+                        )
+                        .padding(start = 24.dp, end = 24.dp, top = 72.dp, bottom = 42.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        if (photo.caption.isNotEmpty()) {
+                            Text(
+                                text = photo.caption,
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Spacer(Modifier.height(6.dp))
+                        }
+                        Text(
+                            text = uploadedAtLabel,
+                            color = Color.White.copy(alpha = 0.78f),
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
         }
@@ -410,7 +439,7 @@ private fun AlbumMosaic(
     onPhotoDelete: (AlbumPhoto) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val groups = remember(photos) { photos.chunked(6) }
+    val daySections = remember(photos) { albumDaySections(photos) }
 
     LazyColumn(
         modifier = modifier.padding(horizontal = layoutMetrics.horizontalPaddingDp.dp),
@@ -418,40 +447,102 @@ private fun AlbumMosaic(
         verticalArrangement = Arrangement.spacedBy((layoutMetrics.gridGapDp + 12f).dp)
     ) {
         itemsIndexed(
-            items = groups,
-            key = { index, group -> group.joinToString("-") { it.id.toString() }.ifEmpty { index.toString() } }
-        ) { groupIndex, groupPhotos ->
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(layoutMetrics.gridGapDp.dp)
-            ) {
-                MosaicLeadRow(
-                    photos = groupPhotos.take(3),
-                    mirror = groupIndex % 2 == 1,
-                    gapDp = layoutMetrics.gridGapDp,
-                    onPhotoClick = onPhotoClick,
-                    onPhotoDelete = onPhotoDelete
-                )
+            items = daySections,
+            key = { _, section -> section.date.toString() }
+        ) { sectionIndex, section ->
+            AlbumDayPhotoSection(
+                section = section,
+                sectionIndex = sectionIndex,
+                layoutMetrics = layoutMetrics,
+                onPhotoClick = onPhotoClick,
+                onPhotoDelete = onPhotoDelete
+            )
+        }
+    }
+}
 
-                groupPhotos.getOrNull(3)?.let { photo ->
-                    PhotoCard(
-                        photo = photo,
-                        onClick = { onPhotoClick(photo) },
-                        onDelete = { onPhotoDelete(photo) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1.72f)
+@Composable
+private fun AlbumDayPhotoSection(
+    section: AlbumDaySection,
+    sectionIndex: Int,
+    layoutMetrics: AlbumLayoutMetrics,
+    onPhotoClick: (AlbumPhoto) -> Unit,
+    onPhotoDelete: (AlbumPhoto) -> Unit
+) {
+    val groups = remember(section.photos) { section.photos.chunked(6) }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        AlbumDateHeader(title = section.title)
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy((layoutMetrics.gridGapDp + 12f).dp)
+        ) {
+            groups.forEachIndexed { groupIndex, groupPhotos ->
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(layoutMetrics.gridGapDp.dp)
+                ) {
+                    val absoluteGroupIndex = sectionIndex + groupIndex
+                    MosaicLeadRow(
+                        photos = groupPhotos.take(3),
+                        mirror = absoluteGroupIndex % 2 == 1,
+                        gapDp = layoutMetrics.gridGapDp,
+                        onPhotoClick = onPhotoClick,
+                        onPhotoDelete = onPhotoDelete
+                    )
+
+                    groupPhotos.getOrNull(3)?.let { photo ->
+                        PhotoCard(
+                            photo = photo,
+                            onClick = { onPhotoClick(photo) },
+                            onDelete = { onPhotoDelete(photo) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1.72f)
+                        )
+                    }
+
+                    MosaicDuoRow(
+                        photos = groupPhotos.drop(4).take(2),
+                        gapDp = layoutMetrics.gridGapDp,
+                        onPhotoClick = onPhotoClick,
+                        onPhotoDelete = onPhotoDelete
                     )
                 }
-
-                MosaicDuoRow(
-                    photos = groupPhotos.drop(4).take(2),
-                    gapDp = layoutMetrics.gridGapDp,
-                    onPhotoClick = onPhotoClick,
-                    onPhotoDelete = onPhotoDelete
-                )
             }
         }
+    }
+}
+
+@Composable
+private fun AlbumDateHeader(
+    title: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .width(4.dp)
+                .height(18.dp)
+                .clip(RoundedCornerShape(2.dp))
+                .background(Color(0xFFFFB4A2))
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = title,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = StandByUsLightColors.fg,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 

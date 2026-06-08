@@ -54,39 +54,6 @@ object StandByUsLightColors {
 }
 
 // ============================================================
-// COLOR — Dark Theme (深夜陪伴)
-// ============================================================
-object StandByUsDarkColors {
-    val bg            = Color(0xFF1E1C1A)
-    val surface       = Color(0xFF2A2724)
-    val surfaceRaised = Color(0xFF332F2C)
-    val overlay       = Color(0x99000000) // rgba(0,0,0,0.6)
-
-    val fg           = Color(0xFFEDEBE8)
-    val fgSecondary  = Color(0xFFB3AFAB)
-    val muted        = Color(0xFF8A8580)
-    val placeholder  = Color(0xFF6C6763)
-
-    val accent       = Color(0xFFFF9B86)
-    val accentHover  = Color(0xFFFFA590)
-    val accentPress  = Color(0xFFFF8A70)
-    val accentSoft   = Color(0xFFA88075)
-    val accentBg     = Color(0xFF3D2D28)
-    val accentGlow   = Color(0x73FF7D66) // rgba(255,125,102,0.45)
-
-    val border       = Color(0xFF3D3936)
-    val borderLight  = Color(0xFF332F2C)
-
-    // Semantic (same as light for readability)
-    val success      = Color(0xFF17A34A)
-    val successBg    = Color(0xFF1A3D2E)
-    val warn         = Color(0xFFEAB308)
-    val warnBg       = Color(0xFF3D371A)
-    val danger       = Color(0xFFDC2626)
-    val dangerBg     = Color(0xFF3D1A1A)
-}
-
-// ============================================================
 // TYPOGRAPHY
 // ============================================================
 object StandByUsTypography {
@@ -204,5 +171,4 @@ object StandByUsMoods {
         MoodColor("💪",   Color(0xFFFFE0B2), Color(0xFFFFCC80), "忙碌"),
     )
 }
-
 

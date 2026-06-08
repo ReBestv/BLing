@@ -40,16 +40,6 @@ val OnDanger = Color(0xFFFFFFFF)
 val Success = Color(0xFF6BCB77)           // 成功
 val Warning = Color(0xFFFFB347)           // 警告
 
-// ===== Dark mode =====
-val DarkBg = Color(0xFF121212)
-val DarkSurface = Color(0xFF1E1E1E)
-val DarkSurfaceVariant = Color(0xFF2A2A2A)
-val DarkTextPrimary = Color(0xFFFFFFFF)
-val DarkTextSecondary = Color(0xFFAAAAAA)
-val DarkTextHint = Color(0xFF777777)
-val DarkBorder = Color(0xFF333333)
-val DarkBorderLight = Color(0xFF444444)
-
 // ===== Material3 scheme aliases (兼容 Theme.kt) =====
 val OnBackground = TextPrimary
 val OnSurface = TextPrimary
@@ -60,14 +50,6 @@ val Error = Danger
 val OnError = OnDanger
 val Tertiary = PrimarySoft
 
-// ===== Dark mode Material3 aliases =====
-val DarkBackground = DarkBg
-val DarkOnBackground = DarkTextPrimary
-val DarkOnSurface = DarkTextPrimary
-val DarkOnSurfaceVariant = DarkTextSecondary
-val DarkOutline = DarkBorder
-val DarkOutlineVariant = DarkBorderLight
-
 // ===== Legacy aliases (兼容旧代码) =====
 val PrimaryVariant = PrimaryDark
 val Orange = Primary
@@ -76,6 +58,3 @@ val Charcoal = TextPrimary
 val Gray = TextSecondary
 val BackgroundLight = Background
 val CardWhite = Surface
-val DarkCard = DarkSurface
-val DarkText = DarkTextPrimary
-val DarkGray = DarkTextSecondary

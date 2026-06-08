@@ -6,13 +6,13 @@ import org.junit.Test
 class HomeLayoutTest {
 
     @Test
-    fun `keeps partner card expressive on regular phones`() {
+    fun `keeps partner card expressive while reserving interaction bubbles`() {
         val metrics = HomeLayout.metrics(availableWidthDp = 393f, availableHeightDp = 620f)
 
         assertEquals(16f, metrics.horizontalPaddingDp, 0.001f)
-        assertEquals(344f, metrics.partnerCardHeightDp, 0.001f)
-        assertEquals(176f, metrics.partnerEmojiSizeDp, 0.001f)
-        assertEquals(8f, metrics.partnerContentGapDp, 0.001f)
+        assertEquals(302f, metrics.partnerCardHeightDp, 0.001f)
+        assertEquals(154.51f, metrics.partnerEmojiSizeDp, 0.01f)
+        assertEquals(7.02f, metrics.partnerContentGapDp, 0.01f)
     }
 
     @Test
