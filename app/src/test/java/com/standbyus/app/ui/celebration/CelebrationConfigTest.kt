@@ -54,12 +54,4 @@ class CelebrationConfigTest {
         assertEquals("shown_love_520_20260520", CelebrationConfig.displayKey("love_520", "20260520"))
         assertTrue(CelebrationConfig.displayKey("birthday_0309", "20260309").contains("birthday_0309"))
     }
-
-    @Test
-    fun previewDaysCoverEveryCelebrationStyle() {
-        val previewStyles = CelebrationConfig.previewDays.map { it.style }.toSet()
-
-        assertEquals(CelebrationStyle.entries.toSet(), previewStyles)
-        assertEquals(CelebrationStyle.entries.size, CelebrationConfig.previewDays.size)
-    }
 }

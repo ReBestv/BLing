@@ -1,13 +1,29 @@
+# Gradle / Android
 .gradle/
 .kotlin/
 build/
 **/build/
+*.apk
+*.aab
+*.ap_
+*.hprof
 
+# Local machine config
 local.properties
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+keystore.properties
 
+# IDEs
 .idea/
 *.iml
 
+# Local agent/tooling state
+.claude/
+.codex/
 .graphify*
 graphify-out/
 .sisyphus/
@@ -15,10 +31,15 @@ graphify-out/
 conversations/
 output/
 
-*.apk
-*.aab
-*.ap_
-*.hprof
+# Generated or temporary assets
+tmp_fonts/
+app/src/main/res_backup/
+*.bak
+__pycache__/
+*.pyc
+/APP简介.md
+
+# Historical generated files kept out of the public repo
 /docs/superpowers/specs/2026-05-20-celebration-events-v1-design.md
 /docs/superpowers/specs/2026-05-20-intimate-interaction-memory-design.md
 /docs/superpowers/plans/2026-05-20-intimate-interactions-celebrations-v1.md
@@ -26,56 +47,9 @@ output/
 /docs/superpowers/plans/2026-05-21-poop-checkin-notification.md
 /docs/superpowers/plans/2026-05-21-theme-stickers.md
 /docs/superpowers/specs/2026-05-21-theme-stickers-design.md
-/themes/VV_processed_512_webp_en/angry.webp
-/APP简介.md
 /app/src/main/res/drawable-nodpi/birthday_splash.webp
-/themes/VV_processed_512_webp_en/bored.webp
-/themes/VV_processed_512_webp_en/coffee.webp
-/themes/VV_processed_512_webp_en/cycling.webp
-/themes/VV_processed_512_webp_en/eating.webp
-/themes/VV_processed_512_webp_en/gaming.webp
-/themes/VV_processed_512_webp_en/hug.webp
-/themes/VV_processed_512_webp_en/love_you.webp
-/themes/VV_processed_512_webp_en/missing_you.webp
-/themes/VV_processed_512_webp_en/sick.webp
-/themes/VV_processed_512_webp_en/sleepy.webp
-/StandBy_Us_视觉规范文档_v1.0.md
-/themes/VV_processed_512_webp_en/studying.webp
-/themes/VV_processed_512_webp_en/surprised.webp
-/themes/VV_processed_512_webp_en/unhappy.webp
+/themes/VV/
+/themes/VV_processed_512_webp/
+/themes/VV_processed_512_webp_en/
 /themes/VV_processed_512_webp_en_preview.png
 /themes/VV_processed_preview.png
-/themes/VV_processed_512_webp_en/whats_up.webp
-/themes/VV_processed_512_webp_en/workout.webp
-/themes/VV/不开心.jpg
-/themes/VV_processed_512_webp/不开心.webp
-/themes/VV/吃饭.jpg
-/themes/VV_processed_512_webp/吃饭.webp
-/themes/VV/喝咖啡.jpg
-/themes/VV_processed_512_webp/喝咖啡.webp
-/themes/VV/困了.jpg
-/themes/VV_processed_512_webp/困了.webp
-/themes/VV/在干嘛.jpg
-/themes/VV_processed_512_webp/在干嘛.webp
-/themes/VV/学习.jpg
-/themes/VV_processed_512_webp/学习.webp
-/themes/VV/惊讶.jpg
-/themes/VV_processed_512_webp/惊讶.webp
-/themes/VV/想你.jpg
-/themes/VV_processed_512_webp/想你.webp
-/themes/VV/抱抱.jpg
-/themes/VV_processed_512_webp/抱抱.webp
-/themes/VV/无聊.jpg
-/themes/VV_processed_512_webp/无聊.webp
-/themes/VV/爱你.jpg
-/themes/VV_processed_512_webp/爱你.webp
-/themes/VV/玩游戏.jpg
-/themes/VV_processed_512_webp/玩游戏.webp
-/themes/VV/生气.jpg
-/themes/VV_processed_512_webp/生气.webp
-/themes/VV/生病.jpg
-/themes/VV_processed_512_webp/生病.webp
-/themes/VV/锻炼.jpg
-/themes/VV_processed_512_webp/锻炼.webp
-/themes/VV/骑车.jpg
-/themes/VV_processed_512_webp/骑车.webp

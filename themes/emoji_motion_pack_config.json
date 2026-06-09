@@ -1,0 +1,26 @@
+{
+  "theme": {
+    "id": "emoji_motion",
+    "name": "动态表情",
+    "bucket": "emoji-motion",
+    "icon": "red_heart.webp"
+  },
+  "stickers": [
+    { "source": "102_Red Heart.mov", "id": "red_heart", "label": "爱你", "tags": ["love"] },
+    { "source": "14_Face Blowing a Kiss.mov", "id": "blowing_kiss", "label": "亲亲", "tags": ["kiss", "love"] },
+    { "source": "20_Hugging Face.mov", "id": "hugging_face", "label": "抱抱", "tags": ["happy", "love"] },
+    { "source": "13_Smiling Face With Heart-Eyes.mov", "id": "heart_eyes", "label": "心动", "tags": ["love", "happy"] },
+    { "source": "10_Smiling Face Blushing.mov", "id": "smiling_blush", "label": "开心", "tags": ["happy"] },
+    { "source": "22_Thinking Face.mov", "id": "thinking_face", "label": "想你", "tags": ["missing", "thinking"] },
+    { "source": "34_Sleepy Face.mov", "id": "sleepy_face", "label": "困了", "tags": ["tired", "sleeping"] },
+    { "source": "36_Sleeping Face.mov", "id": "sleeping_face", "label": "睡觉", "tags": ["sleeping", "tired"] },
+    { "source": "35_Tired Face.mov", "id": "tired_face", "label": "累了", "tags": ["tired"] },
+    { "source": "55_Crying Face.mov", "id": "crying_face", "label": "委屈", "tags": ["sad", "upset"] },
+    { "source": "69_Angry Face.mov", "id": "angry_face", "label": "生气", "tags": ["angry"] },
+    { "source": "71_Face With Medical Mask.mov", "id": "medical_mask", "label": "生病", "tags": ["sick"] },
+    { "source": "11_Face Savoring Food.mov", "id": "savoring_food", "label": "干饭", "tags": ["doing"] },
+    { "source": "12_Smiling Face With Sunglasses.mov", "id": "sunglasses_face", "label": "悠闲", "tags": ["relaxed"] },
+    { "source": "100_Flexed Biceps.mov", "id": "flexed_biceps", "label": "加油", "tags": ["hustling", "doing"] },
+    { "source": "9_Winking Face.mov", "id": "winking_face", "label": "调皮", "tags": ["happy"] }
+  ]
+}

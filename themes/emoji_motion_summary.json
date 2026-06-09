@@ -1,0 +1,415 @@
+{
+  "theme": {
+    "id": "emoji_motion",
+    "name": "动态表情",
+    "bucket": "emoji-motion",
+    "icon": "red_heart.webp",
+    "stickers": [
+      {
+        "id": "red_heart",
+        "label": "爱你",
+        "asset": "red_heart.webp",
+        "tags": [
+          "love"
+        ]
+      },
+      {
+        "id": "blowing_kiss",
+        "label": "亲亲",
+        "asset": "blowing_kiss.webp",
+        "tags": [
+          "kiss",
+          "love"
+        ]
+      },
+      {
+        "id": "hugging_face",
+        "label": "抱抱",
+        "asset": "hugging_face.webp",
+        "tags": [
+          "happy",
+          "love"
+        ]
+      },
+      {
+        "id": "heart_eyes",
+        "label": "心动",
+        "asset": "heart_eyes.webp",
+        "tags": [
+          "love",
+          "happy"
+        ]
+      },
+      {
+        "id": "smiling_blush",
+        "label": "开心",
+        "asset": "smiling_blush.webp",
+        "tags": [
+          "happy"
+        ]
+      },
+      {
+        "id": "thinking_face",
+        "label": "想你",
+        "asset": "thinking_face.webp",
+        "tags": [
+          "missing",
+          "thinking"
+        ]
+      },
+      {
+        "id": "sleepy_face",
+        "label": "困了",
+        "asset": "sleepy_face.webp",
+        "tags": [
+          "tired",
+          "sleeping"
+        ]
+      },
+      {
+        "id": "sleeping_face",
+        "label": "睡觉",
+        "asset": "sleeping_face.webp",
+        "tags": [
+          "sleeping",
+          "tired"
+        ]
+      },
+      {
+        "id": "tired_face",
+        "label": "累了",
+        "asset": "tired_face.webp",
+        "tags": [
+          "tired"
+        ]
+      },
+      {
+        "id": "crying_face",
+        "label": "委屈",
+        "asset": "crying_face.webp",
+        "tags": [
+          "sad",
+          "upset"
+        ]
+      },
+      {
+        "id": "angry_face",
+        "label": "生气",
+        "asset": "angry_face.webp",
+        "tags": [
+          "angry"
+        ]
+      },
+      {
+        "id": "medical_mask",
+        "label": "生病",
+        "asset": "medical_mask.webp",
+        "tags": [
+          "sick"
+        ]
+      },
+      {
+        "id": "savoring_food",
+        "label": "干饭",
+        "asset": "savoring_food.webp",
+        "tags": [
+          "doing"
+        ]
+      },
+      {
+        "id": "sunglasses_face",
+        "label": "悠闲",
+        "asset": "sunglasses_face.webp",
+        "tags": [
+          "relaxed"
+        ]
+      },
+      {
+        "id": "flexed_biceps",
+        "label": "加油",
+        "asset": "flexed_biceps.webp",
+        "tags": [
+          "hustling",
+          "doing"
+        ]
+      },
+      {
+        "id": "winking_face",
+        "label": "调皮",
+        "asset": "winking_face.webp",
+        "tags": [
+          "happy"
+        ]
+      }
+    ],
+    "feelings": []
+  },
+  "fps": 12,
+  "quality": 92,
+  "assets": [
+    {
+      "id": "red_heart",
+      "label": "爱你",
+      "source": "102_Red Heart.mov",
+      "asset": "red_heart.webp",
+      "tags": [
+        "love"
+      ],
+      "frames": 17,
+      "durationMsPerFrame": 83,
+      "size": {
+        "width": 512,
+        "height": 512
+      },
+      "bytes": 147016
+    },
+    {
+      "id": "blowing_kiss",
+      "label": "亲亲",
+      "source": "14_Face Blowing a Kiss.mov",
+      "asset": "blowing_kiss.webp",
+      "tags": [
+        "kiss",
+        "love"
+      ],
+      "frames": 14,
+      "durationMsPerFrame": 83,
+      "size": {
+        "width": 512,
+        "height": 512
+      },
+      "bytes": 187912
+    },
+    {
+      "id": "hugging_face",
+      "label": "抱抱",
+      "source": "20_Hugging Face.mov",
+      "asset": "hugging_face.webp",
+      "tags": [
+        "happy",
+        "love"
+      ],
+      "frames": 13,
+      "durationMsPerFrame": 83,
+      "size": {
+        "width": 512,
+        "height": 512
+      },
+      "bytes": 276178
+    },
+    {
+      "id": "heart_eyes",
+      "label": "心动",
+      "source": "13_Smiling Face With Heart-Eyes.mov",
+      "asset": "heart_eyes.webp",
+      "tags": [
+        "love",
+        "happy"
+      ],
+      "frames": 17,
+      "durationMsPerFrame": 83,
+      "size": {
+        "width": 512,
+        "height": 512
+      },
+      "bytes": 306800
+    },
+    {
+      "id": "smiling_blush",
+      "label": "开心",
+      "source": "10_Smiling Face Blushing.mov",
+      "asset": "smiling_blush.webp",
+      "tags": [
+        "happy"
+      ],
+      "frames": 56,
+      "durationMsPerFrame": 83,
+      "size": {
+        "width": 512,
+        "height": 512
+      },
+      "bytes": 885712
+    },
+    {
+      "id": "thinking_face",
+      "label": "想你",
+      "source": "22_Thinking Face.mov",
+      "asset": "thinking_face.webp",
+      "tags": [
+        "missing",
+        "thinking"
+      ],
+      "frames": 19,
+      "durationMsPerFrame": 83,
+      "size": {
+        "width": 512,
+        "height": 512
+      },
+      "bytes": 184518
+    },
+    {
+      "id": "sleepy_face",
+      "label": "困了",
+      "source": "34_Sleepy Face.mov",
+      "asset": "sleepy_face.webp",
+      "tags": [
+        "tired",
+        "sleeping"
+      ],
+      "frames": 24,
+      "durationMsPerFrame": 83,
+      "size": {
+        "width": 512,
+        "height": 512
+      },
+      "bytes": 430428
+    },
+    {
+      "id": "sleeping_face",
+      "label": "睡觉",
+      "source": "36_Sleeping Face.mov",
+      "asset": "sleeping_face.webp",
+      "tags": [
+        "sleeping",
+        "tired"
+      ],
+      "frames": 72,
+      "durationMsPerFrame": 83,
+      "size": {
+        "width": 512,
+        "height": 512
+      },
+      "bytes": 723202
+    },
+    {
+      "id": "tired_face",
+      "label": "累了",
+      "source": "35_Tired Face.mov",
+      "asset": "tired_face.webp",
+      "tags": [
+        "tired"
+      ],
+      "frames": 21,
+      "durationMsPerFrame": 83,
+      "size": {
+        "width": 512,
+        "height": 512
+      },
+      "bytes": 379712
+    },
+    {
+      "id": "crying_face",
+      "label": "委屈",
+      "source": "55_Crying Face.mov",
+      "asset": "crying_face.webp",
+      "tags": [
+        "sad",
+        "upset"
+      ],
+      "frames": 27,
+      "durationMsPerFrame": 83,
+      "size": {
+        "width": 512,
+        "height": 512
+      },
+      "bytes": 432754
+    },
+    {
+      "id": "angry_face",
+      "label": "生气",
+      "source": "69_Angry Face.mov",
+      "asset": "angry_face.webp",
+      "tags": [
+        "angry"
+      ],
+      "frames": 35,
+      "durationMsPerFrame": 83,
+      "size": {
+        "width": 512,
+        "height": 512
+      },
+      "bytes": 477072
+    },
+    {
+      "id": "medical_mask",
+      "label": "生病",
+      "source": "71_Face With Medical Mask.mov",
+      "asset": "medical_mask.webp",
+      "tags": [
+        "sick"
+      ],
+      "frames": 17,
+      "durationMsPerFrame": 83,
+      "size": {
+        "width": 512,
+        "height": 512
+      },
+      "bytes": 212530
+    },
+    {
+      "id": "savoring_food",
+      "label": "干饭",
+      "source": "11_Face Savoring Food.mov",
+      "asset": "savoring_food.webp",
+      "tags": [
+        "doing"
+      ],
+      "frames": 55,
+      "durationMsPerFrame": 83,
+      "size": {
+        "width": 512,
+        "height": 512
+      },
+      "bytes": 774024
+    },
+    {
+      "id": "sunglasses_face",
+      "label": "悠闲",
+      "source": "12_Smiling Face With Sunglasses.mov",
+      "asset": "sunglasses_face.webp",
+      "tags": [
+        "relaxed"
+      ],
+      "frames": 23,
+      "durationMsPerFrame": 83,
+      "size": {
+        "width": 512,
+        "height": 512
+      },
+      "bytes": 186210
+    },
+    {
+      "id": "flexed_biceps",
+      "label": "加油",
+      "source": "100_Flexed Biceps.mov",
+      "asset": "flexed_biceps.webp",
+      "tags": [
+        "hustling",
+        "doing"
+      ],
+      "frames": 22,
+      "durationMsPerFrame": 83,
+      "size": {
+        "width": 512,
+        "height": 512
+      },
+      "bytes": 359434
+    },
+    {
+      "id": "winking_face",
+      "label": "调皮",
+      "source": "9_Winking Face.mov",
+      "asset": "winking_face.webp",
+      "tags": [
+        "happy"
+      ],
+      "frames": 20,
+      "durationMsPerFrame": 83,
+      "size": {
+        "width": 512,
+        "height": 512
+      },
+      "bytes": 211830
+    }
+  ]
+}

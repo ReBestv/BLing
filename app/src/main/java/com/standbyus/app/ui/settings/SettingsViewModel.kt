@@ -52,9 +52,6 @@ class SettingsViewModel @Inject constructor(
     private val _availableThemes = MutableStateFlow(listOf(EmojiThemeManager.defaultTheme))
     val availableThemes: StateFlow<List<EmojiThemeSet>> = _availableThemes.asStateFlow()
 
-    private val _justPaired = MutableStateFlow(false)
-    val justPaired: StateFlow<Boolean> = _justPaired.asStateFlow()
-
     private val _loading = MutableStateFlow(true)
     val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
@@ -196,7 +193,6 @@ class SettingsViewModel @Inject constructor(
                 val partnerAssigned = pair.partnerIdFor(uid).isNotEmpty()
                 if (partnerAssigned) {
                     _isPaired.value = true
-                    _justPaired.value = true
                     _status.value = "配对成功"
                     cacheAll(pair, uid)
                     val partnerName = when {
@@ -233,7 +229,6 @@ class SettingsViewModel @Inject constructor(
                 val result = pairingRepository.joinPair(pairId, uid, myName)
                 if (result.success) {
                     _isPaired.value = true
-                    _justPaired.value = true
                     _status.value = "配对成功"
                     val partnerName = pairInfo.user1Name.ifEmpty { "" }
                     prefs.edit().apply {
@@ -265,7 +260,6 @@ class SettingsViewModel @Inject constructor(
             _avatarEmoji.value = "🙂"
             _avatarUrl.value = ""
             _isPaired.value = false
-            _justPaired.value = false
             _pairingCode.value = ""
             _joinCodeInput.value = ""
             _partnerNickname.value = ""
@@ -279,10 +273,6 @@ class SettingsViewModel @Inject constructor(
     fun selectTheme(themeId: String) {
         EmojiThemeManager.setCurrentTheme(context, themeId)
         _currentTheme.value = EmojiThemeManager.getCurrentTheme(context)
-    }
-
-    fun dismissPairCelebration() {
-        _justPaired.value = false
     }
 
     fun updateNameInput(name: String) {

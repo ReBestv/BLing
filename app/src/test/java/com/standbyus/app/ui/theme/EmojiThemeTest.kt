@@ -3,6 +3,7 @@ package com.standbyus.app.ui.theme
 import com.standbyus.app.data.model.ThemeFeeling
 import com.standbyus.app.data.model.ThemePack
 import com.standbyus.app.data.model.ThemeSticker
+import com.standbyus.app.data.remote.SupabaseConfig
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -20,7 +21,7 @@ class EmojiThemeTest {
         )
 
         assertEquals(
-            "https://dxwnnskelbygqdvjlorj.supabase.co/storage/v1/object/public/themes/xiaoxin/happy.png",
+            "${SupabaseConfig.STORAGE_URL}themes/xiaoxin/happy.png",
             theme.stickerUrl("happy")
         )
     }
@@ -37,7 +38,7 @@ class EmojiThemeTest {
         )
 
         assertEquals(
-            "https://dxwnnskelbygqdvjlorj.supabase.co/storage/v1/object/public/themes/VV/eating.webp",
+            "${SupabaseConfig.STORAGE_URL}themes/VV/eating.webp",
             theme.themeStickerUrl("eating")
         )
     }
@@ -58,7 +59,7 @@ class EmojiThemeTest {
         )
 
         assertEquals(
-            "https://dxwnnskelbygqdvjlorj.supabase.co/storage/v1/object/public/themes/xiaoxin/happy.png",
+            "${SupabaseConfig.STORAGE_URL}themes/xiaoxin/happy.png",
             EmojiThemeManager.themes.last().resolvedIcon
         )
     }

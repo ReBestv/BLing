@@ -1,4 +1,5 @@
 import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +7,32 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
 }
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.inputStream().use { load(it) }
+    }
+}
+
+fun projectConfig(name: String, fallback: String = ""): String {
+    return localProperties.getProperty(name)
+        ?: providers.gradleProperty(name).orNull
+        ?: providers.environmentVariable(name).orNull
+        ?: fallback
+}
+
+fun String.asBuildConfigString(): String {
+    return "\"" + replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+}
+
+val releaseSigningKeys = listOf(
+    "RELEASE_STORE_FILE",
+    "RELEASE_STORE_PASSWORD",
+    "RELEASE_KEY_ALIAS",
+    "RELEASE_KEY_PASSWORD"
+)
+val hasReleaseSigning = releaseSigningKeys.all { projectConfig(it).isNotBlank() }
 
 android {
     namespace = "com.standbyus.app"
@@ -15,29 +42,38 @@ android {
         applicationId = "com.standbyus.app"
         minSdk = 31
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
-    }
-    val signingProperties = Properties().apply {
-        val file = rootProject.file("local.properties")
-        if (file.exists()) {
-            file.inputStream().use { load(it) }
-        }
+        versionCode = 2
+        versionName = "1.1"
+
+        buildConfigField(
+            "String",
+            "SUPABASE_URL",
+            projectConfig("SUPABASE_URL", "https://example.supabase.co").trimEnd('/').asBuildConfigString()
+        )
+        buildConfigField(
+            "String",
+            "SUPABASE_ANON_KEY",
+            projectConfig("SUPABASE_ANON_KEY").asBuildConfigString()
+        )
     }
 
     signingConfigs {
         create("release") {
-            storeFile = file(signingProperties["RELEASE_STORE_FILE"] as String)
-            storePassword = signingProperties["RELEASE_STORE_PASSWORD"] as String
-            keyAlias = signingProperties["RELEASE_KEY_ALIAS"] as String
-            keyPassword = signingProperties["RELEASE_KEY_PASSWORD"] as String
+            if (hasReleaseSigning) {
+                storeFile = file(projectConfig("RELEASE_STORE_FILE"))
+                storePassword = projectConfig("RELEASE_STORE_PASSWORD")
+                keyAlias = projectConfig("RELEASE_KEY_ALIAS")
+                keyPassword = projectConfig("RELEASE_KEY_PASSWORD")
+            }
         }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = true
-            signingConfig = signingConfigs.getByName("release")
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -53,6 +89,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

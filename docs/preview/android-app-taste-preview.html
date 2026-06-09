@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StandBy Us - Taste Preview</title>
+<style>
+  @font-face {
+    font-family: "MiSans Local";
+    src: url("../../app/src/main/res/font/misans_regular.otf") format("opentype");
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Smiley Sans Local";
+    src: url("../../app/src/main/res/font/smiley_sans_oblique.otf") format("opentype");
+    font-display: swap;
+  }
+
+  :root {
+    --ink: #332620;
+    --soft-ink: #80675c;
+    --muted: #a18b82;
+    --cream: #fff8f1;
+    --milk: #fffdf9;
+    --rose: #ff8f77;
+    --rose-deep: #ef6f5c;
+    --peach: #ffc7a8;
+    --butter: #ffe8b8;
+    --mint: #dceee2;
+    --sky: #dfeeff;
+    --lilac: #eee6ff;
+    --line: rgba(120, 82, 64, .13);
+    --glass: rgba(255, 255, 255, .66);
+    --shadow: rgba(77, 46, 32, .18);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    font-family: "MiSans Local", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background:
+      radial-gradient(circle at 10% 8%, rgba(255, 143, 119, .28), transparent 30%),
+      radial-gradient(circle at 86% 18%, rgba(220, 238, 226, .30), transparent 28%),
+      linear-gradient(135deg, #2c211d 0%, #4a3129 44%, #191513 100%);
+  }
+
+  .stage {
+    width: min(1440px, 100%);
+    margin: 0 auto;
+    padding: 30px 24px 46px;
+  }
+
+  .intro {
+    display: grid;
+    grid-template-columns: minmax(280px, .78fr) minmax(720px, 1.7fr);
+    gap: 26px;
+    align-items: start;
+  }
+
+  .brief {
+    position: sticky;
+    top: 24px;
+    min-height: 760px;
+    padding: 28px;
+    border-radius: 34px;
+    background:
+      radial-gradient(circle at 22% 10%, rgba(255, 229, 214, .86), transparent 30%),
+      linear-gradient(180deg, rgba(255, 250, 246, .96), rgba(255, 242, 232, .88));
+    border: 1px solid rgba(255, 255, 255, .34);
+    box-shadow: 0 28px 78px rgba(0, 0, 0, .36);
+    overflow: hidden;
+  }
+
+  .brief::after {
+    content: "";
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    left: -86px;
+    bottom: -74px;
+    border-radius: 50%;
+    background: rgba(255, 143, 119, .15);
+  }
+
+  .tag {
+    display: inline-flex;
+    padding: 7px 11px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .64);
+    border: 1px solid rgba(255, 143, 119, .24);
+    color: #8b5146;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .08em;
+  }
+
+  h1,
+  h2,
+  h3 {
+    margin: 0;
+    font-family: "Smiley Sans Local", "MiSans Local", sans-serif;
+    font-weight: 900;
+    letter-spacing: -.055em;
+  }
+
+  h1 {
+    margin-top: 18px;
+    font-size: clamp(44px, 5vw, 74px);
+    line-height: .94;
+    max-width: 8ch;
+  }
+
+  .brief p {
+    margin: 18px 0 0;
+    color: var(--soft-ink);
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .dials {
+    display: grid;
+    gap: 10px;
+    margin-top: 26px;
+  }
+
+  .dial {
+    display: grid;
+    grid-template-columns: 82px 1fr 34px;
+    gap: 10px;
+    align-items: center;
+    padding: 11px 12px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, .54);
+    border: 1px solid rgba(255, 255, 255, .46);
+  }
+
+  .dial b {
+    font-size: 12px;
+  }
+
+  .meter {
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(128, 103, 92, .16);
+  }
+
+  .meter i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--rose), var(--peach));
+  }
+
+  .dial span {
+    color: var(--soft-ink);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .notes {
+    display: grid;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .note {
+    padding: 14px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, .52);
+    border: 1px solid rgba(255, 255, 255, .5);
+  }
+
+  .note b {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+
+  .note span {
+    color: var(--soft-ink);
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  .board {
+    padding: 24px;
+    border-radius: 34px;
+    background: rgba(255, 255, 255, .10);
+    border: 1px solid rgba(255, 255, 255, .12);
+    box-shadow: 0 28px 78px rgba(0, 0, 0, .34);
+  }
+
+  .board-head {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 2px 4px 20px;
+    color: #fffaf6;
+  }
+
+  .board-head h2 {
+    font-size: clamp(30px, 3vw, 48px);
+    line-height: .96;
+  }
+
+  .board-head p {
+    max-width: 420px;
+    margin: 0;
+    color: rgba(255, 250, 246, .72);
+    font-size: 13px;
+    line-height: 1.65;
+    text-align: right;
+  }
+
+  .phones {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(240px, 1fr));
+    gap: 20px;
+  }
+
+  .phone-wrap {
+    display: grid;
+    gap: 10px;
+  }
+
+  .phone-label {
+    display: flex;
+    justify-content: space-between;
+    color: rgba(255, 250, 246, .74);
+    font-size: 12px;
+    padding: 0 8px;
+  }
+
+  .phone-label b {
+    color: #fffaf6;
+  }
+
+  .phone {
+    position: relative;
+    min-height: 660px;
+    aspect-ratio: 390 / 844;
+    overflow: hidden;
+    border-radius: 40px;
+    border: 8px solid #16100e;
+    background:
+      radial-gradient(circle at 16% 6%, rgba(255, 202, 173, .95), transparent 27%),
+      radial-gradient(circle at 90% 18%, rgba(220, 238, 226, .86), transparent 28%),
+      linear-gradient(180deg, #fff7f0 0%, #fffaf6 64%, #fffdf9 100%);
+    box-shadow: 0 26px 58px rgba(15, 8, 6, .36);
+  }
+
+  .phone::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 9px;
+    z-index: 6;
+    width: 96px;
+    height: 24px;
+    transform: translateX(-50%);
+    border-radius: 0 0 18px 18px;
+    background: #16100e;
+  }
+
+  .status {
+    height: 42px;
+    padding: 13px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    color: rgba(51, 38, 32, .76);
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .appbar {
+    height: 48px;
+    margin: 4px 16px 0;
+    display: grid;
+    grid-template-columns: 42px 1fr 42px;
+    align-items: center;
+  }
+
+  .brand {
+    justify-self: center;
+    font-family: "Smiley Sans Local", "MiSans Local", sans-serif;
+    font-size: 23px;
+    font-weight: 900;
+    letter-spacing: -.05em;
+  }
+
+  .glass-btn {
+    width: 38px;
+    height: 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 15px;
+    color: #80675c;
+    background: rgba(255, 255, 255, .58);
+    border: 1px solid rgba(255, 255, 255, .58);
+    box-shadow: 0 9px 22px rgba(77, 46, 32, .09);
+  }
+
+  .glyph-back,
+  .glyph-upload,
+  .glyph-gear,
+  .glyph-plus {
+    width: 19px;
+    height: 19px;
+    position: relative;
+  }
+
+  .glyph-back::before {
+    content: "";
+    position: absolute;
+    inset: 3px 4px 3px 1px;
+    border-left: 3px solid currentColor;
+    border-bottom: 3px solid currentColor;
+    transform: rotate(45deg);
+  }
+
+  .glyph-upload::before {
+    content: "";
+    position: absolute;
+    left: 8px;
+    top: 2px;
+    width: 3px;
+    height: 15px;
+    background: currentColor;
+    border-radius: 2px;
+  }
+
+  .glyph-upload::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 2px;
+    width: 10px;
+    height: 10px;
+    border-left: 3px solid currentColor;
+    border-top: 3px solid currentColor;
+    transform: rotate(45deg);
+  }
+
+  .glyph-gear {
+    border: 3px solid currentColor;
+    border-radius: 50%;
+  }
+
+  .glyph-plus::before,
+  .glyph-plus::after {
+    content: "";
+    position: absolute;
+    inset: 8px 2px;
+    background: currentColor;
+    border-radius: 3px;
+  }
+
+  .glyph-plus::after {
+    transform: rotate(90deg);
+  }
+
+  .screen {
+    height: calc(100% - 94px);
+    padding: 10px 18px 84px;
+    overflow: hidden;
+  }
+
+  .emotion-stage {
+    position: relative;
+    min-height: 344px;
+    padding: 28px 20px 22px;
+    overflow: hidden;
+    border-radius: 34px;
+    color: white;
+    background:
+      radial-gradient(circle at 18% 14%, rgba(255,255,255,.54), transparent 30%),
+      radial-gradient(circle at 88% 86%, rgba(255,232,184,.42), transparent 34%),
+      linear-gradient(135deg, #ff806a 0%, #ffb59d 48%, #ffd7ad 100%);
+    box-shadow: 0 22px 42px rgba(255, 143, 119, .28);
+  }
+
+  .emotion-stage::after {
+    content: "";
+    position: absolute;
+    right: -64px;
+    bottom: -78px;
+    width: 210px;
+    height: 210px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .18);
+  }
+
+  .orb {
+    width: 136px;
+    height: 136px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 18px;
+    border-radius: 42px;
+    background: rgba(255, 255, 255, .2);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.45);
+    font-size: 78px;
+    animation: floaty 3.4s ease-in-out infinite;
+  }
+
+  .emotion-stage h3 {
+    position: relative;
+    z-index: 1;
+    font-size: 42px;
+    line-height: .96;
+    text-align: center;
+    text-shadow: 0 4px 16px rgba(93, 43, 30, .22);
+  }
+
+  .emotion-stage p {
+    position: relative;
+    z-index: 1;
+    margin: 10px 0 0;
+    text-align: center;
+    color: rgba(255, 255, 255, .9);
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .reply-panel {
+    position: relative;
+    margin: -18px 10px 0;
+    padding: 24px 13px 14px;
+    border-radius: 0 0 28px 28px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.74), rgba(255,255,255,.34)),
+      rgba(255, 255, 255, .42);
+    border: 1px solid rgba(255,255,255,.64);
+    border-top: 0;
+  }
+
+  .mine {
+    display: grid;
+    grid-template-columns: 52px 1fr 18px;
+    gap: 12px;
+    align-items: center;
+    min-height: 68px;
+    padding: 10px 12px;
+    border-radius: 24px;
+    background: rgba(255, 252, 245, .78);
+    border: 1px solid rgba(255, 255, 255, .76);
+  }
+
+  .mini-orb {
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    border-radius: 19px;
+    background: #fff0e8;
+    font-size: 30px;
+  }
+
+  .mine b {
+    display: block;
+    font-size: 15px;
+  }
+
+  .mine span {
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  .chev {
+    color: var(--muted);
+    font-size: 24px;
+  }
+
+  .quick {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .quick button {
+    min-height: 52px;
+    border: 0;
+    border-radius: 22px;
+    color: #59443c;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 1.35;
+    background: rgba(255,255,255,.74);
+    box-shadow: inset 0 0 0 1px rgba(255, 143, 119, .18);
+  }
+
+  .quick button:nth-child(2) {
+    background: rgba(255, 240, 235, .86);
+  }
+
+  .quick button:nth-child(3) {
+    background: rgba(255, 248, 226, .88);
+  }
+
+  .quick button:nth-child(4) {
+    background: rgba(235, 247, 239, .88);
+  }
+
+  .primary-cta {
+    position: absolute;
+    left: 18px;
+    right: 18px;
+    bottom: 73px;
+    height: 56px;
+    border: 0;
+    border-radius: 999px;
+    color: white;
+    background: linear-gradient(135deg, #ff7966, #ffb69c);
+    box-shadow: 0 18px 30px rgba(255, 121, 102, .32);
+    font: inherit;
+    font-size: 16px;
+    font-weight: 900;
+  }
+
+  .bottom-nav {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 66px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    padding: 8px 10px 0;
+    background: rgba(255, 253, 249, .9);
+    border-top: 1px solid var(--line);
+  }
+
+  .nav {
+    display: grid;
+    justify-items: center;
+    gap: 4px;
+    color: #8c766e;
+    font-size: 10px;
+    font-weight: 900;
+  }
+
+  .nav i {
+    width: 34px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 15px;
+    font-style: normal;
+    font-size: 17px;
+  }
+
+  .nav.active i {
+    color: var(--rose);
+    background: #fff0eb;
+  }
+
+  .collage {
+    height: calc(100% - 54px);
+    overflow: hidden;
+  }
+
+  .filters {
+    display: flex;
+    gap: 10px;
+    padding: 4px 0 15px;
+  }
+
+  .filters span {
+    padding: 9px 15px;
+    border-radius: 999px;
+    color: var(--muted);
+    background: rgba(255,255,255,.58);
+    border: 1px solid var(--line);
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .filters .on {
+    color: white;
+    background: linear-gradient(135deg, var(--rose), var(--peach));
+    border-color: transparent;
+  }
+
+  .mosaic {
+    display: grid;
+    grid-template-columns: 1.08fr .92fr;
+    grid-auto-rows: 112px;
+    gap: 10px;
+  }
+
+  .photo {
+    position: relative;
+    overflow: hidden;
+    border-radius: 25px;
+    background:
+      radial-gradient(circle at 24% 20%, rgba(255,255,255,.5), transparent 26%),
+      linear-gradient(135deg, #dcc5ab, #a9795c);
+  }
+
+  .photo:nth-child(2) {
+    background: linear-gradient(135deg, #bad6c6, #7fa585);
+  }
+
+  .photo:nth-child(3) {
+    background: linear-gradient(135deg, #e7d7ef, #b694c4);
+  }
+
+  .photo:nth-child(4) {
+    background: linear-gradient(135deg, #f0c7ad, #c48361);
+  }
+
+  .photo:nth-child(5) {
+    background: linear-gradient(135deg, #d6e8ff, #91add3);
+  }
+
+  .photo.big {
+    grid-row: span 2;
+  }
+
+  .photo.wide {
+    grid-column: 1 / -1;
+  }
+
+  .photo span {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    padding: 8px 10px;
+    border-radius: 15px;
+    color: white;
+    background: rgba(48, 30, 24, .34);
+    backdrop-filter: blur(12px);
+    font-size: 11px;
+    font-weight: 900;
+  }
+
+  .check-stack {
+    display: grid;
+    gap: 11px;
+  }
+
+  .duel-card,
+  .stat-card {
+    border-radius: 28px;
+    background: rgba(255,255,255,.78);
+    border: 1px solid rgba(255,255,255,.72);
+    box-shadow: 0 14px 30px rgba(77, 46, 32, .09);
+  }
+
+  .duel-card {
+    padding: 17px 19px 16px;
+  }
+
+  .duel-title {
+    text-align: center;
+    font-family: "Smiley Sans Local", "MiSans Local", sans-serif;
+    font-size: 21px;
+    font-weight: 900;
+  }
+
+  .score-row {
+    display: grid;
+    grid-template-columns: 1fr 44px 1fr;
+    align-items: center;
+    gap: 10px;
+    margin-top: 13px;
+  }
+
+  .score {
+    text-align: center;
+  }
+
+  .score b {
+    display: block;
+    font-size: 34px;
+    line-height: 1;
+    letter-spacing: -.04em;
+  }
+
+  .score span {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .vs {
+    display: grid;
+    place-items: center;
+    height: 44px;
+    border-radius: 16px;
+    color: #9a7358;
+    background: #fff0da;
+    font-weight: 900;
+  }
+
+  .bar {
+    height: 8px;
+    margin-top: 14px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(128, 103, 92, .12);
+  }
+
+  .bar i {
+    display: block;
+    width: 72%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #e7b84f, var(--rose));
+  }
+
+  .hint {
+    margin-top: 12px;
+    color: var(--soft-ink);
+    font-size: 12px;
+    line-height: 1.45;
+    text-align: center;
+  }
+
+  .stat-card {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 13px 6px;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat i {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    margin: 0 auto 5px;
+    border-radius: 14px;
+    background: #fff0eb;
+    font-style: normal;
+    font-size: 17px;
+  }
+
+  .stat b {
+    display: block;
+    font-size: 18px;
+  }
+
+  .stat span {
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  .poop-btn {
+    width: 96px;
+    height: 96px;
+    display: grid;
+    place-items: center;
+    margin: 12px auto 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 22%, #ffd4c3, #ff8f77 58%, #eb6d5d);
+    box-shadow: 0 18px 34px rgba(255, 143, 119, .32);
+    font-size: 42px;
+  }
+
+  .post-rail {
+    display: grid;
+    gap: 12px;
+  }
+
+  .sticker-cloud {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+
+  .sticker {
+    min-height: 74px;
+    display: grid;
+    place-items: center;
+    border-radius: 22px;
+    background: rgba(255,255,255,.7);
+    border: 1px solid rgba(255,255,255,.68);
+    font-size: 30px;
+  }
+
+  .sticker.on {
+    background: #fff0eb;
+    border-color: rgba(255, 143, 119, .42);
+    box-shadow: 0 12px 20px rgba(255, 143, 119, .12);
+  }
+
+  .phrase-row {
+    display: flex;
+    gap: 9px;
+    overflow: hidden;
+  }
+
+  .phrase-row span {
+    flex: 0 0 auto;
+    padding: 10px 13px;
+    border-radius: 999px;
+    color: #59443c;
+    background: rgba(255,255,255,.72);
+    border: 1px solid var(--line);
+    font-size: 12px;
+    font-weight: 900;
+  }
+
+  .note-box {
+    min-height: 118px;
+    padding: 15px;
+    border-radius: 26px;
+    color: var(--muted);
+    background: rgba(255,255,255,.72);
+    border: 1px solid rgba(255,255,255,.7);
+    font-size: 13px;
+  }
+
+  .settings-card {
+    display: grid;
+    gap: 12px;
+  }
+
+  .profile,
+  .setting-block {
+    padding: 16px;
+    border-radius: 27px;
+    background: rgba(255,255,255,.72);
+    border: 1px solid rgba(255,255,255,.68);
+    box-shadow: 0 14px 26px rgba(77, 46, 32, .08);
+  }
+
+  .profile {
+    display: grid;
+    grid-template-columns: 58px 1fr;
+    align-items: center;
+    gap: 13px;
+  }
+
+  .avatar {
+    width: 58px;
+    height: 58px;
+    display: grid;
+    place-items: center;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #fff0eb, white);
+    font-size: 32px;
+  }
+
+  .profile b,
+  .setting-block b {
+    display: block;
+    font-size: 15px;
+  }
+
+  .profile span,
+  .setting-block span {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .code {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+    margin-top: 12px;
+  }
+
+  .code i {
+    display: grid;
+    place-items: center;
+    height: 38px;
+    border-radius: 14px;
+    background: #fff0eb;
+    color: #8b5146;
+    font-style: normal;
+    font-weight: 900;
+  }
+
+  @keyframes floaty {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  @media (max-width: 1180px) {
+    .intro {
+      grid-template-columns: 1fr;
+    }
+
+    .brief {
+      position: static;
+      min-height: auto;
+    }
+  }
+
+  @media (max-width: 880px) {
+    .stage {
+      padding: 16px 12px 28px;
+    }
+
+    .phones {
+      grid-template-columns: 1fr;
+    }
+
+    .board-head {
+      display: block;
+    }
+
+    .board-head p {
+      margin-top: 10px;
+      text-align: left;
+    }
+  }
+</style>
+</head>
+<body>
+  <main class="stage">
+    <section class="intro">
+      <aside class="brief">
+        <span class="tag">TASTE PASS · native mobile translation</span>
+        <h1>从工具界面变成情绪场景</h1>
+        <p>
+          这版不再按规范清单压平界面，而是把 StandBy Us 当作一个亲密陪伴产品来做。页面不追求全部整齐，重点是情绪主角、生活拼贴和轻微舞台感。
+        </p>
+        <div class="dials">
+          <div class="dial"><b>VARIANCE</b><div class="meter"><i style="width:80%"></i></div><span>8</span></div>
+          <div class="dial"><b>MOTION</b><div class="meter"><i style="width:50%"></i></div><span>5</span></div>
+          <div class="dial"><b>DENSITY</b><div class="meter"><i style="width:40%"></i></div><span>4</span></div>
+        </div>
+        <div class="notes">
+          <div class="note"><b>首页</b><span>保留状态卡，但改成情绪舞台。回复区更像轻柔对话，而不是按钮面板。</span></div>
+          <div class="note"><b>相册</b><span>不再使用平均网格。用主图、小图、横图混排，强化生活碎片感。</span></div>
+          <div class="note"><b>打卡</b><span>所有功能必须完整可见。PK 是顶部故事，统计是中段节奏，按钮是底部仪式。</span></div>
+        </div>
+      </aside>
+
+      <section class="board">
+        <div class="board-head">
+          <h2>更美观的 HTML 方向稿</h2>
+          <p>这是给 Compose 落地用的视觉母版。它故意更有变化，不再像纯 Material 表单和卡片堆叠。</p>
+        </div>
+
+        <div class="phones">
+          <article class="phone-wrap">
+            <div class="phone-label"><b>首页</b><span>情绪剧场</span></div>
+            <div class="phone">
+              <div class="status"><span>17:20</span><span>5G 51%</span></div>
+              <header class="appbar">
+                <div></div>
+                <div class="brand">StandBy Us</div>
+                <div class="glass-btn"><i class="glyph-gear"></i></div>
+              </header>
+              <section class="screen">
+                <div class="emotion-stage">
+                  <div class="orb">😍</div>
+                  <h3>爱你</h3>
+                  <p>刚刚发来一个小心动</p>
+                </div>
+                <div class="reply-panel">
+                  <div class="mine">
+                    <div class="mini-orb">😐</div>
+                    <div><b>无聊</b><span>轻点更新我的状态</span></div>
+                    <div class="chev">›</div>
+                  </div>
+                  <div class="quick">
+                    <button>抱抱一个</button>
+                    <button>我也想你</button>
+                    <button>辛苦啦</button>
+                    <button>不宁不宁在干嘛</button>
+                  </div>
+                </div>
+              </section>
+              <button class="primary-cta">发布状态</button>
+              <nav class="bottom-nav">
+                <div class="nav active"><i>⌂</i><span>首页</span></div>
+                <div class="nav"><i>▣</i><span>打卡</span></div>
+                <div class="nav"><i>▥</i><span>待办</span></div>
+                <div class="nav"><i>▰</i><span>相册</span></div>
+                <div class="nav"><i>⌛</i><span>时光</span></div>
+              </nav>
+            </div>
+          </article>
+
+          <article class="phone-wrap">
+            <div class="phone-label"><b>相册</b><span>生活拼贴</span></div>
+            <div class="phone">
+              <div class="status"><span>17:20</span><span>5G 51%</span></div>
+              <header class="appbar">
+                <div class="glass-btn"><i class="glyph-back"></i></div>
+                <div class="brand">我们的相册</div>
+                <div class="glass-btn"><i class="glyph-upload"></i></div>
+              </header>
+              <section class="screen collage">
+                <div class="filters"><span class="on">全部</span><span>近7天</span><span>近30天</span><span>近90天</span></div>
+                <div class="mosaic">
+                  <div class="photo big"><span>健身房镜子</span></div>
+                  <div class="photo"><span>夜宵</span></div>
+                  <div class="photo"><span>小饼干</span></div>
+                  <div class="photo wide"><span>这天的云很好看</span></div>
+                  <div class="photo"><span>电影票</span></div>
+                  <div class="photo"><span>下班路上</span></div>
+                </div>
+              </section>
+              <nav class="bottom-nav">
+                <div class="nav"><i>⌂</i><span>首页</span></div>
+                <div class="nav"><i>▣</i><span>打卡</span></div>
+                <div class="nav"><i>▥</i><span>待办</span></div>
+                <div class="nav active"><i>▰</i><span>相册</span></div>
+                <div class="nav"><i>⌛</i><span>时光</span></div>
+              </nav>
+            </div>
+          </article>
+
+          <article class="phone-wrap">
+            <div class="phone-label"><b>打卡</b><span>完整三段节奏</span></div>
+            <div class="phone">
+              <div class="status"><span>17:20</span><span>5G 51%</span></div>
+              <header class="appbar">
+                <div></div>
+                <div class="brand">拉了么</div>
+                <div></div>
+              </header>
+              <section class="screen">
+                <div class="check-stack">
+                  <div class="duel-card">
+                    <div class="duel-title">本月拉屎大王对决</div>
+                    <div class="score-row">
+                      <div class="score"><span>我</span><b>4</b></div>
+                      <div class="vs">VS</div>
+                      <div class="score"><span>TA</span><b>1</b></div>
+                    </div>
+                    <div class="bar"><i></i></div>
+                    <div class="hint">领先 3 次，距离月底还有 25 天</div>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat"><i>💩</i><b>4次</b><span>已记录</span></div>
+                    <div class="stat"><i>⏰</i><b>2m</b><span>间隔</span></div>
+                    <div class="stat"><i>☺</i><b>正常</b><span>风险</span></div>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat"><i>▤</i><b>8次</b><span>本周</span></div>
+                    <div class="stat"><i>▴</i><b>1.6</b><span>平均</span></div>
+                    <div class="stat"><i>●</i><b>3天</b><span>连续</span></div>
+                  </div>
+                </div>
+                <div class="poop-btn">💩</div>
+              </section>
+              <nav class="bottom-nav">
+                <div class="nav"><i>⌂</i><span>首页</span></div>
+                <div class="nav active"><i>▣</i><span>打卡</span></div>
+                <div class="nav"><i>▥</i><span>待办</span></div>
+                <div class="nav"><i>▰</i><span>相册</span></div>
+                <div class="nav"><i>⌛</i><span>时光</span></div>
+              </nav>
+            </div>
+          </article>
+
+          <article class="phone-wrap">
+            <div class="phone-label"><b>发布</b><span>情绪采样</span></div>
+            <div class="phone">
+              <div class="status"><span>17:20</span><span>5G 51%</span></div>
+              <header class="appbar">
+                <div class="glass-btn"><i class="glyph-back"></i></div>
+                <div class="brand">发布状态</div>
+                <div></div>
+              </header>
+              <section class="screen post-rail">
+                <div class="sticker-cloud">
+                  <div class="sticker on">😍</div><div class="sticker">😴</div><div class="sticker">😤</div><div class="sticker">🥺</div>
+                  <div class="sticker">🍚</div><div class="sticker">📺</div><div class="sticker">💪</div><div class="sticker">🌙</div>
+                </div>
+                <div class="phrase-row"><span>想被抱一下</span><span>今天有点累</span><span>晚点回你</span></div>
+                <div class="note-box">写一句小备注，让这个状态更像你。</div>
+              </section>
+              <button class="primary-cta">发布状态</button>
+            </div>
+          </article>
+
+          <article class="phone-wrap">
+            <div class="phone-label"><b>设置</b><span>轻量收纳</span></div>
+            <div class="phone">
+              <div class="status"><span>17:20</span><span>5G 51%</span></div>
+              <header class="appbar">
+                <div class="glass-btn"><i class="glyph-back"></i></div>
+                <div class="brand">设置</div>
+                <div></div>
+              </header>
+              <section class="screen settings-card">
+                <div class="profile"><div class="avatar">🦊</div><div><b>小陈</b><span>头像、昵称和显示身份</span></div></div>
+                <div class="setting-block">
+                  <b>配对码</b><span>发给 TA 后就能同步彼此状态。</span>
+                  <div class="code"><i>8</i><i>Q</i><i>2</i><i>M</i><i>K</i><i>7</i></div>
+                </div>
+                <div class="setting-block"><b>表情主题</b><span>默认、小新、猫猫主题都在这里轻量切换。</span></div>
+                <div class="setting-block"><b>特效预览</b><span>生日、节日、配对成功动画统一收纳。</span></div>
+              </section>
+            </div>
+          </article>
+        </div>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

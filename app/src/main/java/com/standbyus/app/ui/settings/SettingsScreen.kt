@@ -34,10 +34,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import com.standbyus.app.ui.celebration.CelebrationConfig
-import com.standbyus.app.ui.celebration.CelebrationDay
-import com.standbyus.app.ui.celebration.CelebrationOverlay
-import com.standbyus.app.ui.celebration.CelebrationStyle
 import com.standbyus.app.ui.components.AppHeader
 import com.standbyus.app.ui.components.AvatarPicker
 import com.standbyus.app.ui.components.UserAvatar
@@ -63,7 +59,6 @@ fun SettingsScreen(
     val joinCodeInput by viewModel.joinCodeInput.collectAsState()
     val statusText by viewModel.status.collectAsState()
     val isPaired by viewModel.isPaired.collectAsState()
-    val justPaired by viewModel.justPaired.collectAsState()
     val loading by viewModel.loading.collectAsState()
     val currentTheme by viewModel.currentTheme.collectAsState()
     val nameInput by viewModel.nameInput.collectAsState()
@@ -76,8 +71,6 @@ fun SettingsScreen(
 
     // Avatar picker dialog state
     var showAvatarPicker by remember { mutableStateOf(false) }
-    var showEffectPreviewOptions by remember { mutableStateOf(false) }
-    var previewCelebration by remember { mutableStateOf<CelebrationDay?>(null) }
     val avatarPhotoPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri -> uri?.let { viewModel.uploadAvatar(it) } }
@@ -381,7 +374,7 @@ fun SettingsScreen(
                     }
 
                     // Status message
-                    if (statusText.isNotEmpty() && !justPaired) {
+                    if (statusText.isNotEmpty()) {
                         Text(
                             text = statusText,
                             modifier = Modifier.fillMaxWidth(),
@@ -413,16 +406,8 @@ fun SettingsScreen(
                         contentPadding = layoutMetrics.cardPaddingDp.dp,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        CelebrationPreviewSection(
-                            expanded = showEffectPreviewOptions,
-                            onToggle = { showEffectPreviewOptions = !showEffectPreviewOptions },
-                            onPreview = { previewCelebration = it }
-                        )
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
                         Text(
-                            text = "Bling v1.0.0",
+                            text = "Bling v1.1",
                             fontSize = 13.sp,
                             color = TextSecondary
                         )
@@ -504,121 +489,7 @@ fun SettingsScreen(
             }
         }
 
-        // ===== 配对成功庆祝动画 =====
-        if (justPaired) {
-            CelebrationOverlay(
-                celebration = CelebrationDay(
-                    id = "pair_success",
-                    month = 0,
-                    day = 0,
-                    emoji = "💕",
-                    message = "配对成功！",
-                    style = CelebrationStyle.HEARTS,
-                    priority = 0
-                ),
-                onDismiss = { viewModel.dismissPairCelebration() }
-            )
-        }
-
-        previewCelebration?.let { celebration ->
-            CelebrationOverlay(
-                celebration = celebration,
-                onDismiss = { previewCelebration = null }
-            )
-        }
     }
-}
-
-@Composable
-private fun CelebrationPreviewSection(
-    expanded: Boolean,
-    onToggle: () -> Unit,
-    onPreview: (CelebrationDay) -> Unit
-) {
-    OutlinedButton(
-        onClick = onToggle,
-        shape = RoundedCornerShape(28.dp),
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = Primary
-        ),
-        border = BorderStroke(1.dp, Primary),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = if (expanded) "收起特效预览" else "特效预览",
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(vertical = 4.dp)
-        )
-    }
-
-    if (expanded) {
-        Spacer(modifier = Modifier.height(12.dp))
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            CelebrationConfig.previewDays.forEach { celebration ->
-                PreviewEffectRow(
-                    celebration = celebration,
-                    onClick = { onPreview(celebration) }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun PreviewEffectRow(
-    celebration: CelebrationDay,
-    onClick: () -> Unit
-) {
-    Surface(
-        onClick = onClick,
-        shape = RoundedCornerShape(14.dp),
-        color = Color(0xFFFFF8F5),
-        border = BorderStroke(1.dp, Border),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(
-                text = celebration.emoji,
-                fontSize = 22.sp
-            )
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = celebration.style.previewName(),
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = TextPrimary
-                )
-                Spacer(modifier = Modifier.height(2.dp))
-                Text(
-                    text = celebration.message,
-                    fontSize = 12.sp,
-                    color = TextSecondary
-                )
-            }
-            Text(
-                text = "播放",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium,
-                color = Primary
-            )
-        }
-    }
-}
-
-private fun CelebrationStyle.previewName(): String = when (this) {
-    CelebrationStyle.BIRTHDAY -> "生日特效"
-    CelebrationStyle.HEARTS -> "爱心特效"
-    CelebrationStyle.FIREWORKS -> "烟花特效"
-    CelebrationStyle.CHRISTMAS -> "圣诞特效"
-    CelebrationStyle.RED_GOLD -> "红金特效"
 }
 
 // ===== Section Card =====

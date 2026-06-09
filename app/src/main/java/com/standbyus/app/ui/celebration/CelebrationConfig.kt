@@ -67,54 +67,6 @@ object CelebrationConfig {
         ),
     )
 
-    val previewDays = listOf(
-        CelebrationDay(
-            id = "preview_birthday",
-            month = 0,
-            day = 0,
-            emoji = "🎂",
-            message = "生日快乐！",
-            style = CelebrationStyle.BIRTHDAY,
-            priority = 0
-        ),
-        CelebrationDay(
-            id = "preview_hearts",
-            month = 0,
-            day = 0,
-            emoji = "💗",
-            message = "520快乐！",
-            style = CelebrationStyle.HEARTS,
-            priority = 0
-        ),
-        CelebrationDay(
-            id = "preview_fireworks",
-            month = 0,
-            day = 0,
-            emoji = "🎆",
-            message = "元旦快乐！",
-            style = CelebrationStyle.FIREWORKS,
-            priority = 0
-        ),
-        CelebrationDay(
-            id = "preview_christmas",
-            month = 0,
-            day = 0,
-            emoji = "🎄",
-            message = "圣诞快乐！",
-            style = CelebrationStyle.CHRISTMAS,
-            priority = 0
-        ),
-        CelebrationDay(
-            id = "preview_red_gold",
-            month = 0,
-            day = 0,
-            emoji = "⭐",
-            message = "国庆快乐！",
-            style = CelebrationStyle.RED_GOLD,
-            priority = 0
-        )
-    )
-
     fun match(
         month: Int,
         day: Int,
