@@ -4,16 +4,16 @@ enum class InteractionType(
     val key: String,
     val sendText: String
 ) {
-    HUG("hug", "抱抱一个"),
+    HUG("hug", "抱抱"),
     MISS_YOU_TOO("miss_you_too", "我也想你"),
-    HARD_WORK("hard_work", "辛苦啦"),
+    HARD_WORK("hard_work", "想你啦"),
     NUDGE_UPDATE("nudge_update", "不宁不宁在干嘛"),
     POOP_CHECKIN("poop_checkin", "正在拉屎");
 
     fun receivedText(senderName: String = "TA"): String = when (this) {
-        HUG -> "${senderName}抱了你一个"
+        HUG -> "${senderName}想抱抱你"
         MISS_YOU_TOO -> "${senderName}也想你了"
-        HARD_WORK -> "${senderName}说你辛苦啦"
+        HARD_WORK -> "${senderName}想你啦"
         NUDGE_UPDATE -> "${senderName}不宁不宁在干嘛"
         POOP_CHECKIN -> "${senderName}正在拉屎"
     }
