@@ -33,7 +33,22 @@ interface CheckinDao {
     @Query("DELETE FROM checkin_records WHERE userId = :userId")
     suspend fun clearUserRecords(userId: String)
 
+    @Query("DELETE FROM checkin_records WHERE userId = :userId AND timestamp >= :since")
+    suspend fun clearUserRecordsSince(userId: String, since: Long)
+
     /** 获取本地缓存的记录列表（供轮询 fallback 使用） */
     @Query("SELECT * FROM checkin_records WHERE userId = :userId AND timestamp >= :since ORDER BY timestamp DESC")
     suspend fun getRecordsSince(userId: String, since: Long): List<CheckinRecordEntity>
+
+    /** 获取指定时间范围内的记录，用于月历和离线回退。 */
+    @Query(
+        "SELECT * FROM checkin_records " +
+            "WHERE userId = :userId AND timestamp >= :startInclusive AND timestamp < :endExclusive " +
+            "ORDER BY timestamp DESC"
+    )
+    suspend fun getRecordsInRange(
+        userId: String,
+        startInclusive: Long,
+        endExclusive: Long
+    ): List<CheckinRecordEntity>
 }

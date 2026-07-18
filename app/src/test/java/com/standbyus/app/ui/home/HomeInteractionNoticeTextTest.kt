@@ -12,7 +12,7 @@ class HomeInteractionNoticeTextTest {
         val interaction = Interaction(type = InteractionType.HARD_WORK.key)
 
         assertEquals(
-            "小周说你辛苦啦",
+            "小周想你啦",
             HomeInteractionNoticeText.resolve(
                 interaction = interaction,
                 partnerDisplayName = "小周"
@@ -25,7 +25,7 @@ class HomeInteractionNoticeTextTest {
         val interaction = Interaction(type = InteractionType.HUG.key)
 
         assertEquals(
-            "对方抱了你一个",
+            "对方想抱抱你",
             HomeInteractionNoticeText.resolve(
                 interaction = interaction,
                 partnerDisplayName = ""

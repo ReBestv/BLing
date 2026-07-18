@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -61,6 +62,7 @@ private val WinAccent = Color(0xFFE8B84B)
 @Composable
 fun CheckinScreen(
     onBack: () -> Unit,
+    onOpenCalendar: () -> Unit,
     viewModel: CheckinViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
@@ -103,6 +105,7 @@ fun CheckinScreen(
                 Column(modifier = Modifier.fillMaxSize()) {
                     CheckinInfoPanel(
                         state = state,
+                        onOpenCalendar = onOpenCalendar,
                         metrics = metrics,
                         modifier = Modifier
                             .weight(1f)
@@ -134,6 +137,7 @@ fun CheckinScreen(
 @Composable
 private fun CheckinInfoPanel(
     state: CheckinUiState,
+    onOpenCalendar: () -> Unit,
     metrics: CheckinLayoutMetrics,
     modifier: Modifier = Modifier
 ) {
@@ -173,7 +177,15 @@ private fun CheckinInfoPanel(
         ThreeColCard(
             widthDp = metrics.cardWidthDp,
             verticalPaddingDp = metrics.statVerticalPaddingDp,
-            col1 = { StatCell("📊", "${state.weeklyTotal} 次", "总共", Color(0xFFE3F2FD)) },
+            col1 = {
+                StatCell(
+                    emoji = "📊",
+                    value = "${state.weeklyTotal} 次",
+                    label = "总共",
+                    circleBg = Color(0xFFE3F2FD),
+                    onClick = onOpenCalendar
+                )
+            },
             col2 = { StatCell("📈", "${state.weeklyAverage}/天", "平均", Color(0xFFE8F5E9)) },
             col3 = { StatCell("🔥", "${state.streak} 天", "连续打卡", Color(0xFFFFF3E0)) }
         )
@@ -227,12 +239,25 @@ private fun StatCell(
     emoji: String,
     value: String,
     label: String,
-    circleBg: Color
+    circleBg: Color,
+    onClick: (() -> Unit)? = null
 ) {
+    val interactionModifier = if (onClick != null) {
+        Modifier.clickable(
+            role = Role.Button,
+            onClickLabel = "查看打卡日历",
+            onClick = onClick
+        )
+    } else {
+        Modifier
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(interactionModifier)
     ) {
         // Emoji in circle background
         Box(

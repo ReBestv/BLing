@@ -82,9 +82,9 @@ class CheckinRepository @Inject constructor(
                 )
                 val records = results.map { CheckinData.fromMap(it) }
 
-                // When remote fetch succeeds, remote is the source of truth.
-                // Clear local rows for this user so old data cannot survive an unpair/re-pair.
-                checkinDao.clearUserRecords(userId)
+                // Replace only the fetched range so historical month caches remain available.
+                // Unpair cleanup still clears every row for the affected user explicitly.
+                checkinDao.clearUserRecordsSince(userId, since)
                 records.forEach { checkinDao.insert(it.toEntity()) }
                 trySend(records)
             } catch (e: Exception) {
@@ -104,6 +104,31 @@ class CheckinRepository @Inject constructor(
             }
         }
         awaitClose { job.cancel() }
+    }
+
+    suspend fun getCheckInsInRange(
+        userId: String,
+        startInclusive: Long,
+        endExclusive: Long
+    ): List<CheckinData> {
+        if (userId.isEmpty()) return emptyList()
+
+        return try {
+            val results = supabaseService.query(
+                TABLE,
+                "userId=eq.$userId" +
+                    "&timestamp=gte.$startInclusive" +
+                    "&timestamp=lt.$endExclusive" +
+                    "&order=timestamp.desc"
+            )
+            val records = results.map { CheckinData.fromMap(it) }
+            records.forEach { checkinDao.insert(it.toEntity()) }
+            records
+        } catch (e: Exception) {
+            Log.e(TAG, "getCheckInsInRange remote failed: ${e.message}")
+            checkinDao.getRecordsInRange(userId, startInclusive, endExclusive)
+                .map { it.toData() }
+        }
     }
 
     suspend fun getStreakDays(userId: String): Int {

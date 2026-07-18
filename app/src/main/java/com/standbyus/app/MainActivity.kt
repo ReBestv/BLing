@@ -47,6 +47,7 @@ import com.standbyus.app.ui.celebration.CelebrationConfig
 import com.standbyus.app.ui.celebration.CelebrationDay
 import com.standbyus.app.ui.celebration.CelebrationOverlay
 import com.standbyus.app.ui.checkin.CheckinScreen
+import com.standbyus.app.ui.checkin.CheckinCalendarScreen
 import com.standbyus.app.ui.history.HistoryScreen
 import com.standbyus.app.ui.home.HomeScreen
 import com.standbyus.app.ui.poststatus.PostStatusScreen
@@ -136,6 +137,12 @@ class MainActivity : ComponentActivity() {
                             }
                             composable(Routes.CHECKIN) {
                                 CheckinScreen(
+                                    onBack = { navController.popBackStack() },
+                                    onOpenCalendar = { navController.navigate(Routes.CHECKIN_CALENDAR) }
+                                )
+                            }
+                            composable(Routes.CHECKIN_CALENDAR) {
+                                CheckinCalendarScreen(
                                     onBack = { navController.popBackStack() }
                                 )
                             }

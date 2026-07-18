@@ -6,6 +6,7 @@ object Routes {
     const val POST_STATUS = "post_status"
     const val HISTORY = "history"
     const val CHECKIN = "checkin"
+    const val CHECKIN_CALENDAR = "checkin_calendar"
     const val SETTINGS = "settings"
     const val TODO = "todo"
 }

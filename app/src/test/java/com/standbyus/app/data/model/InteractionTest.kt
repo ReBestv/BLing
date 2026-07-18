@@ -47,7 +47,7 @@ class InteractionTest {
 
     @Test
     fun interactionTypeProvidesDisplayText() {
-        assertEquals("TA抱了你一个", InteractionType.HUG.receivedText("TA"))
+        assertEquals("TA想抱抱你", InteractionType.HUG.receivedText("TA"))
         assertEquals("TA也想你了", InteractionType.MISS_YOU_TOO.receivedText("TA"))
         assertEquals("不宁不宁在干嘛", InteractionType.NUDGE_UPDATE.sendText)
         assertEquals("TA正在拉屎", InteractionType.POOP_CHECKIN.receivedText("TA"))
