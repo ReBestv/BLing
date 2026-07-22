@@ -75,6 +75,30 @@ class CheckinCalendarModelsTest {
         assertEquals(july15Records, state.selectedDateRecords)
     }
 
+    @Test
+    fun `partner record labels use resolved nickname`() {
+        val state = CheckinCalendarUiState(
+            recordOwner = CheckinCalendarOwner.PARTNER,
+            partnerDisplayName = "宝贝",
+            isPaired = true
+        )
+
+        assertEquals("宝贝的记录", state.selectedOwnerRecordsTitle)
+        assertEquals("宝贝的打卡", state.selectedOwnerCheckinLabel)
+    }
+
+    @Test
+    fun `my record labels remain first person`() {
+        val state = CheckinCalendarUiState(
+            recordOwner = CheckinCalendarOwner.ME,
+            partnerDisplayName = "宝贝",
+            isPaired = true
+        )
+
+        assertEquals("我的记录", state.selectedOwnerRecordsTitle)
+        assertEquals("我的打卡", state.selectedOwnerCheckinLabel)
+    }
+
     private fun timestamp(
         year: Int,
         month: Int,

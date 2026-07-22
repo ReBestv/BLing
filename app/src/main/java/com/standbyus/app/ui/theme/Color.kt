@@ -18,6 +18,8 @@ val SecondaryLight = Color(0xFFF0E5DB)    // 自动推导
 
 // ===== Tertiary =====
 val TertiaryColor = Color(0xFFD4E2D4)     // --accent-tertiary 薄荷灰绿
+val Partner = Color(0xFF6F9F8A)           // 对方记录强调色
+val PartnerSoft = Color(0xFFE9F3EE)       // 对方记录柔和背景
 
 // ===== Background & Surface =====
 val Background = Color(0xFFFFF8F3)        // --bg-primary

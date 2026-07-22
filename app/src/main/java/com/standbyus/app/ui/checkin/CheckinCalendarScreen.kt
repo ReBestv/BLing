@@ -1,8 +1,11 @@
 package com.standbyus.app.ui.checkin
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,8 +16,10 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -30,12 +35,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
@@ -44,13 +51,19 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.standbyus.app.data.model.CheckinData
 import com.standbyus.app.ui.components.AppHeader
 import com.standbyus.app.ui.theme.Background
 import com.standbyus.app.ui.theme.Border
+import com.standbyus.app.ui.theme.Partner
+import com.standbyus.app.ui.theme.PartnerSoft
 import com.standbyus.app.ui.theme.Primary
 import com.standbyus.app.ui.theme.PrimarySoft
 import com.standbyus.app.ui.theme.Surface
@@ -75,6 +88,19 @@ fun CheckinCalendarScreen(
     viewModel: CheckinCalendarViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val accentColor = if (state.recordOwner == CheckinCalendarOwner.ME) Primary else Partner
+    val accentSoftColor = if (state.recordOwner == CheckinCalendarOwner.ME) PrimarySoft else PartnerSoft
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshPairingState()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     Column(
         modifier = Modifier
@@ -92,34 +118,65 @@ fun CheckinCalendarScreen(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
         ) {
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            CheckinOwnerSwitch(
+                selectedOwner = state.recordOwner,
+                partnerDisplayName = state.partnerDisplayName,
+                isPaired = state.isPaired,
+                onOwnerSelected = viewModel::selectRecordOwner
+            )
+            OwnerContextRow(
+                recordsTitle = state.selectedOwnerRecordsTitle,
+                syncLabel = "已同步",
+                accentColor = accentColor
+            )
+            Spacer(modifier = Modifier.height(8.dp))
             CheckinMonthCalendar(
                 visibleMonth = state.visibleMonth,
                 selectedDate = state.selectedDate,
                 recordsByDate = state.recordsByDate,
+                accentColor = accentColor,
+                accentSoftColor = accentSoftColor,
                 onPreviousMonth = viewModel::showPreviousMonth,
                 onNextMonth = viewModel::showNextMonth,
                 onToday = viewModel::returnToToday,
                 onDateSelected = viewModel::selectDate
             )
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(14.dp))
             SelectedDateHeader(
                 date = state.selectedDate,
-                count = state.selectedDateRecords.size
+                count = state.selectedDateRecords.size,
+                accentColor = accentColor,
+                accentSoftColor = accentSoftColor
             )
             Spacer(modifier = Modifier.height(10.dp))
 
             when {
-                state.isLoading -> CalendarLoadingState(Modifier.weight(1f))
+                state.isLoading -> CalendarLoadingState(
+                    accentColor = accentColor,
+                    modifier = Modifier.weight(1f)
+                )
                 state.errorMessage != null -> CalendarErrorState(
                     message = state.errorMessage.orEmpty(),
                     onRetry = viewModel::retry,
+                    accentColor = accentColor,
                     modifier = Modifier.weight(1f)
                 )
-                state.selectedDateRecords.isEmpty() -> CalendarEmptyState(Modifier.weight(1f))
+                state.selectedDateRecords.isEmpty() -> CalendarEmptyState(
+                    message = if (state.recordOwner == CheckinCalendarOwner.ME) {
+                        "这天还没有打卡记录"
+                    } else {
+                        "${state.partnerDisplayName}这天还没有打卡记录"
+                    },
+                    modifier = Modifier.weight(1f)
+                )
                 else -> CheckinTimeList(
                     selectedDate = state.selectedDate,
                     records = state.selectedDateRecords,
+                    recordOwner = state.recordOwner,
+                    ownerCheckinLabel = state.selectedOwnerCheckinLabel,
+                    accentColor = accentColor,
+                    accentSoftColor = accentSoftColor,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -128,10 +185,160 @@ fun CheckinCalendarScreen(
 }
 
 @Composable
+private fun CheckinOwnerSwitch(
+    selectedOwner: CheckinCalendarOwner,
+    partnerDisplayName: String,
+    isPaired: Boolean,
+    onOwnerSelected: (CheckinCalendarOwner) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(18.dp))
+            .background(Surface)
+            .border(1.dp, Border.copy(alpha = 0.8f), RoundedCornerShape(18.dp))
+            .padding(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        OwnerSwitchOption(
+            label = "我的记录",
+            avatarText = "我",
+            selected = selectedOwner == CheckinCalendarOwner.ME,
+            enabled = true,
+            accentColor = Primary,
+            accentSoftColor = PrimarySoft,
+            onClick = { onOwnerSelected(CheckinCalendarOwner.ME) },
+            modifier = Modifier.weight(1f)
+        )
+        OwnerSwitchOption(
+            label = "${partnerDisplayName}的记录",
+            avatarText = partnerDisplayName.firstOrNull()?.toString().orEmpty().ifEmpty { "对" },
+            selected = selectedOwner == CheckinCalendarOwner.PARTNER,
+            enabled = isPaired,
+            accentColor = Partner,
+            accentSoftColor = PartnerSoft,
+            onClick = { onOwnerSelected(CheckinCalendarOwner.PARTNER) },
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun OwnerSwitchOption(
+    label: String,
+    avatarText: String,
+    selected: Boolean,
+    enabled: Boolean,
+    accentColor: Color,
+    accentSoftColor: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val backgroundColor by animateColorAsState(
+        targetValue = if (selected) accentSoftColor else Color.Transparent,
+        animationSpec = tween(durationMillis = 220),
+        label = "ownerSwitchBackground"
+    )
+    val textColor by animateColorAsState(
+        targetValue = if (selected) TextPrimary else TextSecondary,
+        animationSpec = tween(durationMillis = 180),
+        label = "ownerSwitchText"
+    )
+
+    Row(
+        modifier = modifier
+            .heightIn(min = 48.dp)
+            .alpha(if (enabled) 1f else 0.42f)
+            .clip(RoundedCornerShape(14.dp))
+            .background(backgroundColor)
+            .selectable(
+                selected = selected,
+                enabled = enabled,
+                role = Role.Tab,
+                onClick = onClick
+            )
+            .semantics {
+                contentDescription = if (enabled) label else "$label，尚未绑定"
+            }
+            .padding(horizontal = 10.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(26.dp)
+                .clip(CircleShape)
+                .background(accentColor),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = avatarText,
+                color = Color.White,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
+            )
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = label,
+            color = textColor,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
+private fun OwnerContextRow(
+    recordsTitle: String,
+    syncLabel: String,
+    accentColor: Color
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 36.dp)
+            .padding(horizontal = 2.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = "正在查看", color = TextSecondary, fontSize = 12.sp)
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text = recordsTitle,
+            modifier = Modifier.weight(1f),
+            color = TextPrimary,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Box(
+            modifier = Modifier
+                .size(7.dp)
+                .clip(CircleShape)
+                .background(accentColor)
+        )
+        Spacer(modifier = Modifier.width(6.dp))
+        Text(
+            text = syncLabel,
+            color = TextSecondary,
+            fontSize = 12.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+@Composable
 private fun CheckinMonthCalendar(
     visibleMonth: YearMonth,
     selectedDate: LocalDate,
     recordsByDate: Map<LocalDate, List<CheckinData>>,
+    accentColor: Color,
+    accentSoftColor: Color,
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
     onToday: () -> Unit,
@@ -181,7 +388,7 @@ private fun CheckinMonthCalendar(
                 onClick = onToday,
                 modifier = Modifier.align(Alignment.CenterEnd)
             ) {
-                Text(text = "回到今天", color = Primary, fontSize = 12.sp)
+                Text(text = "回到今天", color = accentColor, fontSize = 12.sp)
             }
         }
 
@@ -214,6 +421,8 @@ private fun CheckinMonthCalendar(
                             count = recordsByDate[date]?.size ?: 0,
                             isSelected = date == selectedDate,
                             isToday = date == today,
+                            accentColor = accentColor,
+                            accentSoftColor = accentSoftColor,
                             onClick = { onDateSelected(date) },
                             modifier = Modifier.weight(1f)
                         )
@@ -230,6 +439,8 @@ private fun CheckinCalendarDay(
     count: Int,
     isSelected: Boolean,
     isToday: Boolean,
+    accentColor: Color,
+    accentSoftColor: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -246,8 +457,8 @@ private fun CheckinCalendarDay(
             .clip(CircleShape)
             .then(
                 when {
-                    isSelected -> Modifier.background(Primary)
-                    isToday -> Modifier.border(1.5.dp, Primary, CircleShape)
+                    isSelected -> Modifier.background(accentColor)
+                    isToday -> Modifier.border(1.5.dp, accentColor, CircleShape)
                     else -> Modifier
                 }
             )
@@ -271,12 +482,12 @@ private fun CheckinCalendarDay(
                     .align(Alignment.TopEnd)
                     .size(17.dp)
                     .clip(CircleShape)
-                    .background(if (isSelected) Color.White else PrimarySoft),
+                    .background(if (isSelected) Color.White else accentSoftColor),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = if (count > 9) "9+" else count.toString(),
-                    color = Primary,
+                    color = accentColor,
                     fontSize = if (count > 9) 8.sp else 9.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -286,7 +497,12 @@ private fun CheckinCalendarDay(
 }
 
 @Composable
-private fun SelectedDateHeader(date: LocalDate, count: Int) {
+private fun SelectedDateHeader(
+    date: LocalDate,
+    count: Int,
+    accentColor: Color,
+    accentSoftColor: Color
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -300,12 +516,12 @@ private fun SelectedDateHeader(date: LocalDate, count: Int) {
         )
         Text(
             text = "$count 次",
-            color = Primary,
+            color = accentColor,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier
                 .clip(RoundedCornerShape(12.dp))
-                .background(PrimarySoft)
+                .background(accentSoftColor)
                 .padding(horizontal = 10.dp, vertical = 5.dp)
         )
     }
@@ -315,11 +531,15 @@ private fun SelectedDateHeader(date: LocalDate, count: Int) {
 private fun CheckinTimeList(
     selectedDate: LocalDate,
     records: List<CheckinData>,
+    recordOwner: CheckinCalendarOwner,
+    ownerCheckinLabel: String,
+    accentColor: Color,
+    accentSoftColor: Color,
     modifier: Modifier = Modifier
 ) {
     val listState = rememberLazyListState()
 
-    LaunchedEffect(selectedDate) {
+    LaunchedEffect(selectedDate, recordOwner) {
         listState.scrollToItem(0)
     }
 
@@ -330,13 +550,25 @@ private fun CheckinTimeList(
         contentPadding = PaddingValues(bottom = 24.dp)
     ) {
         itemsIndexed(records, key = { _, item -> "${item.userId}_${item.timestamp}" }) { index, record ->
-            CheckinTimeRow(record = record, number = records.size - index)
+            CheckinTimeRow(
+                record = record,
+                number = records.size - index,
+                ownerCheckinLabel = ownerCheckinLabel,
+                accentColor = accentColor,
+                accentSoftColor = accentSoftColor
+            )
         }
     }
 }
 
 @Composable
-private fun CheckinTimeRow(record: CheckinData, number: Int) {
+private fun CheckinTimeRow(
+    record: CheckinData,
+    number: Int,
+    ownerCheckinLabel: String,
+    accentColor: Color,
+    accentSoftColor: Color
+) {
     val time = remember(record.timestamp) {
         Instant.ofEpochMilli(record.timestamp)
             .atZone(ZoneId.systemDefault())
@@ -365,35 +597,57 @@ private fun CheckinTimeRow(record: CheckinData, number: Int) {
                 .padding(start = 16.dp)
         ) {
             Text(
-                text = "当天第 $number 次记录",
-                color = TextSecondary,
+                text = ownerCheckinLabel,
+                color = TextPrimary,
                 fontSize = 13.sp,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
-            if (record.note.isNotBlank()) {
-                Spacer(modifier = Modifier.height(3.dp))
-                Text(
-                    text = record.note,
-                    color = TextPrimary,
-                    fontSize = 14.sp
-                )
-            }
+            Spacer(modifier = Modifier.height(3.dp))
+            Text(
+                text = record.note.ifBlank { "当天第 $number 次记录" },
+                color = TextSecondary,
+                fontSize = 12.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .clip(CircleShape)
+                .background(accentSoftColor),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = number.toString(),
+                color = accentColor,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }
 
 @Composable
-private fun CalendarLoadingState(modifier: Modifier = Modifier) {
+private fun CalendarLoadingState(
+    accentColor: Color,
+    modifier: Modifier = Modifier
+) {
     Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        CircularProgressIndicator(color = Primary, strokeWidth = 3.dp)
+        CircularProgressIndicator(color = accentColor, strokeWidth = 3.dp)
     }
 }
 
 @Composable
-private fun CalendarEmptyState(modifier: Modifier = Modifier) {
+private fun CalendarEmptyState(
+    message: String,
+    modifier: Modifier = Modifier
+) {
     Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Text(
-            text = "这天还没有打卡记录",
+            text = message,
             color = TextSecondary,
             fontSize = 15.sp
         )
@@ -404,6 +658,7 @@ private fun CalendarEmptyState(modifier: Modifier = Modifier) {
 private fun CalendarErrorState(
     message: String,
     onRetry: () -> Unit,
+    accentColor: Color,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -414,7 +669,7 @@ private fun CalendarErrorState(
         Text(text = message, color = TextSecondary, fontSize = 15.sp)
         Spacer(modifier = Modifier.height(8.dp))
         TextButton(onClick = onRetry) {
-            Text(text = "重新加载", color = Primary)
+            Text(text = "重新加载", color = accentColor)
         }
     }
 }
