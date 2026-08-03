@@ -19,7 +19,9 @@ import androidx.compose.foundation.verticalScroll
 import com.standbyus.app.ui.theme.StandByUsLightColors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FileUpload
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -41,8 +43,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.standbyus.app.data.model.AlbumComment
 import com.standbyus.app.data.model.AlbumPhoto
 import com.standbyus.app.ui.components.AppHeader
+import com.standbyus.app.ui.components.UserAvatar
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.foundation.gestures.detectTransformGestures
@@ -62,9 +66,21 @@ fun AlbumScreen(
     val caption by viewModel.caption.collectAsState()
     val error by viewModel.error.collectAsState()
     val filterDays by viewModel.filterDays.collectAsState()
+    val comments by viewModel.comments.collectAsState()
+    val activeCommentPhotoId by viewModel.activeCommentPhotoId.collectAsState()
+    val commentCounts by viewModel.commentCounts.collectAsState()
+    val commentsLoading by viewModel.commentsLoading.collectAsState()
+    val commentText by viewModel.commentText.collectAsState()
+    val sendingComment by viewModel.sendingComment.collectAsState()
+    val deletingCommentId by viewModel.deletingCommentId.collectAsState()
+    val commentError by viewModel.commentError.collectAsState()
+    val myDeviceId by viewModel.myDeviceId.collectAsState()
+    val myCommentProfile by viewModel.myCommentProfile.collectAsState()
+    val partnerCommentProfile by viewModel.partnerCommentProfile.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
 
     var fullScreenPhoto by remember { mutableStateOf<AlbumPhoto?>(null) }
+    var commentToDelete by remember { mutableStateOf<AlbumComment?>(null) }
 
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -89,6 +105,12 @@ fun AlbumScreen(
     LaunchedEffect(error) {
         if (error.isNotEmpty()) {
             snackbarHostState.showSnackbar(error)
+        }
+    }
+
+    LaunchedEffect(commentError) {
+        if (commentError.isNotEmpty()) {
+            snackbarHostState.showSnackbar(commentError)
         }
     }
 
@@ -335,6 +357,11 @@ fun AlbumScreen(
             val uploadedAtLabel = remember(photo.createdAt) {
                 albumUploadedAtLabel(photo.createdAt)
             }
+            val commentCount = commentCounts[photo.id]
+
+            LaunchedEffect(photo.id) {
+                viewModel.preloadCommentCount(photo)
+            }
             
             Box(
                 modifier = Modifier
@@ -369,13 +396,19 @@ fun AlbumScreen(
                         .clickable(
                             interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
                             indication = null
-                        ) { fullScreenPhoto = null },
+                        ) {
+                            viewModel.closeComments()
+                            fullScreenPhoto = null
+                        },
                     contentScale = ContentScale.Fit
                 )
                 
                 // 返回按钮
                 IconButton(
-                    onClick = { fullScreenPhoto = null },
+                    onClick = {
+                        viewModel.closeComments()
+                        fullScreenPhoto = null
+                    },
                     modifier = Modifier
                         .align(Alignment.TopStart)
                         .padding(top = 32.dp, start = 8.dp)
@@ -424,9 +457,292 @@ fun AlbumScreen(
                             lineHeight = 16.sp,
                             textAlign = TextAlign.Center
                         )
+                        Spacer(Modifier.height(8.dp))
+                        TextButton(
+                            onClick = { viewModel.openComments(photo) },
+                            colors = ButtonDefaults.textButtonColors(contentColor = Color.White)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.ChatBubbleOutline,
+                                contentDescription = null,
+                                modifier = Modifier.size(19.dp)
+                            )
+                            Spacer(Modifier.width(6.dp))
+                            Text(
+                                text = commentCount?.let { "评论 $it" } ?: "评论",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
                 }
             }
+
+            if (activeCommentPhotoId == photo.id) {
+                AlbumCommentsSheet(
+                    comments = comments,
+                    commentCount = commentCounts[photo.id] ?: comments.size,
+                    loading = commentsLoading,
+                    text = commentText,
+                    sending = sendingComment,
+                    deletingCommentId = deletingCommentId,
+                    myDeviceId = myDeviceId,
+                    myProfile = myCommentProfile,
+                    partnerProfile = partnerCommentProfile,
+                    onDismiss = viewModel::closeComments,
+                    onTextChange = viewModel::updateCommentText,
+                    onSend = viewModel::sendComment,
+                    onDeleteRequest = { commentToDelete = it }
+                )
+            }
+        }
+
+        commentToDelete?.let { comment ->
+            AlertDialog(
+                onDismissRequest = { commentToDelete = null },
+                title = { Text("删除评论") },
+                text = { Text("确定要删除这条评论吗？") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            commentToDelete = null
+                            viewModel.deleteComment(comment)
+                        }
+                    ) {
+                        Text("删除", color = MaterialTheme.colorScheme.error)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { commentToDelete = null }) {
+                        Text("取消")
+                    }
+                }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@Composable
+private fun AlbumCommentsSheet(
+    comments: List<AlbumComment>,
+    commentCount: Int,
+    loading: Boolean,
+    text: String,
+    sending: Boolean,
+    deletingCommentId: Long?,
+    myDeviceId: String,
+    myProfile: AlbumCommentProfile,
+    partnerProfile: AlbumCommentProfile,
+    onDismiss: () -> Unit,
+    onTextChange: (String) -> Unit,
+    onSend: () -> Unit,
+    onDeleteRequest: (AlbumComment) -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        containerColor = StandByUsLightColors.surface,
+        contentColor = StandByUsLightColors.fg
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 340.dp, max = 620.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp)
+                    .padding(start = 24.dp, end = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "评论",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = "${if (loading) commentCount else comments.size} 条",
+                    fontSize = 13.sp,
+                    color = StandByUsLightColors.muted
+                )
+                IconButton(onClick = onDismiss) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "关闭评论",
+                        tint = StandByUsLightColors.muted
+                    )
+                }
+            }
+            HorizontalDivider(color = StandByUsLightColors.borderLight)
+
+            when {
+                loading -> Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(28.dp),
+                        strokeWidth = 3.dp,
+                        color = Color(0xFFFF8E78)
+                    )
+                }
+
+                comments.isEmpty() -> Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .padding(horizontal = 32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "还没有评论，写下第一句吧",
+                        color = StandByUsLightColors.muted,
+                        textAlign = TextAlign.Center,
+                        fontSize = 14.sp
+                    )
+                }
+
+                else -> LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 4.dp)
+                ) {
+                    itemsIndexed(
+                        items = comments,
+                        key = { _, comment -> comment.id }
+                    ) { index, comment ->
+                        val isMine = comment.authorDeviceId == myDeviceId
+                        AlbumCommentRow(
+                            comment = comment,
+                            profile = if (isMine) myProfile else partnerProfile,
+                            isMine = isMine,
+                            deleting = deletingCommentId == comment.id,
+                            onDeleteRequest = onDeleteRequest
+                        )
+                        if (index < comments.lastIndex) {
+                            HorizontalDivider(color = StandByUsLightColors.borderLight.copy(alpha = 0.65f))
+                        }
+                    }
+                }
+            }
+
+            HorizontalDivider(color = StandByUsLightColors.borderLight)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .imePadding()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                UserAvatar(
+                    avatarUrl = myProfile.avatarUrl,
+                    avatarEmoji = myProfile.avatarEmoji,
+                    size = 36.dp,
+                    textSize = 17.sp,
+                    contentDescription = "${myProfile.displayName}的头像"
+                )
+                Spacer(Modifier.width(10.dp))
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = onTextChange,
+                    placeholder = { Text("说点什么…") },
+                    modifier = Modifier.weight(1f),
+                    minLines = 1,
+                    maxLines = 3,
+                    shape = RoundedCornerShape(16.dp),
+                    supportingText = {
+                        Text(
+                            text = "${text.length}/100",
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.End
+                        )
+                    }
+                )
+                Spacer(Modifier.width(8.dp))
+                Button(
+                    onClick = onSend,
+                    enabled = text.trim().isNotEmpty() && !sending,
+                    modifier = Modifier.heightIn(min = 48.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF8E78))
+                ) {
+                    if (sending) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text("发送")
+                    }
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun AlbumCommentRow(
+    comment: AlbumComment,
+    profile: AlbumCommentProfile,
+    isMine: Boolean,
+    deleting: Boolean,
+    onDeleteRequest: (AlbumComment) -> Unit
+) {
+    val deleteModifier = if (isMine && !deleting) {
+        Modifier.combinedClickable(
+            onClick = {},
+            onLongClick = { onDeleteRequest(comment) }
+        )
+    } else {
+        Modifier
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .then(deleteModifier)
+            .padding(vertical = 14.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        UserAvatar(
+            avatarUrl = profile.avatarUrl,
+            avatarEmoji = profile.avatarEmoji,
+            size = 40.dp,
+            textSize = 18.sp,
+            contentDescription = "${profile.displayName}的头像"
+        )
+        Spacer(Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = profile.displayName,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF6D544C)
+            )
+            Spacer(Modifier.height(3.dp))
+            Text(
+                text = comment.content,
+                fontSize = 15.sp,
+                lineHeight = 22.sp,
+                color = StandByUsLightColors.fg
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = if (deleting) "删除中…" else albumCommentTimeLabel(comment.createdAt),
+                fontSize = 12.sp,
+                color = StandByUsLightColors.muted
+            )
         }
     }
 }

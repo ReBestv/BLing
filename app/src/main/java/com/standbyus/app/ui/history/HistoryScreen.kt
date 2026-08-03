@@ -54,14 +54,19 @@ fun HistoryScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(lifecycleOwner) {
+        viewModel.startAutoRefresh()
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 viewModel.refresh()
+                viewModel.startAutoRefresh()
+            } else if (event == Lifecycle.Event.ON_PAUSE) {
+                viewModel.stopAutoRefresh()
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
+            viewModel.stopAutoRefresh()
         }
     }
 

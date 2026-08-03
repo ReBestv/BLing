@@ -15,6 +15,9 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 @HiltViewModel
@@ -54,6 +57,8 @@ class HistoryViewModel @Inject constructor(
     )
     val myAvatarUrl: StateFlow<String> = _myAvatarUrl.asStateFlow()
 
+    private var autoRefreshJob: Job? = null
+
     init {
         prefs.registerOnSharedPreferenceChangeListener(avatarPreferenceListener)
         loadHistory()
@@ -62,6 +67,22 @@ class HistoryViewModel @Inject constructor(
     fun refresh() {
         refreshMyAvatarSnapshot()
         loadHistory()
+    }
+
+    /** Refreshes the timeline while its screen is visible. */
+    fun startAutoRefresh() {
+        if (autoRefreshJob?.isActive == true) return
+        autoRefreshJob = viewModelScope.launch {
+            while (isActive) {
+                delay(HISTORY_POLL_MS)
+                loadHistory()
+            }
+        }
+    }
+
+    fun stopAutoRefresh() {
+        autoRefreshJob?.cancel()
+        autoRefreshJob = null
     }
 
     private fun loadHistory() {
@@ -90,12 +111,14 @@ class HistoryViewModel @Inject constructor(
                     }
                 }
 
-                val pair = runCatching { pairingRepository.findPairByUserId(myId) }
+                val cachedPartnerId = prefs.getString(KEY_PARTNER_ID, null)
+                val pairResult = runCatching { pairingRepository.findPairByUserId(myId) }
                     .onFailure { Log.e(TAG, "pair lookup failed", it) }
-                    .getOrNull()
+                val pair = pairResult.getOrNull()
                 val partnerId = when {
                     pair?.user1Id == myId && pair.user2Id.isNotEmpty() -> pair.user2Id
                     pair?.user2Id == myId && pair.user1Id.isNotEmpty() -> pair.user1Id
+                    !cachedPartnerId.isNullOrEmpty() -> cachedPartnerId
                     else -> ""
                 }
 
@@ -123,7 +146,12 @@ class HistoryViewModel @Inject constructor(
                         }
                     }
                 } else {
-                    clearPartnerCache()
+                    // A request failure must not turn a temporarily offline device into an
+                    // unpaired one. Clear local relationship data only after the server has
+                    // successfully confirmed that no pairing exists.
+                    if (pairResult.isSuccess) {
+                        clearPartnerCache()
+                    }
                     _partnerName.value = resolvePartnerName()
                     emptyList()
                 }
@@ -177,9 +205,11 @@ class HistoryViewModel @Inject constructor(
         private const val KEY_AVATAR_EMOJI = "avatar_emoji"
         private const val KEY_AVATAR_URL = "avatar_url"
         private const val DEFAULT_AVATAR = "\uD83D\uDE42"
+        private const val HISTORY_POLL_MS = 6_000L
     }
 
     override fun onCleared() {
+        stopAutoRefresh()
         prefs.unregisterOnSharedPreferenceChangeListener(avatarPreferenceListener)
         super.onCleared()
     }
