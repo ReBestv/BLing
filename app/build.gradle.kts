@@ -34,6 +34,21 @@ val releaseSigningKeys = listOf(
 )
 val hasReleaseSigning = releaseSigningKeys.all { projectConfig(it).isNotBlank() }
 
+// Unit tests and IDE sync work without credentials; installable packages must be configured.
+tasks.configureEach {
+    if (name in setOf("packageDebug", "packageRelease", "bundleDebug", "bundleRelease", "signDebugBundle", "signReleaseBundle")) {
+        doFirst {
+            val syncUrl = projectConfig("SUPABASE_URL").trim().trimEnd('/')
+            val syncKey = projectConfig("SUPABASE_ANON_KEY").trim()
+            check(syncUrl.startsWith("https://") && syncUrl != "https://example.supabase.co" &&
+                syncUrl != "https://your-project.supabase.co" && syncKey.isNotBlank() &&
+                syncKey != "your-anon-or-publishable-key") {
+                "缺少有效的 Supabase 配置，禁止生成无法同步的安装包。请在 local.properties 或构建环境配置 SUPABASE_URL 和 SUPABASE_ANON_KEY。"
+            }
+        }
+    }
+}
+
 android {
     namespace = "com.standbyus.app"
     compileSdk = 35
@@ -42,8 +57,8 @@ android {
         applicationId = "com.standbyus.app"
         minSdk = 31
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 7
+        versionName = "1.4.1"
 
         buildConfigField(
             "String",
@@ -118,4 +133,5 @@ dependencies {
     implementation(libs.coil.gif)
     testImplementation(libs.junit)
     testImplementation(libs.json)
+    testImplementation(libs.coroutines.test)
 }

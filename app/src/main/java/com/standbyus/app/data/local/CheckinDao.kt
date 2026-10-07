@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 
 @Dao
 interface CheckinDao {
@@ -22,10 +23,20 @@ interface CheckinDao {
     @Query("SELECT COUNT(*) FROM checkin_records WHERE userId = :userId AND timestamp >= :startOfMonth")
     suspend fun getMonthCount(userId: String, startOfMonth: Long): Int
 
-    /** 获取从 since 时间以来的所有活跃日期（以天为单位），用于计算连续打卡 */
-    @Query("SELECT DISTINCT CAST(timestamp / 86400000 AS INTEGER) FROM checkin_records " +
-           "WHERE userId = :userId AND timestamp >= :since ORDER BY timestamp DESC")
-    suspend fun getActiveDays(userId: String, since: Long): List<Long>
+    @Query("SELECT timestamp FROM checkin_records WHERE userId = :userId ORDER BY timestamp DESC")
+    suspend fun getTimestamps(userId: String): List<Long>
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertAll(records: List<CheckinRecordEntity>)
+
+    @Query("DELETE FROM checkin_records WHERE userId = :userId AND timestamp >= :since")
+    suspend fun clearRecordsSince(userId: String, since: Long)
+
+    @Transaction
+    suspend fun replaceRecordsSince(userId: String, since: Long, records: List<CheckinRecordEntity>) {
+        clearRecordsSince(userId, since)
+        insertAll(records)
+    }
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(record: CheckinRecordEntity)

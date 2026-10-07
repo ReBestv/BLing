@@ -117,10 +117,11 @@ class SupabaseService @Inject constructor() {
             .url("${SupabaseConfig.SUPABASE_URL}/storage/v1/object/$bucket/$path")
             .delete()
             .build()
-        val response = uploadClient.newCall(request).execute()
-        if (!response.isSuccessful && response.code != 404) {
-            val bodyStr = response.body?.string() ?: ""
-            throw IOException("删除文件失败 (${response.code}): $bodyStr")
+        uploadClient.newCall(request).execute().use { response ->
+            if (!response.isSuccessful && response.code != 404) {
+                val bodyStr = response.body?.string() ?: ""
+                throw IOException("删除文件失败 (${response.code}): $bodyStr")
+            }
         }
     }
 
@@ -147,13 +148,15 @@ class SupabaseService @Inject constructor() {
     }
 
     private suspend fun executeAndParse(request: Request): List<Map<String, Any>> = withContext(Dispatchers.IO) {
-        val response = client.newCall(request).execute()
-        val bodyStr = response.body?.string() ?: throw IOException("空响应")
-        Log.d(TAG, "Response code: ${response.code}, body: $bodyStr")
-        if (!response.isSuccessful) {
-            throw IOException("Supabase 错误 (${response.code}): $bodyStr")
+        if (!SupabaseConfig.isConfigured()) throw SupabaseConfigurationException()
+        client.newCall(request).execute().use { response ->
+            val bodyStr = response.body?.string() ?: throw IOException("空响应")
+            Log.d(TAG, "Response code: ${response.code}")
+            if (!response.isSuccessful) {
+                throw SupabaseHttpException(response.code, "Supabase 错误 (${response.code}): $bodyStr")
+            }
+            parseJsonArray(bodyStr)
         }
-        parseJsonArray(bodyStr)
     }
 
     private fun parseJsonArray(json: String): List<Map<String, Any>> {

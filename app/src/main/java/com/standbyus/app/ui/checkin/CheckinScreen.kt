@@ -24,9 +24,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.Alignment
@@ -39,6 +40,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -63,7 +69,7 @@ fun CheckinScreen(
     onBack: () -> Unit,
     viewModel: CheckinViewModel = hiltViewModel()
 ) {
-    val state by viewModel.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(lifecycleOwner) {
@@ -89,6 +95,15 @@ fun CheckinScreen(
                 title = "拉了么",
                 showDivider = false // Usually matching home/other pages?
             )
+            if (state.syncMessage.isNotEmpty()) {
+                Text(
+                    text = state.syncMessage,
+                    color = TextPrimary,
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
+                        .semantics { liveRegion = LiveRegionMode.Polite }
+                )
+            }
 
             // ── Fixed content area (adapts proportions to available screen space) ──
             BoxWithConstraints(
@@ -116,11 +131,23 @@ fun CheckinScreen(
                             .padding(bottom = metrics.buttonBottomPaddingDp.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        BigCheckinButton(
-                            onClick = { viewModel.checkIn() },
-                            isCheckingIn = state.isCheckingIn,
-                            sizeDp = metrics.buttonSizeDp
-                        )
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            if (state.feedback.isNotEmpty()) {
+                                Text(
+                                    text = state.feedback,
+                                    color = if (state.feedbackIsError) Color(0xFF9C3024) else TextPrimary,
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 14.sp,
+                                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+                                        .semantics { liveRegion = LiveRegionMode.Polite }
+                                )
+                            }
+                            BigCheckinButton(
+                                onClick = { viewModel.checkIn() },
+                                isCheckingIn = state.isCheckingIn,
+                                sizeDp = metrics.buttonSizeDp
+                            )
+                        }
                     }
 
                     // Space for bottom nav
@@ -501,9 +528,14 @@ private fun BigCheckinButton(
                     colors = listOf(PrimaryColor, GradientEnd)
                 )
             )
-            .clickable(enabled = !isCheckingIn) { onClick() },
+            .semantics { contentDescription = if (isCheckingIn) "正在打卡" else "打卡" }
+            .clickable(enabled = !isCheckingIn, role = Role.Button) { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        Text(text = "💩", fontSize = (sizeDp * 0.42f).sp)
+        if (isCheckingIn) {
+            CircularProgressIndicator(color = TextPrimary, modifier = Modifier.size(32.dp))
+        } else {
+            Text(text = "💩", fontSize = (sizeDp * 0.42f).sp)
+        }
     }
 }

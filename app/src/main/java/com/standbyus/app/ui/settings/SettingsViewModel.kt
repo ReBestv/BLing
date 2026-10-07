@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -137,8 +138,17 @@ class SettingsViewModel @Inject constructor(
             _isPaired.value = true
         }
         viewModelScope.launch {
-            val uid = supabaseService.getCachedDeviceId()
-            val pair = runCatching { pairingRepository.findPairByUserId(uid) }.getOrNull()
+            val uid = supabaseService.getDeviceId(context)
+            val pair = try {
+                pairingRepository.findPairByUserId(uid)
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (error: Exception) {
+                Log.w(TAG, "Pairing lookup failed; keeping existing relationship", error)
+                _status.value = "连接暂时失败，已保留原配对，请稍后重试"
+                _loading.value = false
+                return@launch
+            }
             val partnerAssigned = pair?.partnerIdFor(uid).orEmpty().isNotEmpty()
             if (pair != null && partnerAssigned) {
                 _isPaired.value = true

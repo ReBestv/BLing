@@ -7,20 +7,25 @@ import androidx.lifecycle.viewModelScope
 import com.standbyus.app.data.model.InteractionType
 import com.standbyus.app.data.remote.SupabaseService
 import com.standbyus.app.data.repository.CheckinRepository
+import com.standbyus.app.data.repository.CheckinFailure
+import com.standbyus.app.data.repository.CheckinSubmitResult
 import com.standbyus.app.data.repository.InteractionRepository
 import com.standbyus.app.data.repository.PairingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.Calendar
+import java.time.LocalDate
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 
 data class CheckinUiState(
     val todayCount: Int = 0,
@@ -31,7 +36,10 @@ data class CheckinUiState(
     val streak: Int = 0,
     val isCheckingIn: Boolean = false,
     val isPaired: Boolean = false,
-    val pkStats: PKStats? = null
+    val pkStats: PKStats? = null,
+    val feedback: String = "",
+    val feedbackIsError: Boolean = false,
+    val syncMessage: String = ""
 )
 
 enum class RiskLevel(val label: String, val emoji: String) {
@@ -92,83 +100,68 @@ class CheckinViewModel @Inject constructor(
     private val _myUserId = MutableStateFlow("")
     private val _partnerUserId = MutableStateFlow("")
     private val _isCheckingIn = MutableStateFlow(false)
-    private val _refreshTrigger = MutableStateFlow(0L)
+    private val _submitResult = MutableStateFlow<CheckinSubmitResult?>(null)
+    val uiState: StateFlow<CheckinUiState> = combine(_myUserId, _partnerUserId) { myId, partnerId ->
+        myId to partnerId
+    }.flatMapLatest { (myId, partnerId) ->
+        if (myId.isEmpty()) return@flatMapLatest flowOf(CheckinUiState())
+        combine(
+            checkinRepository.observeCheckIns(myId),
+            if (partnerId.isEmpty()) flowOf(emptyList()) else checkinRepository.observeCheckIns(partnerId),
+            _isCheckingIn,
+            _submitResult,
+            checkinRepository.syncErrors
+        ) { _, _, checkingIn, result, syncErrors ->
+            val todayCount = checkinRepository.getTodayCount(myId)
+            val lastCheckinTime = checkinRepository.getLastCheckinTime(myId)
+            val weekTotal = checkinRepository.getWeekCount(myId)
+            val streak = checkinRepository.getStreakDays(myId)
+            val weekAverage = calculateWeekAverage(weekTotal)
+            val interval = CheckinIntervalFormatter.sinceLastCheckin(
+                lastCheckinTime = lastCheckinTime,
+                now = System.currentTimeMillis()
+            )
+            val riskLevel = calculateRiskLevel(lastCheckinTime)
+            val pkStats = if (partnerId.isNotEmpty()) {
+                val myMonthCount = checkinRepository.getMonthCount(myId)
+                val partnerMonthCount = checkinRepository.getMonthCount(partnerId)
+                PKStats(myMonthCount, partnerMonthCount)
+            } else {
+                null
+            }
 
-    private val monthStart: Long
-        get() {
-            val cal = Calendar.getInstance()
-            cal.set(Calendar.DAY_OF_MONTH, 1)
-            cal.set(Calendar.HOUR_OF_DAY, 0)
-            cal.set(Calendar.MINUTE, 0)
-            cal.set(Calendar.SECOND, 0)
-            cal.set(Calendar.MILLISECOND, 0)
-            return cal.timeInMillis
+            CheckinUiState(
+                todayCount = todayCount,
+                lastInterval = interval,
+                riskLevel = riskLevel,
+                weeklyTotal = weekTotal,
+                weeklyAverage = weekAverage,
+                streak = streak,
+                isCheckingIn = checkingIn,
+                isPaired = partnerId.isNotEmpty(),
+                pkStats = pkStats,
+                feedback = when (result) {
+                    is CheckinSubmitResult.Saved -> if (result.cached) "打卡已记录" else "打卡已保存，正在重新加载记录"
+                    is CheckinSubmitResult.Failed -> result.reason.submitMessage
+                    null -> ""
+                },
+                feedbackIsError = result is CheckinSubmitResult.Failed,
+                syncMessage = when {
+                    syncErrors[myId] == CheckinFailure.CONFIGURATION || syncErrors[partnerId] == CheckinFailure.CONFIGURATION ->
+                        "当前版本无法连接同步服务，原配对和已有记录仍保留"
+                    syncErrors.containsKey(myId) -> "打卡记录同步暂时失败，保留已有记录并自动重试"
+                    syncErrors.containsKey(partnerId) -> "对方打卡同步暂时失败，保留已有记录并自动重试"
+                    else -> ""
+                }
+            )
         }
-
-    val uiState: StateFlow<CheckinUiState> = combine(
-        _myUserId,
-        _partnerUserId,
-        _isCheckingIn,
-        _refreshTrigger
-    ) { myId, partnerId, checkingIn, _ ->
-        if (myId.isEmpty()) return@combine CheckinUiState()
-
-        val todayCount = checkinRepository.getTodayCount(myId)
-        val lastCheckinTime = checkinRepository.getLastCheckinTime(myId)
-        val weekTotal = checkinRepository.getWeekCount(myId)
-        val streak = checkinRepository.getStreakDays(myId)
-        val weekAverage = calculateWeekAverage(weekTotal)
-        val interval = CheckinIntervalFormatter.sinceLastCheckin(
-            lastCheckinTime = lastCheckinTime,
-            now = System.currentTimeMillis()
-        )
-        val riskLevel = calculateRiskLevel(lastCheckinTime)
-        val pkStats = if (partnerId.isNotEmpty()) {
-            val myMonthCount = checkinRepository.getMonthCount(myId)
-            val partnerMonthCount = checkinRepository.getMonthCount(partnerId)
-            PKStats(myMonthCount, partnerMonthCount)
-        } else {
-            null
-        }
-
-        CheckinUiState(
-            todayCount = todayCount,
-            lastInterval = interval,
-            riskLevel = riskLevel,
-            weeklyTotal = weekTotal,
-            weeklyAverage = weekAverage,
-            streak = streak,
-            isCheckingIn = checkingIn,
-            isPaired = partnerId.isNotEmpty(),
-            pkStats = pkStats
-        )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), CheckinUiState())
 
     init {
-        val uid = supabaseService.getCachedDeviceId()
+        val uid = supabaseService.getDeviceId(context)
         Log.d(TAG, "deviceId=$uid")
         _myUserId.value = uid
         refreshPairingState()
-
-        viewModelScope.launch {
-            _myUserId.collect { id ->
-                if (id.isNotEmpty()) {
-                    checkinRepository.observeCheckIns(id, monthStart)
-                        .collect { _refreshTrigger.value = System.currentTimeMillis() }
-                }
-            }
-        }
-
-        viewModelScope.launch {
-            _partnerUserId.collect { id ->
-                if (id.isNotEmpty()) {
-                    checkinRepository.observeCheckIns(id, monthStart)
-                        .collect { _refreshTrigger.value = System.currentTimeMillis() }
-                } else {
-                    _refreshTrigger.value = System.currentTimeMillis()
-                }
-            }
-        }
     }
 
     fun refreshPairingState() {
@@ -213,15 +206,20 @@ class CheckinViewModel @Inject constructor(
 
     fun checkIn() {
         if (_isCheckingIn.value) return
+        _submitResult.value = null
         _isCheckingIn.value = true
         viewModelScope.launch {
             try {
-                val checkedIn = checkinRepository.submitCheckIn()
-                if (checkedIn) {
-                    sendPoopCheckinInteraction()
+                val result = checkinRepository.submitCheckIn()
+                _submitResult.value = result
+                if (result is CheckinSubmitResult.Saved) {
+                    viewModelScope.launch { sendPoopCheckinInteraction() }
                 }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
             } catch (e: Exception) {
                 Log.e(TAG, "checkIn failed", e)
+                _submitResult.value = CheckinSubmitResult.Failed(CheckinFailure.from(e))
             } finally {
                 _isCheckingIn.value = false
             }
@@ -240,6 +238,8 @@ class CheckinViewModel @Inject constructor(
                 type = InteractionType.POOP_CHECKIN,
                 targetStatusTime = System.currentTimeMillis()
             )
+        } catch (cancelled: CancellationException) {
+            throw cancelled
         } catch (e: Exception) {
             Log.e(TAG, "poop checkin interaction failed", e)
         }
@@ -253,7 +253,6 @@ class CheckinViewModel @Inject constructor(
             apply()
         }
         _partnerUserId.value = ""
-        _refreshTrigger.value = System.currentTimeMillis()
     }
 
     private fun calculateRiskLevel(lastCheckinTime: Long?): RiskLevel {
@@ -267,17 +266,7 @@ class CheckinViewModel @Inject constructor(
     }
 
     private fun calculateWeekAverage(weekTotal: Int): Float {
-        val dayOfWeek = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
-        val daysPassed = when (dayOfWeek) {
-            Calendar.SUNDAY -> 7
-            Calendar.MONDAY -> 1
-            Calendar.TUESDAY -> 2
-            Calendar.WEDNESDAY -> 3
-            Calendar.THURSDAY -> 4
-            Calendar.FRIDAY -> 5
-            Calendar.SATURDAY -> 6
-            else -> 1
-        }
+        val daysPassed = LocalDate.now().dayOfWeek.value
         if (daysPassed == 0) return 0f
         return kotlin.math.round(weekTotal.toFloat() / daysPassed * 10) / 10f
     }
